@@ -1,7 +1,6 @@
 package user
 
 import (
-	"time"
 	usermodel "user_management/modules/user/model"
 
 	"gorm.io/gorm"
@@ -19,7 +18,6 @@ func (r *UserRepository) Create(user *usermodel.UserCreate) error {
 	if err := r.db.Create(user).Error; err != nil {
 		return err
 	}
-	r.db.Model(user).Update("CreatedAt", time.Now())
 	return nil
 }
 
@@ -27,7 +25,6 @@ func (r *UserRepository) Update(cond map[string]interface{}, userUpdate *usermod
 	if err := r.db.Where(cond).Updates(userUpdate).Error; err != nil {
 		return err
 	}
-	r.db.Model(userUpdate).Update("UpdatedAt", time.Now())
 	return nil
 }
 
@@ -36,7 +33,6 @@ func (r *UserRepository) Delete(cond map[string]interface{}) (*usermodel.User, e
 	if err := r.db.Where(cond).Updates("status = 0").Error; err != nil {
 		return nil, err
 	}
-	r.db.Model(&user).Update("DeletedAt", time.Now())
 	return user, nil
 }
 
