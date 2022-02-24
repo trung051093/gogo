@@ -5,9 +5,9 @@ import (
 )
 
 type UserCreate struct {
-	FirstName   string    `json:"firstName" gorm:"column:first_name;"`
-	LastName    string    `json:"lastName" gorm:"column:last_name;"`
-	Email       string    `json:"email" gorm:"column:email;"`
+	FirstName   string    `validate:"required" json:"firstName" gorm:"column:first_name;"`
+	LastName    string    `validate:"required" json:"lastName" gorm:"column:last_name;"`
+	Email       string    `validate:"required,email" json:"email" gorm:"column:email;"`
 	Address     string    `json:"address" gorm:"column:address;"`
 	Company     string    `json:"company" gorm:"column:company;"`
 	BirthDate   time.Time `json:"birthDate" gorm:"column:birth_date;"`

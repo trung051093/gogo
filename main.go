@@ -9,6 +9,7 @@ import (
 	usermodel "user_management/modules/user/model"
 
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -32,15 +33,20 @@ func main() {
 	log.Println(db)
 
 	db = db.Debug()
+	validate := validator.New()
 
 	db.AutoMigrate(&usermodel.User{})
 
-	appCtx := component.NewAppContext(db)
+	appCtx := component.NewAppContext(db, validate)
 
 	router := gin.Default()
 	v1 := router.Group("/v1")
 	{
 		v1.POST("/user", user.CreateUserHandler(appCtx))
+		v1.PATCH("/user/:id", user.UpdateUserHandler(appCtx))
+		v1.DELETE("/user", user.DeleteUserHandler(appCtx))
+		v1.GET("/user/:id", user.GetUserHandler(appCtx))
+		v1.GET("/users", user.ListUserHandler(appCtx))
 	}
 	router.Run(fmt.Sprintf(":%d", config.API_PORT)) // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
 }
