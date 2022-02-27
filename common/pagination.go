@@ -12,7 +12,7 @@ func (p *Pagination) Paginate() error {
 		p.Page = 1
 	}
 
-	if p.Limit <= 0 || p.Limit >= 100 {
+	if p.Limit <= 0 || p.Limit >= 1001 {
 		p.Limit = 10
 	}
 

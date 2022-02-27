@@ -16,13 +16,13 @@ type Writer interface {
 }
 
 //Repository interface
-type IUserRepository interface {
+type UserRepository interface {
 	Reader
 	Writer
 }
 
 //Service interface
-type IUserService interface {
+type UserService interface {
 	GetUser(id uint) (*usermodel.User, error)
 	SearchUsers(cond map[string]interface{}) ([]usermodel.User, error)
 	CreateUser(user *usermodel.User) error

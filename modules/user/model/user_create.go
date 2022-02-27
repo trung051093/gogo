@@ -12,6 +12,7 @@ type UserCreate struct {
 	Company     string    `json:"company" gorm:"column:company;"`
 	BirthDate   time.Time `json:"birthDate" gorm:"column:birth_date;"`
 	PhoneNumber string    `json:"phoneNumber" gorm:"column:phone_number;"`
+	Gender      string    `json:"gender" gorm:"column:gender;"`
 }
 
 func (UserCreate) TableName() string { return User{}.TableName() }

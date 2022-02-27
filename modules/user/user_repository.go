@@ -7,36 +7,36 @@ import (
 	"gorm.io/gorm"
 )
 
-type UserRepository struct {
+type userRepository struct {
 	db *gorm.DB
 }
 
-func NewUserRepository(db *gorm.DB) *UserRepository {
-	return &UserRepository{db: db}
+func NewUserRepository(db *gorm.DB) *userRepository {
+	return &userRepository{db: db}
 }
 
-func (r *UserRepository) Create(user *usermodel.UserCreate) error {
+func (r *userRepository) Create(user *usermodel.UserCreate) error {
 	if err := r.db.Create(&user).Error; err != nil {
 		return err
 	}
 	return nil
 }
 
-func (r *UserRepository) Update(cond map[string]interface{}, userUpdate *usermodel.UserUpdate) error {
+func (r *userRepository) Update(cond map[string]interface{}, userUpdate *usermodel.UserUpdate) error {
 	if err := r.db.Where(cond).Updates(&userUpdate).Error; err != nil {
 		return err
 	}
 	return nil
 }
 
-func (r *UserRepository) Delete(cond map[string]interface{}) error {
+func (r *userRepository) Delete(cond map[string]interface{}) error {
 	if err := r.db.Where(cond).Delete(&usermodel.User{}).Error; err != nil {
 		return err
 	}
 	return nil
 }
 
-func (r *UserRepository) Get(id uint) (*usermodel.User, error) {
+func (r *userRepository) Get(id uint) (*usermodel.User, error) {
 	var user *usermodel.User
 
 	if err := r.db.Where("id = ?", id).First(&user).Error; err != nil {
@@ -46,7 +46,7 @@ func (r *UserRepository) Get(id uint) (*usermodel.User, error) {
 	return user, nil
 }
 
-func (r *UserRepository) Search(cond map[string]interface{}, paging *common.Pagination) ([]usermodel.User, error) {
+func (r *userRepository) Search(cond map[string]interface{}, paging *common.Pagination) ([]usermodel.User, error) {
 	var users []usermodel.User
 
 	if err := r.db.Model(&usermodel.User{}).Where(cond).Count(&paging.Total).Error; err != nil {

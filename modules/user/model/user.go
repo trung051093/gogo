@@ -13,6 +13,7 @@ type User struct {
 	Address     string    `json:"address" gorm:"column:address;"`
 	Company     string    `json:"company" gorm:"column:company;"`
 	BirthDate   time.Time `json:"birthDate" gorm:"column:birth_date;"`
+	Gender      string    `json:"gender" gorm:"column:gender;"`
 	PhoneNumber string    `json:"phoneNumber" gorm:"column:phone_number;"`
 }
 

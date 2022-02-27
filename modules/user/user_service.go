@@ -5,27 +5,27 @@ import (
 	usermodel "user_management/modules/user/model"
 )
 
-type UserService struct {
-	repo *UserRepository
+type userService struct {
+	repo *userRepository
 }
 
-func NewUserService(repo *UserRepository) *UserService {
-	return &UserService{repo: repo}
+func NewUserService(repo *userRepository) *userService {
+	return &userService{repo: repo}
 }
 
-func (s *UserService) SearchUsers(cond map[string]interface{}, p *common.Pagination) ([]usermodel.User, error) {
+func (s *userService) SearchUsers(cond map[string]interface{}, p *common.Pagination) ([]usermodel.User, error) {
 	return s.repo.Search(cond, p)
 }
 
-func (s *UserService) GetUser(id uint) (*usermodel.User, error) {
+func (s *userService) GetUser(id uint) (*usermodel.User, error) {
 	return s.repo.Get(id)
 }
 
-func (s *UserService) CreateUser(newUser *usermodel.UserCreate) error {
+func (s *userService) CreateUser(newUser *usermodel.UserCreate) error {
 	return s.repo.Create(newUser)
 }
 
-func (s *UserService) UpdateUser(id uint, userUpdate *usermodel.UserUpdate) error {
+func (s *userService) UpdateUser(id uint, userUpdate *usermodel.UserUpdate) error {
 	user, err := s.GetUser(id)
 	if user == nil {
 		return common.ErrNotFound
@@ -36,7 +36,7 @@ func (s *UserService) UpdateUser(id uint, userUpdate *usermodel.UserUpdate) erro
 	return s.repo.Update(map[string]interface{}{"id": id}, userUpdate)
 }
 
-func (s *UserService) DeleteUser(id uint) error {
+func (s *userService) DeleteUser(id uint) error {
 	user, err := s.GetUser(id)
 	if user == nil {
 		return common.ErrNotFound

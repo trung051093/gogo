@@ -44,7 +44,7 @@ func main() {
 	{
 		v1.POST("/user", user.CreateUserHandler(appCtx))
 		v1.PATCH("/user/:id", user.UpdateUserHandler(appCtx))
-		v1.DELETE("/user", user.DeleteUserHandler(appCtx))
+		v1.DELETE("/user/:id", user.DeleteUserHandler(appCtx))
 		v1.GET("/user/:id", user.GetUserHandler(appCtx))
 		v1.GET("/users", user.ListUserHandler(appCtx))
 	}
