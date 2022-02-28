@@ -8,6 +8,7 @@ import (
 	"user_management/modules/user"
 	usermodel "user_management/modules/user/model"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 	"gorm.io/driver/postgres"
@@ -40,6 +41,9 @@ func main() {
 	appCtx := component.NewAppContext(db, validate)
 
 	router := gin.Default()
+	corsConfig := cors.DefaultConfig()
+	corsConfig.AllowAllOrigins = true
+	router.Use(cors.New(corsConfig))
 	v1 := router.Group("/v1")
 	{
 		v1.POST("/user", user.CreateUserHandler(appCtx))
