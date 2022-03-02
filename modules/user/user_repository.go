@@ -46,14 +46,14 @@ func (r *userRepository) Get(id uint) (*usermodel.User, error) {
 	return user, nil
 }
 
-func (r *userRepository) Search(cond map[string]interface{}, paging *common.Pagination) ([]usermodel.User, error) {
+func (r *userRepository) Search(cond map[string]interface{}, filter *usermodel.UserFilter, paging *common.Pagination) ([]usermodel.User, error) {
 	var users []usermodel.User
 
 	if err := r.db.Model(&usermodel.User{}).Where(cond).Count(&paging.Total).Error; err != nil {
 		return nil, err
 	}
 
-	if err := r.db.Limit(paging.Limit).Offset(paging.Offset).Where(cond).Find(&users).Error; err != nil {
+	if err := r.db.Model(&usermodel.User{}).Limit(paging.Limit).Offset(paging.Offset).Where(cond).Order(filter.Order).Select(filter.Fields).Find(&users).Error; err != nil {
 		return nil, err
 	}
 

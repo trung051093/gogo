@@ -3,6 +3,7 @@ package user
 import (
 	"net/http"
 	"strconv"
+	"strings"
 	"user_management/common"
 	component "user_management/components"
 	usermodel "user_management/modules/user/model"
@@ -100,7 +101,18 @@ func GetUserHandler(appCtx component.AppContext) func(*gin.Context) {
 
 func ListUserHandler(appCtx component.AppContext) func(*gin.Context) {
 	return func(ginCtx *gin.Context) {
+		var filter usermodel.UserFilter
 		var paging common.Pagination
+		filter.Order = ginCtx.Query("Order")
+
+		if fieldQuery := ginCtx.Query("Fields"); fieldQuery != "" {
+			filter.Fields = strings.Split(fieldQuery, ",")
+		}
+
+		if err := filter.Process(); err != nil {
+			ginCtx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
 
 		if err := ginCtx.ShouldBind(&paging); err != nil {
 			ginCtx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -115,7 +127,7 @@ func ListUserHandler(appCtx component.AppContext) func(*gin.Context) {
 		userRepo := NewUserRepository(appCtx.GetMainDBConnection())
 		userService := NewUserService(userRepo)
 
-		data, err := userService.SearchUsers(map[string]interface{}{}, &paging)
+		data, err := userService.SearchUsers(map[string]interface{}{}, &filter, &paging)
 
 		if err != nil {
 			ginCtx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})

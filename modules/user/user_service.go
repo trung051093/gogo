@@ -13,8 +13,8 @@ func NewUserService(repo *userRepository) *userService {
 	return &userService{repo: repo}
 }
 
-func (s *userService) SearchUsers(cond map[string]interface{}, p *common.Pagination) ([]usermodel.User, error) {
-	return s.repo.Search(cond, p)
+func (s *userService) SearchUsers(cond map[string]interface{}, f *usermodel.UserFilter, p *common.Pagination) ([]usermodel.User, error) {
+	return s.repo.Search(cond, f, p)
 }
 
 func (s *userService) GetUser(id uint) (*usermodel.User, error) {

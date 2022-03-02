@@ -1,10 +1,10 @@
 package common
 
 type Pagination struct {
-	Page   int
-	Limit  int
-	Total  int64
-	Offset int
+	Page   int   `json:"page"`
+	Limit  int   `json:"limit"`
+	Total  int64 `json:"total"`
+	Offset int   `json:"offset"`
 }
 
 func (p *Pagination) Paginate() error {
