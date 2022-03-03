@@ -15,11 +15,11 @@ func NewUserRepository(db *gorm.DB) *userRepository {
 	return &userRepository{db: db}
 }
 
-func (r *userRepository) Create(user *usermodel.UserCreate) error {
+func (r *userRepository) Create(user *usermodel.UserCreate) (int, error) {
 	if err := r.db.Create(&user).Error; err != nil {
-		return common.ErrorCannotCreateEntity(usermodel.EntityName, err)
+		return -1, common.ErrorCannotCreateEntity(usermodel.EntityName, err)
 	}
-	return nil
+	return user.Id, nil
 }
 
 func (r *userRepository) Update(cond map[string]interface{}, userUpdate *usermodel.UserUpdate) error {

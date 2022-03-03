@@ -21,7 +21,7 @@ func (s *userService) GetUser(id uint) (*usermodel.User, error) {
 	return s.repo.Get(id)
 }
 
-func (s *userService) CreateUser(newUser *usermodel.UserCreate) error {
+func (s *userService) CreateUser(newUser *usermodel.UserCreate) (int, error) {
 	return s.repo.Create(newUser)
 }
 

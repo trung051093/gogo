@@ -8,6 +8,7 @@ type UserFilter struct {
 func (u *UserFilter) Process() error {
 	if len(u.Fields) == 0 {
 		u.Fields = []string{
+			UserField["id"],
 			UserField["firstName"],
 			UserField["lastName"],
 			UserField["email"],

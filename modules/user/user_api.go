@@ -31,11 +31,13 @@ func CreateUserHandler(appCtx component.AppContext) func(*gin.Context) {
 		userRepo := NewUserRepository(appCtx.GetMainDBConnection())
 		userService := NewUserService(userRepo)
 
-		if err := userService.CreateUser(&newData); err != nil {
+		userId, err := userService.CreateUser(&newData)
+
+		if err != nil {
 			panic(err)
 		}
 
-		ginCtx.JSON(http.StatusOK, common.SimpleSuccessResponse(true))
+		ginCtx.JSON(http.StatusOK, common.SimpleSuccessResponse(userId))
 	}
 }
 

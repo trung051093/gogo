@@ -20,6 +20,7 @@ type User struct {
 }
 
 var UserField = map[string]string{
+	"id":          "id",
 	"firstName":   "first_name",
 	"lastName":    "last_name",
 	"email":       "email",
