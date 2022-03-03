@@ -32,15 +32,13 @@ func main() {
 		return
 	}
 
-	log.Println(db)
-
 	db = db.Debug()
+
 	validate := validator.New()
 
 	db.AutoMigrate(&usermodel.User{})
 
 	appCtx := component.NewAppContext(db, validate)
-	log.Println(appCtx)
 
 	router := gin.Default()
 	corsConfig := cors.DefaultConfig()
