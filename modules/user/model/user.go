@@ -5,9 +5,11 @@ import (
 	"user_management/common"
 )
 
+const EntityName = "user"
+
 type User struct {
 	common.SQLModel
-	FirstName   *string    `json:"firstName" gorm:"column:first_name;"`
+	FirstName   *string    `json:"firstName,omitempty" gorm:"column:first_name;"`
 	LastName    *string    `json:"lastName" gorm:"column:last_name;"`
 	Email       *string    `json:"email" gorm:"column:email;"`
 	Address     *string    `json:"address" gorm:"column:address;"`

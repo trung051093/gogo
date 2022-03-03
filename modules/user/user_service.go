@@ -27,10 +27,7 @@ func (s *userService) CreateUser(newUser *usermodel.UserCreate) error {
 
 func (s *userService) UpdateUser(id uint, userUpdate *usermodel.UserUpdate) error {
 	user, err := s.GetUser(id)
-	if user == nil {
-		return common.ErrNotFound
-	}
-	if err != nil {
+	if user == nil || err != nil {
 		return err
 	}
 	return s.repo.Update(map[string]interface{}{"id": id}, userUpdate)
@@ -38,10 +35,7 @@ func (s *userService) UpdateUser(id uint, userUpdate *usermodel.UserUpdate) erro
 
 func (s *userService) DeleteUser(id uint) error {
 	user, err := s.GetUser(id)
-	if user == nil {
-		return common.ErrNotFound
-	}
-	if err != nil {
+	if user == nil || err != nil {
 		return err
 	}
 	return s.repo.Delete(map[string]interface{}{"id": id})

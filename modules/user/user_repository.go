@@ -17,21 +17,21 @@ func NewUserRepository(db *gorm.DB) *userRepository {
 
 func (r *userRepository) Create(user *usermodel.UserCreate) error {
 	if err := r.db.Create(&user).Error; err != nil {
-		return err
+		return common.ErrorCannotCreateEntity(usermodel.EntityName, err)
 	}
 	return nil
 }
 
 func (r *userRepository) Update(cond map[string]interface{}, userUpdate *usermodel.UserUpdate) error {
 	if err := r.db.Where(cond).Updates(&userUpdate).Error; err != nil {
-		return err
+		return common.ErrorCannotUpdateEntity(usermodel.EntityName, err)
 	}
 	return nil
 }
 
 func (r *userRepository) Delete(cond map[string]interface{}) error {
 	if err := r.db.Where(cond).Delete(&usermodel.User{}).Error; err != nil {
-		return err
+		return common.ErrorCannotDeleteEntity(usermodel.EntityName, err)
 	}
 	return nil
 }
@@ -40,7 +40,7 @@ func (r *userRepository) Get(id uint) (*usermodel.User, error) {
 	var user *usermodel.User
 
 	if err := r.db.Where("id = ?", id).First(&user).Error; err != nil {
-		return nil, err
+		return nil, common.ErrorCannotFoundEntity(usermodel.EntityName, err)
 	}
 
 	return user, nil
@@ -50,11 +50,11 @@ func (r *userRepository) Search(cond map[string]interface{}, filter *usermodel.U
 	var users []usermodel.User
 
 	if err := r.db.Model(&usermodel.User{}).Where(cond).Count(&paging.Total).Error; err != nil {
-		return nil, err
+		return nil, common.ErrorCannotListEntity(usermodel.EntityName, err)
 	}
 
 	if err := r.db.Model(&usermodel.User{}).Limit(paging.Limit).Offset(paging.Offset).Where(cond).Order(filter.Order).Select(filter.Fields).Find(&users).Error; err != nil {
-		return nil, err
+		return nil, common.ErrorCannotListEntity(usermodel.EntityName, err)
 	}
 
 	return users, nil

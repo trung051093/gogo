@@ -5,6 +5,7 @@ import (
 	"log"
 	component "user_management/components"
 	"user_management/config"
+	"user_management/middleware"
 	"user_management/modules/user"
 	usermodel "user_management/modules/user/model"
 
@@ -39,11 +40,13 @@ func main() {
 	db.AutoMigrate(&usermodel.User{})
 
 	appCtx := component.NewAppContext(db, validate)
+	log.Println(appCtx)
 
 	router := gin.Default()
 	corsConfig := cors.DefaultConfig()
 	corsConfig.AllowAllOrigins = true
 	router.Use(cors.New(corsConfig))
+	router.Use(middleware.ErrorHandler(appCtx))
 	v1 := router.Group("/v1")
 	{
 		v1.POST("/user", user.CreateUserHandler(appCtx))

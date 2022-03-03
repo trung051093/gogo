@@ -20,25 +20,22 @@ func CreateUserHandler(appCtx component.AppContext) func(*gin.Context) {
 		var newData usermodel.UserCreate
 
 		if err := ginCtx.ShouldBind(&newData); err != nil {
-			ginCtx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-			return
+			panic(common.ErrorInvalidRequest(usermodel.EntityName, err))
 		}
 
 		validate := appCtx.GetValidator()
 		if err := validate.Struct(&newData); err != nil {
-			ginCtx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-			return
+			panic(common.ErrorInvalidRequest(usermodel.EntityName, err))
 		}
 
 		userRepo := NewUserRepository(appCtx.GetMainDBConnection())
 		userService := NewUserService(userRepo)
 
 		if err := userService.CreateUser(&newData); err != nil {
-			ginCtx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-			return
+			panic(err)
 		}
 
-		ginCtx.JSON(http.StatusOK, gin.H{"data": true})
+		ginCtx.JSON(http.StatusOK, common.SimpleSuccessResponse(true))
 	}
 }
 
@@ -49,30 +46,26 @@ func UpdateUserHandler(appCtx component.AppContext) func(*gin.Context) {
 		id, err := strconv.Atoi(ginCtx.Param("id"))
 
 		if err != nil {
-			ginCtx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-			return
+			panic(common.ErrorInvalidRequest(usermodel.EntityName, err))
 		}
 
 		if err := ginCtx.ShouldBind(&updateData); err != nil {
-			ginCtx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-			return
+			panic(common.ErrorInvalidRequest(usermodel.EntityName, err))
 		}
 
 		validate := appCtx.GetValidator()
 		if err := validate.Struct(&updateData); err != nil {
-			ginCtx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-			return
+			panic(common.ErrorInvalidRequest(usermodel.EntityName, err))
 		}
 
 		userRepo := NewUserRepository(appCtx.GetMainDBConnection())
 		userService := NewUserService(userRepo)
 
 		if err := userService.UpdateUser(uint(id), &updateData); err != nil {
-			ginCtx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-			return
+			panic(err)
 		}
 
-		ginCtx.JSON(http.StatusOK, gin.H{"data": true})
+		ginCtx.JSON(http.StatusOK, common.SimpleSuccessResponse(true))
 	}
 }
 
@@ -81,8 +74,7 @@ func GetUserHandler(appCtx component.AppContext) func(*gin.Context) {
 		id, err := strconv.Atoi(ginCtx.Param("id"))
 
 		if err != nil {
-			ginCtx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-			return
+			panic(common.ErrorInvalidRequest(usermodel.EntityName, err))
 		}
 
 		userRepo := NewUserRepository(appCtx.GetMainDBConnection())
@@ -91,11 +83,10 @@ func GetUserHandler(appCtx component.AppContext) func(*gin.Context) {
 		user, err := userService.GetUser(uint(id))
 
 		if err != nil {
-			ginCtx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-			return
+			panic(err)
 		}
 
-		ginCtx.JSON(http.StatusOK, gin.H{"data": user})
+		ginCtx.JSON(http.StatusOK, common.SimpleSuccessResponse(user))
 	}
 }
 
@@ -110,18 +101,15 @@ func ListUserHandler(appCtx component.AppContext) func(*gin.Context) {
 		}
 
 		if err := filter.Process(); err != nil {
-			ginCtx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-			return
+			panic(common.ErrorInvalidRequest(usermodel.EntityName, err))
 		}
 
 		if err := ginCtx.ShouldBind(&paging); err != nil {
-			ginCtx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-			return
+			panic(common.ErrorInvalidRequest(usermodel.EntityName, err))
 		}
 
 		if err := paging.Paginate(); err != nil {
-			ginCtx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-			return
+			panic(common.ErrorInvalidRequest(usermodel.EntityName, err))
 		}
 
 		userRepo := NewUserRepository(appCtx.GetMainDBConnection())
@@ -130,11 +118,10 @@ func ListUserHandler(appCtx component.AppContext) func(*gin.Context) {
 		data, err := userService.SearchUsers(map[string]interface{}{}, &filter, &paging)
 
 		if err != nil {
-			ginCtx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-			return
+			panic(err)
 		}
 
-		ginCtx.JSON(http.StatusOK, gin.H{"data": data, "pagination": paging})
+		ginCtx.JSON(http.StatusOK, common.SuccessResponse(data, paging, nil))
 	}
 }
 
