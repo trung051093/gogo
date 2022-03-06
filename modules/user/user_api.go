@@ -96,17 +96,26 @@ func ListUserHandler(appCtx component.AppContext) func(*gin.Context) {
 	return func(ginCtx *gin.Context) {
 		var filter usermodel.UserFilter
 		var paging common.Pagination
-		filter.Order = ginCtx.Query("Order")
 
-		if fieldQuery := ginCtx.Query("Fields"); fieldQuery != "" {
+		filter.Order = ginCtx.Query("order")
+
+		if fieldQuery := ginCtx.Query("fields"); fieldQuery != "" {
 			filter.Fields = strings.Split(fieldQuery, ",")
 		}
 
-		if err := filter.Process(); err != nil {
+		if pageQuery, err := strconv.Atoi(ginCtx.Query("page")); err != nil {
 			panic(common.ErrorInvalidRequest(usermodel.EntityName, err))
+		} else {
+			paging.Page = pageQuery
 		}
 
-		if err := ginCtx.ShouldBind(&paging); err != nil {
+		if limitQuery, err := strconv.Atoi(ginCtx.Query("limit")); err != nil {
+			panic(common.ErrorInvalidRequest(usermodel.EntityName, err))
+		} else {
+			paging.Limit = limitQuery
+		}
+
+		if err := filter.Process(); err != nil {
 			panic(common.ErrorInvalidRequest(usermodel.EntityName, err))
 		}
 
@@ -132,18 +141,16 @@ func DeleteUserHandler(appCtx component.AppContext) func(*gin.Context) {
 		id, err := strconv.Atoi(ginCtx.Param("id"))
 
 		if err != nil {
-			ginCtx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-			return
+			panic(common.ErrorInvalidRequest(usermodel.EntityName, err))
 		}
 
 		userRepo := NewUserRepository(appCtx.GetMainDBConnection())
 		userService := NewUserService(userRepo)
 
 		if err := userService.DeleteUser(uint(id)); err != nil {
-			ginCtx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-			return
+			panic(common.ErrorCannotDeleteEntity(usermodel.EntityName, err))
 		}
 
-		ginCtx.JSON(http.StatusOK, gin.H{"data": true})
+		ginCtx.JSON(http.StatusOK, common.SimpleSuccessResponse(true))
 	}
 }
