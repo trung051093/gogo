@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"log"
 	component "user_management/components"
-	"user_management/config"
 	"user_management/middleware"
+	"user_management/modules/auth"
 	"user_management/modules/user"
 	usermodel "user_management/modules/user/model"
 
@@ -17,14 +17,16 @@ import (
 )
 
 func main() {
+	var config = &component.Config{}
+	component.GetConfig(config)
 	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%d sslmode=%s TimeZone=%s",
-		config.DB_HOST,
-		config.DB_USER,
-		config.DB_PASSWORD,
-		config.DB_DATABASE,
-		config.DB_PORT,
-		config.SSL_MODE,
-		config.TIME_ZONE)
+		config.Database.Host,
+		config.Database.Username,
+		config.Database.Password,
+		config.Database.Name,
+		config.Database.Port,
+		config.Database.SSLMode,
+		config.Database.TimeZone)
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 
 	if err != nil {
@@ -38,7 +40,7 @@ func main() {
 
 	db.AutoMigrate(&usermodel.User{})
 
-	appCtx := component.NewAppContext(db, validate)
+	appCtx := component.NewAppContext(db, validate, config)
 
 	router := gin.Default()
 	corsConfig := cors.DefaultConfig()
@@ -51,7 +53,10 @@ func main() {
 		v1.PATCH("/user/:id", user.UpdateUserHandler(appCtx))
 		v1.DELETE("/user/:id", user.DeleteUserHandler(appCtx))
 		v1.GET("/user/:id", user.GetUserHandler(appCtx))
-		v1.GET("/users", user.ListUserHandler(appCtx))
+		v1.GET("/users", middleware.JWTRequireHandler(appCtx), user.ListUserHandler(appCtx))
+
+		v1.POST("/auth/register", auth.RegisterUserHandler(appCtx))
+		v1.POST("/auth/login", auth.LoginUserHandler(appCtx))
 	}
-	router.Run(fmt.Sprintf(":%d", config.API_PORT)) // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
+	router.Run(fmt.Sprintf(":%d", config.Server.Port)) // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
 }

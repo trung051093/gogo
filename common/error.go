@@ -159,3 +159,11 @@ func ErrorEntityDeleted(entity string, err error) *AppError {
 		fmt.Sprintf("%s_DELETED", strings.ToUpper(entity)),
 	)
 }
+
+func ErrorUnauthorized() *AppError {
+	return NewUnauthorized(
+		errors.New("Unauthorized"),
+		fmt.Sprintf("Unauthorized"),
+		fmt.Sprintf("UNAUTHORIZED"),
+	)
+}

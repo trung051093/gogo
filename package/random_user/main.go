@@ -1,9 +1,10 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
-	"user_management/config"
+	component "user_management/components"
 	usermodel "user_management/modules/user/model"
 
 	"user_management/modules/user"
@@ -13,14 +14,16 @@ import (
 )
 
 func main() {
+	var config = &component.Config{}
+	component.GetConfig(config)
 	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%d sslmode=%s TimeZone=%s",
-		config.DB_HOST,
-		config.DB_USER,
-		config.DB_PASSWORD,
-		config.DB_DATABASE,
-		config.DB_PORT,
-		config.SSL_MODE,
-		config.TIME_ZONE)
+		config.Database.Host,
+		config.Database.Username,
+		config.Database.Password,
+		config.Database.Name,
+		config.Database.Port,
+		config.Database.SSLMode,
+		config.Database.TimeZone)
 
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 
@@ -49,9 +52,11 @@ func main() {
 		return
 	}
 
+	ctx := context.Background()
+
 	for _, user := range users {
 		fmt.Println(user.Name.Title + " : " + user.Name.First + " " + user.Name.Last)
-		repository.Create(&usermodel.UserCreate{
+		repository.Create(ctx, &usermodel.UserCreate{
 			FirstName:   user.Name.First,
 			LastName:    user.Name.Last,
 			Email:       user.Email,

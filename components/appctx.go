@@ -6,23 +6,33 @@ import (
 )
 
 type AppContext interface {
-	GetMainDBConnection() (db *gorm.DB)
+	GetMainDBConnection() *gorm.DB
 	GetValidator() *validator.Validate
+	GetConfig() *Config
 }
 
 type appContext struct {
+	config   *Config
 	db       *gorm.DB
 	validate *validator.Validate
 }
 
-func NewAppContext(db *gorm.DB, validate *validator.Validate) *appContext {
-	return &appContext{db: db, validate: validate}
+func NewAppContext(
+	db *gorm.DB,
+	validate *validator.Validate,
+	config *Config,
+) *appContext {
+	return &appContext{db: db, validate: validate, config: config}
 }
 
-func (appCtx *appContext) GetMainDBConnection() (db *gorm.DB) {
+func (appCtx *appContext) GetMainDBConnection() *gorm.DB {
 	return appCtx.db
 }
 
 func (appCtx *appContext) GetValidator() *validator.Validate {
 	return appCtx.validate
+}
+
+func (appCtx *appContext) GetConfig() *Config {
+	return appCtx.config
 }

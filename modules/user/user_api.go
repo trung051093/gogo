@@ -31,7 +31,7 @@ func CreateUserHandler(appCtx component.AppContext) func(*gin.Context) {
 		userRepo := NewUserRepository(appCtx.GetMainDBConnection())
 		userService := NewUserService(userRepo)
 
-		userId, err := userService.CreateUser(&newData)
+		userId, err := userService.CreateUser(ginCtx.Request.Context(), &newData)
 
 		if err != nil {
 			panic(err)
@@ -63,7 +63,7 @@ func UpdateUserHandler(appCtx component.AppContext) func(*gin.Context) {
 		userRepo := NewUserRepository(appCtx.GetMainDBConnection())
 		userService := NewUserService(userRepo)
 
-		if err := userService.UpdateUser(uint(id), &updateData); err != nil {
+		if err := userService.UpdateUser(ginCtx.Request.Context(), uint(id), &updateData); err != nil {
 			panic(err)
 		}
 
@@ -82,7 +82,7 @@ func GetUserHandler(appCtx component.AppContext) func(*gin.Context) {
 		userRepo := NewUserRepository(appCtx.GetMainDBConnection())
 		userService := NewUserService(userRepo)
 
-		user, err := userService.GetUser(uint(id))
+		user, err := userService.GetUser(ginCtx.Request.Context(), uint(id))
 
 		if err != nil {
 			panic(err)
@@ -99,24 +99,24 @@ func ListUserHandler(appCtx component.AppContext) func(*gin.Context) {
 
 		filter.Order = ginCtx.Query("order")
 
+		if err := filter.Process(); err != nil {
+			panic(common.ErrorInvalidRequest(usermodel.EntityName, err))
+		}
+
 		if fieldQuery := ginCtx.Query("fields"); fieldQuery != "" {
 			filter.Fields = strings.Split(fieldQuery, ",")
 		}
 
 		if pageQuery, err := strconv.Atoi(ginCtx.Query("page")); err != nil {
-			panic(common.ErrorInvalidRequest(usermodel.EntityName, err))
+			paging.Page = common.DefaultPage
 		} else {
 			paging.Page = pageQuery
 		}
 
 		if limitQuery, err := strconv.Atoi(ginCtx.Query("limit")); err != nil {
-			panic(common.ErrorInvalidRequest(usermodel.EntityName, err))
+			paging.Limit = common.DefaultLimit
 		} else {
 			paging.Limit = limitQuery
-		}
-
-		if err := filter.Process(); err != nil {
-			panic(common.ErrorInvalidRequest(usermodel.EntityName, err))
 		}
 
 		if err := paging.Paginate(); err != nil {
@@ -126,7 +126,7 @@ func ListUserHandler(appCtx component.AppContext) func(*gin.Context) {
 		userRepo := NewUserRepository(appCtx.GetMainDBConnection())
 		userService := NewUserService(userRepo)
 
-		data, err := userService.SearchUsers(map[string]interface{}{}, &filter, &paging)
+		data, err := userService.SearchUsers(ginCtx.Request.Context(), map[string]interface{}{}, &filter, &paging)
 
 		if err != nil {
 			panic(err)
@@ -147,7 +147,7 @@ func DeleteUserHandler(appCtx component.AppContext) func(*gin.Context) {
 		userRepo := NewUserRepository(appCtx.GetMainDBConnection())
 		userService := NewUserService(userRepo)
 
-		if err := userService.DeleteUser(uint(id)); err != nil {
+		if err := userService.DeleteUser(ginCtx.Request.Context(), uint(id)); err != nil {
 			panic(common.ErrorCannotDeleteEntity(usermodel.EntityName, err))
 		}
 
