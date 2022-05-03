@@ -1,7 +1,7 @@
 package middleware
 
 import (
-	"net/http"
+	"errors"
 	"strings"
 	"user_management/common"
 	component "user_management/components"
@@ -13,23 +13,25 @@ import (
 func JWTRequireHandler(appCtx component.AppContext) gin.HandlerFunc {
 	return func(ginCtx *gin.Context) {
 		auth := ginCtx.Request.Header.Get("Authorization")
-
+		unauthorizedError := common.NewUnauthorized(
+			errors.New("Unauthorized !!!"),
+			"Unauthorized",
+			"Unauthorized",
+		)
 		if auth == "" {
-			ginCtx.String(http.StatusForbidden, "No Authorization header provided")
-			ginCtx.Abort()
-			return
+			ginCtx.AbortWithStatusJSON(unauthorizedError.StatusCode, unauthorizedError)
+			panic(unauthorizedError)
 		}
 		token := strings.TrimPrefix(auth, "Bearer ")
 		if token == auth {
-			ginCtx.String(http.StatusForbidden, "Could not find bearer token in Authorization header")
-			ginCtx.Abort()
-			return
+			ginCtx.AbortWithStatusJSON(unauthorizedError.StatusCode, unauthorizedError)
+			panic(unauthorizedError)
 		}
 		jwtProvider := jwtauthprovider.NewJWTProvider(appCtx.GetConfig().JWT.Secret)
 		tokenPayload, err := jwtProvider.Validate(token)
 		if err != nil {
-			ginCtx.AbortWithError(http.StatusInternalServerError, err)
-			return
+			ginCtx.AbortWithStatusJSON(unauthorizedError.StatusCode, unauthorizedError)
+			panic(unauthorizedError)
 		}
 		ginCtx.Set(common.CurrentUser, tokenPayload)
 		ginCtx.Next()
