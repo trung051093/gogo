@@ -4,11 +4,11 @@ import (
 	"context"
 	"errors"
 	"user_management/common"
-	component "user_management/components"
+	"user_management/components/appctx"
+	"user_management/components/hasher"
 	authmodel "user_management/modules/auth/model"
 	authprovider "user_management/modules/auth_providers"
 	jwtauthprovider "user_management/modules/auth_providers/jwt"
-	"user_management/modules/hash"
 	usermodel "user_management/modules/user/model"
 
 	"user_management/modules/user"
@@ -17,15 +17,15 @@ import (
 type authService struct {
 	jwtProvider jwtauthprovider.JWTProvider
 	userService user.UserService
-	hashService hash.HashService
-	config      *component.Config
+	hashService hasher.HashService
+	config      *appctx.Config
 }
 
 func NewAuthService(
 	jwtProvider jwtauthprovider.JWTProvider,
 	userService user.UserService,
-	hashService hash.HashService,
-	config *component.Config,
+	hashService hasher.HashService,
+	config *appctx.Config,
 ) *authService {
 	return &authService{jwtProvider: jwtProvider, userService: userService, hashService: hashService, config: config}
 }

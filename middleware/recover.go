@@ -2,12 +2,12 @@ package middleware
 
 import (
 	"user_management/common"
-	component "user_management/components"
+	"user_management/components/appctx"
 
 	"github.com/gin-gonic/gin"
 )
 
-func ErrorHandler(appCtx component.AppContext) gin.HandlerFunc {
+func ErrorHandler(appCtx appctx.AppContext) gin.HandlerFunc {
 	return func(ginCtx *gin.Context) {
 		defer func() {
 			if err := recover(); err != nil {

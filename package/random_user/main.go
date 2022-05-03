@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
-	component "user_management/components"
+	"user_management/components/appctx"
 	usermodel "user_management/modules/user/model"
 
 	"user_management/modules/user"
@@ -14,8 +14,8 @@ import (
 )
 
 func main() {
-	var config = &component.Config{}
-	component.GetConfig(config)
+	var config = &appctx.Config{}
+	appctx.GetConfig(config)
 	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%d sslmode=%s TimeZone=%s",
 		config.Database.Host,
 		config.Database.Username,

@@ -3,10 +3,10 @@ package auth
 import (
 	"net/http"
 	"user_management/common"
-	component "user_management/components"
+	"user_management/components/appctx"
+	"user_management/components/hasher"
 	authmodel "user_management/modules/auth/model"
 	jwtauthprovider "user_management/modules/auth_providers/jwt"
-	"user_management/modules/hash"
 	"user_management/modules/user"
 	usermodel "user_management/modules/user/model"
 
@@ -17,7 +17,7 @@ type AuthHandler struct {
 	ctx *gin.Context
 }
 
-func RegisterUserHandler(appCtx component.AppContext) func(*gin.Context) {
+func RegisterUserHandler(appCtx appctx.AppContext) func(*gin.Context) {
 	return func(ginCtx *gin.Context) {
 		var newData authmodel.AuthRegister
 
@@ -32,7 +32,7 @@ func RegisterUserHandler(appCtx component.AppContext) func(*gin.Context) {
 
 		appConfig := appCtx.GetConfig()
 		userRepo := user.NewUserRepository(appCtx.GetMainDBConnection())
-		hashService := hash.NewHashService()
+		hashService := hasher.NewHashService()
 		userService := user.NewUserService(userRepo)
 		jwtProvider := jwtauthprovider.NewJWTProvider(appCtx.GetConfig().JWT.Secret)
 		authService := NewAuthService(jwtProvider, userService, hashService, appConfig)
@@ -47,7 +47,7 @@ func RegisterUserHandler(appCtx component.AppContext) func(*gin.Context) {
 	}
 }
 
-func LoginUserHandler(appCtx component.AppContext) func(*gin.Context) {
+func LoginUserHandler(appCtx appctx.AppContext) func(*gin.Context) {
 	return func(ginCtx *gin.Context) {
 		var loginData authmodel.AuthLogin
 
@@ -63,7 +63,7 @@ func LoginUserHandler(appCtx component.AppContext) func(*gin.Context) {
 		appConfig := appCtx.GetConfig()
 		userRepo := user.NewUserRepository(appCtx.GetMainDBConnection())
 		userService := user.NewUserService(userRepo)
-		hashService := hash.NewHashService()
+		hashService := hasher.NewHashService()
 		jwtProvider := jwtauthprovider.NewJWTProvider(appConfig.JWT.Secret)
 		authService := NewAuthService(jwtProvider, userService, hashService, appConfig)
 

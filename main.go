@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
-	component "user_management/components"
+	"user_management/components/appctx"
 	"user_management/middleware"
 	"user_management/modules/auth"
 	"user_management/modules/user"
@@ -17,8 +17,8 @@ import (
 )
 
 func main() {
-	var config = &component.Config{}
-	component.GetConfig(config)
+	var config = &appctx.Config{}
+	appctx.GetConfig(config)
 	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%d sslmode=%s TimeZone=%s",
 		config.Database.Host,
 		config.Database.Username,
@@ -40,7 +40,7 @@ func main() {
 
 	db.AutoMigrate(&usermodel.User{})
 
-	appCtx := component.NewAppContext(db, validate, config)
+	appCtx := appctx.NewAppContext(db, validate, config)
 
 	router := gin.Default()
 	corsConfig := cors.DefaultConfig()

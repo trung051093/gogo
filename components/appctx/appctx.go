@@ -1,4 +1,4 @@
-package component
+package appctx
 
 import (
 	"github.com/go-playground/validator/v10"

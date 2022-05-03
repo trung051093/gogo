@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"strings"
 	"user_management/common"
-	component "user_management/components"
+	"user_management/components/appctx"
 	usermodel "user_management/modules/user/model"
 
 	"github.com/gin-gonic/gin"
@@ -15,7 +15,7 @@ type UserHandler struct {
 	ctx *gin.Context
 }
 
-func CreateUserHandler(appCtx component.AppContext) func(*gin.Context) {
+func CreateUserHandler(appCtx appctx.AppContext) func(*gin.Context) {
 	return func(ginCtx *gin.Context) {
 		var newData usermodel.UserCreate
 
@@ -41,7 +41,7 @@ func CreateUserHandler(appCtx component.AppContext) func(*gin.Context) {
 	}
 }
 
-func UpdateUserHandler(appCtx component.AppContext) func(*gin.Context) {
+func UpdateUserHandler(appCtx appctx.AppContext) func(*gin.Context) {
 	return func(ginCtx *gin.Context) {
 		var updateData usermodel.UserUpdate
 
@@ -71,7 +71,7 @@ func UpdateUserHandler(appCtx component.AppContext) func(*gin.Context) {
 	}
 }
 
-func GetUserHandler(appCtx component.AppContext) func(*gin.Context) {
+func GetUserHandler(appCtx appctx.AppContext) func(*gin.Context) {
 	return func(ginCtx *gin.Context) {
 		id, err := strconv.Atoi(ginCtx.Param("id"))
 
@@ -92,7 +92,7 @@ func GetUserHandler(appCtx component.AppContext) func(*gin.Context) {
 	}
 }
 
-func ListUserHandler(appCtx component.AppContext) func(*gin.Context) {
+func ListUserHandler(appCtx appctx.AppContext) func(*gin.Context) {
 	return func(ginCtx *gin.Context) {
 		var filter usermodel.UserFilter
 		var paging common.Pagination
@@ -136,7 +136,7 @@ func ListUserHandler(appCtx component.AppContext) func(*gin.Context) {
 	}
 }
 
-func DeleteUserHandler(appCtx component.AppContext) func(*gin.Context) {
+func DeleteUserHandler(appCtx appctx.AppContext) func(*gin.Context) {
 	return func(ginCtx *gin.Context) {
 		id, err := strconv.Atoi(ginCtx.Param("id"))
 

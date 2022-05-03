@@ -4,13 +4,13 @@ import (
 	"errors"
 	"strings"
 	"user_management/common"
-	component "user_management/components"
+	"user_management/components/appctx"
 	jwtauthprovider "user_management/modules/auth_providers/jwt"
 
 	"github.com/gin-gonic/gin"
 )
 
-func JWTRequireHandler(appCtx component.AppContext) gin.HandlerFunc {
+func JWTRequireHandler(appCtx appctx.AppContext) gin.HandlerFunc {
 	return func(ginCtx *gin.Context) {
 		auth := ginCtx.Request.Header.Get("Authorization")
 		unauthorizedError := common.NewUnauthorized(
