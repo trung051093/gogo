@@ -25,28 +25,28 @@ var letters = []byte("1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUV
 func GenerateMD5(str string, salt string) string {
 	h := md5.New()
 	h.Write([]byte(str))
-	hash := hex.EncodeToString(h.Sum(nil))
+	hash := hex.EncodeToString(h.Sum([]byte(salt)))
 	return hash
 }
 
 func GenerateSHA512(str string, salt string) string {
 	h := sha512.New()
 	h.Write([]byte(str))
-	hash := hex.EncodeToString(h.Sum(nil))
+	hash := hex.EncodeToString(h.Sum([]byte(salt)))
 	return hash
 }
 
 func GenerateSHA256(str string, salt string) string {
 	h := sha256.New()
 	h.Write([]byte(str))
-	hash := hex.EncodeToString(h.Sum(nil))
+	hash := hex.EncodeToString(h.Sum([]byte(salt)))
 	return hash
 }
 
 func GenerateSHA1(str string, salt string) string {
 	h := sha1.New()
 	h.Write([]byte(str))
-	hash := hex.EncodeToString(h.Sum(nil))
+	hash := hex.EncodeToString(h.Sum([]byte(salt)))
 	return hash
 }
 
