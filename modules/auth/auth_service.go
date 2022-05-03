@@ -8,6 +8,7 @@ import (
 	authmodel "user_management/modules/auth/model"
 	authprovider "user_management/modules/auth_providers"
 	jwtauthprovider "user_management/modules/auth_providers/jwt"
+	"user_management/modules/hash"
 	usermodel "user_management/modules/user/model"
 
 	"user_management/modules/user"
@@ -16,11 +17,17 @@ import (
 type authService struct {
 	jwtProvider jwtauthprovider.JWTProvider
 	userService user.UserService
+	hashService hash.HashService
 	config      *component.Config
 }
 
-func NewAuthService(jwtProvider jwtauthprovider.JWTProvider, userService user.UserService, config *component.Config) *authService {
-	return &authService{jwtProvider: jwtProvider, userService: userService, config: config}
+func NewAuthService(
+	jwtProvider jwtauthprovider.JWTProvider,
+	userService user.UserService,
+	hashService hash.HashService,
+	config *component.Config,
+) *authService {
+	return &authService{jwtProvider: jwtProvider, userService: userService, hashService: hashService, config: config}
 }
 
 func (s *authService) Register(ctx context.Context, payload *authmodel.AuthRegister) error {
@@ -30,8 +37,8 @@ func (s *authService) Register(ctx context.Context, payload *authmodel.AuthRegis
 		return common.ErrorEntityExisted(usermodel.EntityName, errors.New("User already exists"))
 	}
 
-	passwordSalt := common.GenerateRandomString(s.config.JWT.PasswordSaltLength)
-	hashPassword := common.GenerateSHA256(payload.Password, passwordSalt)
+	passwordSalt := s.hashService.GenerateRandomString(s.config.JWT.PasswordSaltLength)
+	hashPassword := s.hashService.GenerateSHA256(payload.Password, passwordSalt)
 	newUser := &usermodel.UserCreate{
 		Email:        payload.Email,
 		Password:     hashPassword,
@@ -54,7 +61,7 @@ func (s *authService) Login(ctx context.Context, payload *authmodel.AuthLogin) (
 		return nil, common.ErrorCannotFoundEntity(usermodel.EntityName, searchErr)
 	}
 
-	hashPassword := common.GenerateSHA256(payload.Password, user.PasswordSalt)
+	hashPassword := s.hashService.GenerateSHA256(payload.Password, user.PasswordSalt)
 	if user.Password != hashPassword {
 		return nil, common.ErrorInvalidRequest(usermodel.EntityName, errors.New("Email or Password wrong !!!"))
 	}

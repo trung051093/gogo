@@ -6,6 +6,7 @@ import (
 	component "user_management/components"
 	authmodel "user_management/modules/auth/model"
 	jwtauthprovider "user_management/modules/auth_providers/jwt"
+	"user_management/modules/hash"
 	"user_management/modules/user"
 	usermodel "user_management/modules/user/model"
 
@@ -31,9 +32,10 @@ func RegisterUserHandler(appCtx component.AppContext) func(*gin.Context) {
 
 		appConfig := appCtx.GetConfig()
 		userRepo := user.NewUserRepository(appCtx.GetMainDBConnection())
+		hashService := hash.NewHashService()
 		userService := user.NewUserService(userRepo)
 		jwtProvider := jwtauthprovider.NewJWTProvider(appCtx.GetConfig().JWT.Secret)
-		authService := NewAuthService(jwtProvider, userService, appConfig)
+		authService := NewAuthService(jwtProvider, userService, hashService, appConfig)
 
 		err := authService.Register(ginCtx, &newData)
 
@@ -61,8 +63,9 @@ func LoginUserHandler(appCtx component.AppContext) func(*gin.Context) {
 		appConfig := appCtx.GetConfig()
 		userRepo := user.NewUserRepository(appCtx.GetMainDBConnection())
 		userService := user.NewUserService(userRepo)
+		hashService := hash.NewHashService()
 		jwtProvider := jwtauthprovider.NewJWTProvider(appConfig.JWT.Secret)
-		authService := NewAuthService(jwtProvider, userService, appConfig)
+		authService := NewAuthService(jwtProvider, userService, hashService, appConfig)
 
 		token, err := authService.Login(ginCtx, &loginData)
 
