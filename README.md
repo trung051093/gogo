@@ -1,11 +1,7 @@
 # Installation
 
 ```bash
-go get gorm.io/gorm@v1.20.11 
-```
-
-```bash
-go get gorm.io/driver/postgres
+go get
 ```
 
 - Create a postgres localhost
