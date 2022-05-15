@@ -14,8 +14,9 @@ type UserCreate struct {
 	BirthDate    time.Time `json:"birthDate" gorm:"column:birth_date;"`
 	PhoneNumber  string    `json:"phoneNumber" gorm:"column:phone_number;"`
 	Gender       string    `json:"gender" gorm:"column:gender;"`
+	Role         string    `json:"role" gorm:"column:role;"`
 	Password     string    `json:"password" gorm:"column:password;"`
-	PasswordSalt string    `json:"passwordSalt" gorm:"column:password_salt;"`
+	PasswordSalt string    `json:"-" gorm:"column:password_salt;"`
 }
 
 func (UserCreate) TableName() string { return User{}.TableName() }

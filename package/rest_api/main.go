@@ -47,13 +47,13 @@ func main() {
 	corsConfig.AllowAllOrigins = true
 	router.Use(cors.New(corsConfig))
 	router.Use(middleware.ErrorHandler(appCtx))
-	v1 := router.Group("/v1")
+	v1 := router.Group("/api/v1")
 	{
 		v1.POST("/user", user.CreateUserHandler(appCtx))
 		v1.PATCH("/user/:id", user.UpdateUserHandler(appCtx))
 		v1.DELETE("/user/:id", user.DeleteUserHandler(appCtx))
 		v1.GET("/user/:id", user.GetUserHandler(appCtx))
-		v1.GET("/users", middleware.JWTRequireHandler(appCtx), user.ListUserHandler(appCtx))
+		v1.GET("/users", user.ListUserHandler(appCtx))
 
 		v1.POST("/auth/register", auth.RegisterUserHandler(appCtx))
 		v1.POST("/auth/login", auth.LoginUserHandler(appCtx))

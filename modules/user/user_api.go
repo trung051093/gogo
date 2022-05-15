@@ -6,6 +6,7 @@ import (
 	"strings"
 	"user_management/common"
 	"user_management/components/appctx"
+	"user_management/components/hasher"
 	usermodel "user_management/modules/user/model"
 
 	"github.com/gin-gonic/gin"
@@ -28,8 +29,15 @@ func CreateUserHandler(appCtx appctx.AppContext) func(*gin.Context) {
 			panic(common.ErrorInvalidRequest(usermodel.EntityName, err))
 		}
 
+		appConfig := appCtx.GetConfig()
+
 		userRepo := NewUserRepository(appCtx.GetMainDBConnection())
 		userService := NewUserService(userRepo)
+		hashService := hasher.NewHashService()
+
+		passwordSalt := hashService.GenerateRandomString(appConfig.JWT.PasswordSaltLength)
+		hashPassword := hashService.GenerateSHA256(newData.Password, passwordSalt)
+		newData.Password = hashPassword
 
 		userId, err := userService.CreateUser(ginCtx.Request.Context(), &newData)
 
@@ -60,8 +68,15 @@ func UpdateUserHandler(appCtx appctx.AppContext) func(*gin.Context) {
 			panic(common.ErrorInvalidRequest(usermodel.EntityName, err))
 		}
 
+		appConfig := appCtx.GetConfig()
+
 		userRepo := NewUserRepository(appCtx.GetMainDBConnection())
 		userService := NewUserService(userRepo)
+		hashService := hasher.NewHashService()
+
+		passwordSalt := hashService.GenerateRandomString(appConfig.JWT.PasswordSaltLength)
+		hashPassword := hashService.GenerateSHA256(updateData.Password, passwordSalt)
+		updateData.Password = hashPassword
 
 		if err := userService.UpdateUser(ginCtx.Request.Context(), uint(id), &updateData); err != nil {
 			panic(err)
