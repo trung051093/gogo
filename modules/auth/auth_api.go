@@ -37,7 +37,7 @@ func RegisterUserHandler(appCtx appctx.AppContext) func(*gin.Context) {
 		jwtProvider := jwtauthprovider.NewJWTProvider(appCtx.GetConfig().JWT.Secret)
 		authService := NewAuthService(jwtProvider, userService, hashService, appConfig)
 
-		err := authService.Register(ginCtx, &newData)
+		err := authService.Register(ginCtx.Request.Context(), &newData)
 
 		if err != nil {
 			panic(err)
@@ -67,7 +67,7 @@ func LoginUserHandler(appCtx appctx.AppContext) func(*gin.Context) {
 		jwtProvider := jwtauthprovider.NewJWTProvider(appConfig.JWT.Secret)
 		authService := NewAuthService(jwtProvider, userService, hashService, appConfig)
 
-		token, err := authService.Login(ginCtx, &loginData)
+		token, err := authService.Login(ginCtx.Request.Context(), &loginData)
 
 		if err != nil {
 			panic(err)

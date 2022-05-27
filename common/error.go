@@ -3,6 +3,7 @@ package common
 import (
 	"errors"
 	"fmt"
+	"log"
 	"net/http"
 	"strings"
 )
@@ -17,6 +18,12 @@ type AppError struct {
 	RootErr    error  `json:"-"`
 	ErrorKey   string `json:"errorKey"`
 	Log        string `json:"log"`
+}
+
+func FailOnError(err error, msg string) {
+	if err != nil {
+		log.Fatalf("%s: %s", msg, err)
+	}
 }
 
 func NewErrorResponse(rootErr error, message string, log, key string) *AppError {

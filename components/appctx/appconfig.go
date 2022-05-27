@@ -3,6 +3,8 @@ package appctx
 import (
 	"fmt"
 	"os"
+	"path"
+	"runtime"
 
 	"gopkg.in/yaml.v3"
 )
@@ -15,12 +17,17 @@ type Config struct {
 	Database struct {
 		Host     string `yaml:"host"`
 		Name     string `yaml:"name"`
-		Username string `yaml:"user"`
-		Password string `yaml:"pass"`
+		Username string `yaml:"username"`
+		Password string `yaml:"password"`
 		Port     int    `yaml:"port"`
 		TimeZone string `yaml:"time_zone"`
 		SSLMode  string `yaml:"ssl_mode"`
 	} `yaml:"database"`
+	ElasticSearch struct {
+		Host     string `yaml:"host"`
+		Username string `yaml:"username"`
+		Password string `yaml:"password"`
+	} `yaml:"elasticsearch"`
 	JWT struct {
 		Secret             string `yaml:"secret"`
 		PasswordSaltLength int    `yaml:"pass_salt_length"`
@@ -28,8 +35,16 @@ type Config struct {
 	} `yaml:"jwt"`
 }
 
+func RootDir() string {
+	_, b, _, _ := runtime.Caller(0)
+	d := path.Join(path.Dir(b))
+	return d
+}
+
 func GetConfig(cfg *Config) {
-	f, err := os.Open("config.yml")
+	rootDir := RootDir()
+	fmt.Sprintln("root dir:", rootDir)
+	f, err := os.Open(rootDir + "/config.yml")
 	if err != nil {
 		fmt.Sprintln(err)
 	}

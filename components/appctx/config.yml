@@ -6,12 +6,18 @@ server:
 # Database credentials
 database:
   host: "127.0.0.1"
-  user: "root"
-  pass: "root"
+  username: "root"
+  password: "root"
   name: "example"
   port: 5432
   time_zone: "Asia/Shanghai"
   ssl_mode: "disable"
+
+# Elastic search
+elasticsearch: 
+  host: "http://95.111.248.127:9200"
+  username: elastic
+  password: 50m5qgHDkxIecSyD
 
 # JWT credentials
 jwt:
