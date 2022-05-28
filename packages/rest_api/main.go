@@ -47,6 +47,7 @@ func main() {
 	corsConfig.AllowAllOrigins = true
 	router.Use(cors.New(corsConfig))
 	router.Use(middleware.ErrorHandler(appCtx))
+	router.Use(middleware.AppendElasticSearch(appCtx))
 	v1 := router.Group("/api/v1")
 	{
 		v1.POST("/user", user.CreateUserHandler(appCtx))

@@ -1,7 +1,11 @@
 package usermodel
 
 import (
+	"log"
 	"time"
+	"user_management/common"
+
+	"gorm.io/gorm"
 )
 
 type UserCreate struct {
@@ -20,3 +24,10 @@ type UserCreate struct {
 }
 
 func (UserCreate) TableName() string { return User{}.TableName() }
+
+func (u *UserCreate) AfterCreate(tx *gorm.DB) (err error) {
+	ctx := tx.Statement.Context
+	ok := ctx.Value(common.ElasticSearchService)
+	log.Println("AfterCreate ctx:", ok)
+	return
+}

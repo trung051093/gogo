@@ -1,5 +1,6 @@
 package common
 
 const (
-	CurrentUser = "CurrentUser"
+	CurrentUser          = "CurrentUser"
+	ElasticSearchService = "ElasticSearchService"
 )

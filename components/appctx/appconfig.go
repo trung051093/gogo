@@ -23,6 +23,12 @@ type Config struct {
 		TimeZone string `yaml:"time_zone"`
 		SSLMode  string `yaml:"ssl_mode"`
 	} `yaml:"database"`
+	RabbitMQ struct {
+		Host     string `yaml:"host"`
+		Port     int    `yaml:"port"`
+		Username string `yaml:"username"`
+		Password string `yaml:"password"`
+	} `yaml:"rabbitmq"`
 	ElasticSearch struct {
 		Host     string `yaml:"host"`
 		Username string `yaml:"username"`

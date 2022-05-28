@@ -9,6 +9,7 @@ import (
 )
 
 type ElasticSearchService interface {
+	LogInfo()
 }
 
 type elasticSearchSevice struct {

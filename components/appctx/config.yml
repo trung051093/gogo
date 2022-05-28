@@ -19,6 +19,13 @@ elasticsearch:
   username: elastic
   password: 50m5qgHDkxIecSyD
 
+# Rabbit MQ
+rabbitmq: 
+  host: "95.111.248.127"
+  port: 5672
+  username: admin
+  password: uhuy4tbda0vwZQr2GdRbxknim8J
+
 # JWT credentials
 jwt:
   secret: "123!"
