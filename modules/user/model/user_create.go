@@ -29,13 +29,9 @@ func (UserCreate) TableName() string { return User{}.TableName() }
 func (u *UserCreate) AfterCreate(tx *gorm.DB) (err error) {
 	ctx := tx.Statement.Context
 	if rabbitmqService, ok := rabbitmq.FromContext(ctx); ok {
-		log.Println("AfterCreate rabbitmqService ok:", ok)
-		log.Println("AfterCreate rabbitmqService:", rabbitmqService)
 		go func() {
-			if queue, queueErr := rabbitmqService.GetQueue(common.IndexingQueue); queueErr == nil {
-				if userString, err := common.ConvertJsonToString(common.CompactJson(u)); err == nil {
-					rabbitmqService.Publish(queue, userString)
-				}
+			if publishErr := rabbitmqService.PublishWithTopic(common.IndexingQueue, u); publishErr != nil {
+				log.Println("AfterCreate publish error:", publishErr)
 			}
 		}()
 	}

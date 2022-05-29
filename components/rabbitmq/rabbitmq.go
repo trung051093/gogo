@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"sync"
+	"user_management/common"
 
 	"github.com/streadway/amqp"
 )
@@ -87,6 +88,19 @@ func (r *RabbitmqSerivce) Publish(queue amqp.Queue, message string) error {
 			ContentType: "text/plain",
 			Body:        []byte(message),
 		})
+}
+
+func (r *RabbitmqSerivce) PublishWithTopic(topic string, data interface{}) error {
+	queue, queueErr := r.GetQueue(topic)
+	if queueErr != nil {
+		return queueErr
+	}
+	message, convertMessageErr := common.ConvertJsonToString(common.CompactJson(data))
+	if convertMessageErr != nil {
+		return convertMessageErr
+	}
+	r.Publish(queue, message)
+	return nil
 }
 
 func (r *RabbitmqSerivce) Consume(q amqp.Queue) (<-chan amqp.Delivery, error) {
