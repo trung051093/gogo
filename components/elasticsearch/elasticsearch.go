@@ -1,32 +1,53 @@
 package elasticsearch
 
 import (
+	"context"
 	"encoding/json"
 	"log"
 	"strings"
+	"sync"
 
 	"github.com/elastic/go-elasticsearch/v7"
 )
 
-type ElasticSearchService interface {
-	LogInfo()
-}
+type key string
 
-type elasticSearchSevice struct {
+type ElasticSearchSevice struct {
 	client *elasticsearch.Client
 }
 
-func NewEsService(config elasticsearch.Config) *elasticSearchSevice {
-	client, err := elasticsearch.NewClient(config)
-	if err != nil {
-		log.Fatalf("Error creating the client: %s", err)
-	}
-	return &elasticSearchSevice{
-		client: client,
-	}
+var ElasticSearchServiceKey key = "ElasticSearchService"
+var once sync.Once
+var instance *ElasticSearchSevice
+var initErr error
+
+// singleton
+func NewEsService(config elasticsearch.Config) (*ElasticSearchSevice, error) {
+	once.Do(func() {
+		client, initErr := elasticsearch.NewClient(config)
+		if initErr != nil {
+			log.Fatalf("Error creating the client: %s", initErr)
+			return
+		}
+		initErr = nil
+		instance = &ElasticSearchSevice{client: client}
+	})
+	return instance, initErr
 }
 
-func (es *elasticSearchSevice) LogInfo() {
+func WithContext(ctx context.Context, es *ElasticSearchSevice) context.Context {
+	return context.WithValue(ctx, ElasticSearchServiceKey, es)
+}
+
+func FromContext(ctx context.Context) (*ElasticSearchSevice, bool) {
+	esService := ctx.Value(ElasticSearchServiceKey)
+	if es, ok := esService.(*ElasticSearchSevice); ok {
+		return es, true
+	}
+	return nil, false
+}
+
+func (es *ElasticSearchSevice) LogInfo() {
 	var (
 		r map[string]interface{}
 	)

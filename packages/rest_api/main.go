@@ -4,11 +4,14 @@ import (
 	"fmt"
 	"log"
 	"user_management/components/appctx"
+	"user_management/components/elasticsearch"
+	"user_management/components/rabbitmq"
 	"user_management/middleware"
 	"user_management/modules/auth"
 	"user_management/modules/user"
 	usermodel "user_management/modules/user/model"
 
+	esv7 "github.com/elastic/go-elasticsearch/v7"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
@@ -40,22 +43,48 @@ func main() {
 
 	db.AutoMigrate(&usermodel.User{})
 
-	appCtx := appctx.NewAppContext(db, validate, config)
+	configEs := &esv7.Config{
+		Addresses: []string{config.ElasticSearch.Host},
+		Username:  config.ElasticSearch.Username,
+		Password:  config.ElasticSearch.Password,
+	}
+	esService, err := elasticsearch.NewEsService(*configEs)
+	// app should be work without elastic search service, so no need return when getting error
+	if err != nil {
+		log.Println(err)
+	}
+
+	configRabbitMQ := &rabbitmq.RabbitmqConfig{
+		Host: config.RabbitMQ.Host,
+		Port: config.RabbitMQ.Port,
+		User: config.RabbitMQ.Username,
+		Pass: config.RabbitMQ.Password,
+	}
+	rabbitmqService, rabbitErr := rabbitmq.NewRabbitMQ(*configRabbitMQ)
+	if rabbitErr != nil {
+		return
+	}
+	defer rabbitmqService.Close()
+
+	appCtx := appctx.NewAppContext(db, validate, config, esService, rabbitmqService)
 
 	router := gin.Default()
 	corsConfig := cors.DefaultConfig()
 	corsConfig.AllowAllOrigins = true
 	router.Use(cors.New(corsConfig))
 	router.Use(middleware.ErrorHandler(appCtx))
-	router.Use(middleware.AppendElasticSearch(appCtx))
+	router.Use(middleware.SetElasticSearch(appCtx))
+	router.Use(middleware.SetRabbitMQ(appCtx))
 	v1 := router.Group("/api/v1")
 	{
+		// user
 		v1.POST("/user", user.CreateUserHandler(appCtx))
 		v1.PATCH("/user/:id", user.UpdateUserHandler(appCtx))
 		v1.DELETE("/user/:id", user.DeleteUserHandler(appCtx))
 		v1.GET("/user/:id", user.GetUserHandler(appCtx))
 		v1.GET("/users", user.ListUserHandler(appCtx))
 
+		// authentication
 		v1.POST("/auth/register", auth.RegisterUserHandler(appCtx))
 		v1.POST("/auth/login", auth.LoginUserHandler(appCtx))
 	}

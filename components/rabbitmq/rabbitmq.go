@@ -1,8 +1,10 @@
 package rabbitmq
 
 import (
+	"context"
 	"fmt"
 	"log"
+	"sync"
 
 	"github.com/streadway/amqp"
 )
@@ -14,28 +16,57 @@ type RabbitmqConfig struct {
 	Pass string
 }
 
-type rabbitmqSerivce struct {
+type RabbitmqSerivce struct {
 	conn    *amqp.Connection
 	channel *amqp.Channel
 }
 
-func NewRabbitMQ(config RabbitmqConfig) *rabbitmqSerivce {
-	connStr := fmt.Sprintf("amqp://%s:%s@%s:%d/", config.User, config.Pass, config.Host, config.Port)
-	conn, connErr := amqp.Dial(connStr)
+type key string
+
+var RabbitMQServiceKey key = "RabbitMQService"
+var once sync.Once
+var instance *RabbitmqSerivce
+var connErr error
+var channelErr error
+
+func NewRabbitMQ(config RabbitmqConfig) (*RabbitmqSerivce, error) {
+	once.Do(func() {
+		connStr := fmt.Sprintf("amqp://%s:%s@%s:%d/", config.User, config.Pass, config.Host, config.Port)
+		conn, connErr := amqp.Dial(connStr)
+		if connErr != nil {
+			log.Println("Failed to connect to RabbitMQ: ", connErr)
+		}
+		channel, channelErr := conn.Channel()
+		if channelErr != nil {
+			log.Println("Failed to open the channel RabbitMQ: ", channelErr)
+		}
+		instance = &RabbitmqSerivce{
+			conn:    conn,
+			channel: channel,
+		}
+	})
 	if connErr != nil {
-		log.Println("Failed to connect to RabbitMQ: ", connErr)
+		return nil, connErr
 	}
-	channel, channelErr := conn.Channel()
 	if channelErr != nil {
-		log.Println("Failed to open the channel RabbitMQ: ", channelErr)
+		return nil, channelErr
 	}
-	return &rabbitmqSerivce{
-		conn:    conn,
-		channel: channel,
-	}
+	return instance, nil
 }
 
-func (r *rabbitmqSerivce) GetQueue(topic string) (amqp.Queue, error) {
+func WithContext(ctx context.Context, rabbitmq *RabbitmqSerivce) context.Context {
+	return context.WithValue(ctx, RabbitMQServiceKey, rabbitmq)
+}
+
+func FromContext(ctx context.Context) (*RabbitmqSerivce, bool) {
+	rabbitmqService := ctx.Value(RabbitMQServiceKey)
+	if es, ok := rabbitmqService.(*RabbitmqSerivce); ok {
+		return es, true
+	}
+	return nil, false
+}
+
+func (r *RabbitmqSerivce) GetQueue(topic string) (amqp.Queue, error) {
 	return r.channel.QueueDeclare(
 		topic, // name
 		false, // durable
@@ -46,7 +77,7 @@ func (r *rabbitmqSerivce) GetQueue(topic string) (amqp.Queue, error) {
 	)
 }
 
-func (r *rabbitmqSerivce) Publish(queue amqp.Queue, message string) error {
+func (r *RabbitmqSerivce) Publish(queue amqp.Queue, message string) error {
 	return r.channel.Publish(
 		"",         // exchange
 		queue.Name, // routing key
@@ -58,7 +89,7 @@ func (r *rabbitmqSerivce) Publish(queue amqp.Queue, message string) error {
 		})
 }
 
-func (r *rabbitmqSerivce) Consume(q amqp.Queue) (<-chan amqp.Delivery, error) {
+func (r *RabbitmqSerivce) Consume(q amqp.Queue) (<-chan amqp.Delivery, error) {
 	return r.channel.Consume(
 		q.Name, // queue
 		"",     // consumer
@@ -70,7 +101,7 @@ func (r *rabbitmqSerivce) Consume(q amqp.Queue) (<-chan amqp.Delivery, error) {
 	)
 }
 
-func (r *rabbitmqSerivce) Close() {
+func (r *RabbitmqSerivce) Close() {
 	r.channel.Close()
 	r.conn.Close()
 }

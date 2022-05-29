@@ -4,6 +4,7 @@ import (
 	"log"
 	"time"
 	"user_management/common"
+	"user_management/components/rabbitmq"
 
 	"gorm.io/gorm"
 )
@@ -19,7 +20,7 @@ type UserCreate struct {
 	PhoneNumber  string    `json:"phoneNumber" gorm:"column:phone_number;"`
 	Gender       string    `json:"gender" gorm:"column:gender;"`
 	Role         string    `json:"role" gorm:"column:role;"`
-	Password     string    `json:"password" gorm:"column:password;"`
+	Password     string    `json:"-" gorm:"column:password;"`
 	PasswordSalt string    `json:"-" gorm:"column:password_salt;"`
 }
 
@@ -27,7 +28,16 @@ func (UserCreate) TableName() string { return User{}.TableName() }
 
 func (u *UserCreate) AfterCreate(tx *gorm.DB) (err error) {
 	ctx := tx.Statement.Context
-	ok := ctx.Value(common.ElasticSearchService)
-	log.Println("AfterCreate ctx:", ok)
+	if rabbitmqService, ok := rabbitmq.FromContext(ctx); ok {
+		log.Println("AfterCreate rabbitmqService ok:", ok)
+		log.Println("AfterCreate rabbitmqService:", rabbitmqService)
+		go func() {
+			if queue, queueErr := rabbitmqService.GetQueue(common.IndexingQueue); queueErr == nil {
+				if userString, err := common.ConvertJsonToString(common.CompactJson(u)); err == nil {
+					rabbitmqService.Publish(queue, userString)
+				}
+			}
+		}()
+	}
 	return
 }
