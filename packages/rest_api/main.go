@@ -19,8 +19,7 @@ import (
 )
 
 func main() {
-	var config = &appctx.Config{}
-	appctx.GetConfig(config)
+	config := appctx.GetConfig()
 	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%d sslmode=%s TimeZone=%s",
 		config.Database.Host,
 		config.Database.Username,
@@ -42,13 +41,13 @@ func main() {
 
 	db.AutoMigrate(&usermodel.User{})
 
-	configEs := appctx.GetElasticSearchConfig(config)
+	configEs := config.GetElasticSearchConfig()
 	esService, esErr := elasticsearch.NewEsService(*configEs)
 	if esErr != nil {
 		return
 	}
 
-	configRabbitMQ := appctx.GetRabbitMQConfig(config)
+	configRabbitMQ := config.GetRabbitMQConfig()
 	rabbitmqService, rabbitErr := rabbitmq.NewRabbitMQ(*configRabbitMQ)
 	if rabbitErr != nil {
 		return

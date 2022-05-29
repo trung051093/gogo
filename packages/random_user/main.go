@@ -14,8 +14,7 @@ import (
 )
 
 func main() {
-	var config = &appctx.Config{}
-	appctx.GetConfig(config)
+	config := appctx.GetConfig()
 	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%d sslmode=%s TimeZone=%s",
 		config.Database.Host,
 		config.Database.Username,

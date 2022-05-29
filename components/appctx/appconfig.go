@@ -49,7 +49,8 @@ func RootDir() string {
 	return d
 }
 
-func GetConfig(cfg *Config) {
+func GetConfig() *Config {
+	var cfg Config
 	rootDir := RootDir()
 	fmt.Sprintln("root dir:", rootDir)
 	f, err := os.Open(rootDir + "/config.yml")
@@ -63,9 +64,10 @@ func GetConfig(cfg *Config) {
 	if err != nil {
 		fmt.Sprintln(err)
 	}
+	return &cfg
 }
 
-func GetRabbitMQConfig(cfg *Config) *rabbitmq.RabbitmqConfig {
+func (cfg *Config) GetRabbitMQConfig() *rabbitmq.RabbitmqConfig {
 	return &rabbitmq.RabbitmqConfig{
 		Host: cfg.RabbitMQ.Host,
 		Port: cfg.RabbitMQ.Port,
@@ -74,7 +76,7 @@ func GetRabbitMQConfig(cfg *Config) *rabbitmq.RabbitmqConfig {
 	}
 }
 
-func GetElasticSearchConfig(cfg *Config) *es.Config {
+func (cfg *Config) GetElasticSearchConfig() *es.Config {
 	return &es.Config{
 		Addresses: []string{cfg.ElasticSearch.Host},
 		Username:  cfg.ElasticSearch.Username,

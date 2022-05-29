@@ -9,32 +9,21 @@ import (
 	"user_management/components/elasticsearch"
 	"user_management/components/rabbitmq"
 
-	es "github.com/elastic/go-elasticsearch/v8"
 	"github.com/streadway/amqp"
 )
 
 func main() {
-	config := &appctx.Config{}
-	appctx.GetConfig(config)
+	config := appctx.GetConfig()
 	ctx := context.Background()
 
-	configEs := &es.Config{
-		Addresses: []string{config.ElasticSearch.Host},
-		Username:  config.ElasticSearch.Username,
-		Password:  config.ElasticSearch.Password,
-	}
+	configEs := config.GetElasticSearchConfig()
 	esService, esErr := elasticsearch.NewEsService(*configEs)
 	if esErr != nil {
 		return
 	}
 	esService.LogInfo(ctx)
 
-	configRabbitMQ := &rabbitmq.RabbitmqConfig{
-		Host: config.RabbitMQ.Host,
-		Port: config.RabbitMQ.Port,
-		User: config.RabbitMQ.Username,
-		Pass: config.RabbitMQ.Password,
-	}
+	configRabbitMQ := config.GetRabbitMQConfig()
 	rabbitmqService, rabbitErr := rabbitmq.NewRabbitMQ(*configRabbitMQ)
 	if rabbitErr != nil {
 		return
