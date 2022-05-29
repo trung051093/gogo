@@ -48,10 +48,9 @@ func main() {
 		Username:  config.ElasticSearch.Username,
 		Password:  config.ElasticSearch.Password,
 	}
-	esService, err := elasticsearch.NewEsService(*configEs)
-	// app should be work without elastic search service, so no need return when getting error
-	if err != nil {
-		log.Println(err)
+	esService, esErr := elasticsearch.NewEsService(*configEs)
+	if esErr != nil {
+		return
 	}
 
 	configRabbitMQ := &rabbitmq.RabbitmqConfig{

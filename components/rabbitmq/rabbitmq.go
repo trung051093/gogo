@@ -27,8 +27,7 @@ type key string
 var RabbitMQServiceKey key = "RabbitMQService"
 var once sync.Once
 var instance *RabbitmqSerivce
-var connErr error
-var channelErr error
+var instanceErr error
 
 func NewRabbitMQ(config RabbitmqConfig) (*RabbitmqSerivce, error) {
 	connStr := fmt.Sprintf("amqp://%s:%s@%s:%d/", config.User, config.Pass, config.Host, config.Port)
@@ -50,15 +49,17 @@ func NewRabbitMQ(config RabbitmqConfig) (*RabbitmqSerivce, error) {
 	}, nil
 }
 
-func GetIntance(config RabbitmqConfig) *RabbitmqSerivce {
+// singleton
+func GetIntance(config RabbitmqConfig) (*RabbitmqSerivce, error) {
 	once.Do(func() {
-		service, err := NewRabbitMQ(config)
-		if err != nil {
+		service, instanceErr := NewRabbitMQ(config)
+		if instanceErr != nil {
 			return
 		}
+		instanceErr = nil
 		instance = service
 	})
-	return instance
+	return instance, instanceErr
 }
 
 func WithContext(ctx context.Context, rabbitmq *RabbitmqSerivce) context.Context {
