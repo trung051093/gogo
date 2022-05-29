@@ -1,10 +1,17 @@
 package usermodel
 
 import (
+	"fmt"
+	"log"
 	"time"
+	"user_management/common"
+	"user_management/components/rabbitmq"
+
+	"gorm.io/gorm"
 )
 
 type UserUpdate struct {
+	Id           int        `json:"id" gorm:"column:id;"`
 	FirstName    string     `validate:"omitempty" json:"firstName" gorm:"column:first_name;"`
 	LastName     string     `validate:"omitempty" json:"lastName" gorm:"column:last_name;"`
 	Email        *string    `validate:"omitempty,email" json:"email" gorm:"column:email;"`
@@ -14,8 +21,30 @@ type UserUpdate struct {
 	PhoneNumber  *string    `json:"phoneNumber" gorm:"column:phone_number;"`
 	Gender       string     `json:"gender" gorm:"column:gender;"`
 	Role         string     `json:"role" gorm:"column:role;"`
-	Password     string     `json:"password" gorm:"column:password;"`
+	Password     string     `json:"-" gorm:"column:password;"`
 	PasswordSalt string     `json:"-" gorm:"column:password_salt;"`
 }
 
-func (UserUpdate) TableName() string { return User{}.TableName() }
+func (UserUpdate) TableName() string  { return User{}.TableName() }
+func (UserUpdate) TableIndex() string { return User{}.TableIndex() }
+
+func (u *UserUpdate) AfterUpdate(tx *gorm.DB) (err error) {
+	ctx := tx.Statement.Context
+	if rabbitmqService, ok := rabbitmq.FromContext(ctx); ok {
+		log.Println("AfterUpdate rabbitmqService:", rabbitmqService)
+		go func() {
+			defer common.Recovery()
+			dataIndex := &common.DataIndex{
+				Id:       fmt.Sprintf("%d", u.Id),
+				Index:    u.TableIndex(),
+				Action:   common.Update,
+				Data:     common.CompactJson(u),
+				SendTime: time.Now(),
+			}
+			if publishErr := rabbitmqService.PublishWithTopic(ctx, common.IndexingQueue, dataIndex); publishErr != nil {
+				log.Println("AfterUpdate publish error:", publishErr)
+			}
+		}()
+	}
+	return
+}

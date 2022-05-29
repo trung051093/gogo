@@ -5,7 +5,9 @@ import (
 	"os"
 	"path"
 	"runtime"
+	"user_management/components/rabbitmq"
 
+	es "github.com/elastic/go-elasticsearch/v8"
 	"gopkg.in/yaml.v3"
 )
 
@@ -60,5 +62,22 @@ func GetConfig(cfg *Config) {
 	err = decoder.Decode(&cfg)
 	if err != nil {
 		fmt.Sprintln(err)
+	}
+}
+
+func GetRabbitMQConfig(cfg *Config) *rabbitmq.RabbitmqConfig {
+	return &rabbitmq.RabbitmqConfig{
+		Host: cfg.RabbitMQ.Host,
+		Port: cfg.RabbitMQ.Port,
+		User: cfg.RabbitMQ.Username,
+		Pass: cfg.RabbitMQ.Password,
+	}
+}
+
+func GetElasticSearchConfig(cfg *Config) *es.Config {
+	return &es.Config{
+		Addresses: []string{cfg.ElasticSearch.Host},
+		Username:  cfg.ElasticSearch.Username,
+		Password:  cfg.ElasticSearch.Password,
 	}
 }

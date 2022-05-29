@@ -1,8 +1,14 @@
 package usermodel
 
 import (
+	"fmt"
+	"log"
+	"strings"
 	"time"
 	"user_management/common"
+	"user_management/components/rabbitmq"
+
+	"gorm.io/gorm"
 )
 
 const EntityName = "user"
@@ -35,3 +41,28 @@ var UserField = map[string]string{
 }
 
 func (User) TableName() string { return "users" }
+
+func (User) TableIndex() string {
+	return strings.ToLower(fmt.Sprintf("%s-%s", common.Project, User{}.TableName()))
+}
+
+func (u *User) AfterDelete(tx *gorm.DB) (err error) {
+	ctx := tx.Statement.Context
+	if rabbitmqService, ok := rabbitmq.FromContext(ctx); ok {
+		log.Println("AfterDelete rabbitmqService:", rabbitmqService)
+		go func() {
+			defer common.Recovery()
+			dataIndex := &common.DataIndex{
+				Id:       fmt.Sprintf("%d", u.Id),
+				Index:    u.TableIndex(),
+				Action:   common.Delete,
+				Data:     common.CompactJson(u),
+				SendTime: time.Now(),
+			}
+			if publishErr := rabbitmqService.PublishWithTopic(ctx, common.IndexingQueue, dataIndex); publishErr != nil {
+				log.Println("AfterDelete publish error:", publishErr)
+			}
+		}()
+	}
+	return
+}

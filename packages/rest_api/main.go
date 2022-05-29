@@ -11,7 +11,6 @@ import (
 	"user_management/modules/user"
 	usermodel "user_management/modules/user/model"
 
-	esv7 "github.com/elastic/go-elasticsearch/v7"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
@@ -43,22 +42,13 @@ func main() {
 
 	db.AutoMigrate(&usermodel.User{})
 
-	configEs := &esv7.Config{
-		Addresses: []string{config.ElasticSearch.Host},
-		Username:  config.ElasticSearch.Username,
-		Password:  config.ElasticSearch.Password,
-	}
+	configEs := appctx.GetElasticSearchConfig(config)
 	esService, esErr := elasticsearch.NewEsService(*configEs)
 	if esErr != nil {
 		return
 	}
 
-	configRabbitMQ := &rabbitmq.RabbitmqConfig{
-		Host: config.RabbitMQ.Host,
-		Port: config.RabbitMQ.Port,
-		User: config.RabbitMQ.Username,
-		Pass: config.RabbitMQ.Password,
-	}
+	configRabbitMQ := appctx.GetRabbitMQConfig(config)
 	rabbitmqService, rabbitErr := rabbitmq.NewRabbitMQ(*configRabbitMQ)
 	if rabbitErr != nil {
 		return

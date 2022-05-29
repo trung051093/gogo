@@ -1,6 +1,7 @@
 package usermodel
 
 import (
+	"fmt"
 	"log"
 	"time"
 	"user_management/common"
@@ -26,13 +27,22 @@ type UserCreate struct {
 
 func (UserCreate) TableName() string { return User{}.TableName() }
 
+func (UserCreate) TableIndex() string { return User{}.TableIndex() }
+
 func (u *UserCreate) AfterCreate(tx *gorm.DB) (err error) {
 	ctx := tx.Statement.Context
 	if rabbitmqService, ok := rabbitmq.FromContext(ctx); ok {
 		log.Println("AfterCreate rabbitmqService:", rabbitmqService)
 		go func() {
 			defer common.Recovery()
-			if publishErr := rabbitmqService.PublishWithTopic(ctx, common.IndexingQueue, u); publishErr != nil {
+			dataIndex := &common.DataIndex{
+				Id:       fmt.Sprintf("%d", u.Id),
+				Index:    u.TableIndex(),
+				Action:   common.Create,
+				Data:     common.CompactJson(u),
+				SendTime: time.Now(),
+			}
+			if publishErr := rabbitmqService.PublishWithTopic(ctx, common.IndexingQueue, dataIndex); publishErr != nil {
 				log.Println("AfterCreate publish error:", publishErr)
 			}
 		}()

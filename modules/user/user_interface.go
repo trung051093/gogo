@@ -14,9 +14,9 @@ type Reader interface {
 
 //Writer user writer
 type Writer interface {
-	Create(ctx context.Context, user *usermodel.User) error
-	Update(ctx context.Context, cond map[string]interface{}, userUpdate *usermodel.UserUpdate) error
-	Delete(ctx context.Context, cond map[string]interface{}) (*usermodel.User, error)
+	Create(ctx context.Context, user *usermodel.User) (int, error)
+	Update(ctx context.Context, id uint, userUpdate *usermodel.UserUpdate) error
+	Delete(ctx context.Context, user *usermodel.User) error
 }
 
 //Repository interface

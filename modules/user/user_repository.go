@@ -23,15 +23,15 @@ func (r *userRepository) Create(ctx context.Context, user *usermodel.UserCreate)
 	return user.Id, nil
 }
 
-func (r *userRepository) Update(ctx context.Context, cond map[string]interface{}, userUpdate *usermodel.UserUpdate) error {
-	if err := r.db.WithContext(ctx).Where(cond).Updates(&userUpdate).Error; err != nil {
+func (r *userRepository) Update(ctx context.Context, id uint, userUpdate *usermodel.UserUpdate) error {
+	if err := r.db.WithContext(ctx).Where(map[string]interface{}{"id": id}).Updates(&userUpdate).Error; err != nil {
 		return common.ErrorCannotUpdateEntity(usermodel.EntityName, err)
 	}
 	return nil
 }
 
-func (r *userRepository) Delete(ctx context.Context, cond map[string]interface{}) error {
-	if err := r.db.WithContext(ctx).Where(cond).Delete(&usermodel.User{}).Error; err != nil {
+func (r *userRepository) Delete(ctx context.Context, user *usermodel.User) error {
+	if err := r.db.WithContext(ctx).Delete(user).Error; err != nil {
 		return common.ErrorCannotDeleteEntity(usermodel.EntityName, err)
 	}
 	return nil

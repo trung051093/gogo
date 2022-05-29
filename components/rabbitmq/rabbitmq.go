@@ -2,10 +2,10 @@ package rabbitmq
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
 	"sync"
-	"user_management/common"
 
 	"github.com/streadway/amqp"
 )
@@ -85,7 +85,7 @@ func (r *RabbitmqSerivce) GetQueue(ctx context.Context, topic string) (amqp.Queu
 	)
 }
 
-func (r *RabbitmqSerivce) Publish(ctx context.Context, queue amqp.Queue, message string) error {
+func (r *RabbitmqSerivce) Publish(ctx context.Context, queue amqp.Queue, body []byte) error {
 	return r.channel.Publish(
 		"",         // exchange
 		queue.Name, // routing key
@@ -93,7 +93,7 @@ func (r *RabbitmqSerivce) Publish(ctx context.Context, queue amqp.Queue, message
 		false,      // immediate
 		amqp.Publishing{
 			ContentType: "text/plain",
-			Body:        []byte(message),
+			Body:        body,
 		})
 }
 
@@ -102,15 +102,15 @@ func (r *RabbitmqSerivce) PublishWithTopic(ctx context.Context, topic string, da
 	if queueErr != nil {
 		return queueErr
 	}
-	message, convertMessageErr := common.ConvertJsonToString(common.CompactJson(data))
-	if convertMessageErr != nil {
-		return convertMessageErr
+	databyte, dataErr := json.Marshal(data)
+	if dataErr != nil {
+		return dataErr
 	}
-	r.Publish(ctx, queue, message)
+	r.Publish(ctx, queue, databyte)
 	return nil
 }
 
-func (r *RabbitmqSerivce) Consume(q amqp.Queue) (<-chan amqp.Delivery, error) {
+func (r *RabbitmqSerivce) Consume(ctx context.Context, q amqp.Queue) (<-chan amqp.Delivery, error) {
 	return r.channel.Consume(
 		q.Name, // queue
 		"",     // consumer
@@ -120,6 +120,10 @@ func (r *RabbitmqSerivce) Consume(q amqp.Queue) (<-chan amqp.Delivery, error) {
 		false,  // no-wait
 		nil,    // args
 	)
+}
+
+func (r *RabbitmqSerivce) QueuePurge(ctx context.Context, topic string) (int, error) {
+	return r.channel.QueuePurge(topic, false)
 }
 
 func (r *RabbitmqSerivce) Close() {

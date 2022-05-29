@@ -35,7 +35,8 @@ func (s *userService) UpdateUser(ctx context.Context, id uint, userUpdate *userm
 	if user == nil || err != nil {
 		return err
 	}
-	return s.repo.Update(ctx, map[string]interface{}{"id": id}, userUpdate)
+	userUpdate.Id = *user.Id
+	return s.repo.Update(ctx, id, userUpdate)
 }
 
 func (s *userService) DeleteUser(ctx context.Context, id uint) error {
@@ -43,5 +44,5 @@ func (s *userService) DeleteUser(ctx context.Context, id uint) error {
 	if user == nil || err != nil {
 		return err
 	}
-	return s.repo.Delete(ctx, map[string]interface{}{"id": id})
+	return s.repo.Delete(ctx, user)
 }
