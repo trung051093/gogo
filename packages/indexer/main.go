@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"log"
 	"user_management/common"
 	"user_management/components/appctx"
@@ -23,7 +24,7 @@ func main() {
 	if esErr != nil {
 		return
 	}
-	esService.LogInfo()
+	esService.LogInfo(context.Background())
 
 	configRabbitMQ := &rabbitmq.RabbitmqConfig{
 		Host: config.RabbitMQ.Host,
@@ -37,7 +38,7 @@ func main() {
 	}
 	defer rabbitmqService.Close()
 
-	queue, queueErr := rabbitmqService.GetQueue(common.IndexingQueue)
+	queue, queueErr := rabbitmqService.GetQueue(context.Background(), common.IndexingQueue)
 	if queueErr != nil {
 		log.Println("Get Queue Failled: ", queueErr)
 		return

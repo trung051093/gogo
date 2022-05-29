@@ -47,7 +47,7 @@ func FromContext(ctx context.Context) (*ElasticSearchSevice, bool) {
 	return nil, false
 }
 
-func (es *ElasticSearchSevice) LogInfo() {
+func (es *ElasticSearchSevice) LogInfo(ctx context.Context) {
 	var (
 		r map[string]interface{}
 	)

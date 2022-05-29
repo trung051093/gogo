@@ -67,7 +67,7 @@ func FromContext(ctx context.Context) (*RabbitmqSerivce, bool) {
 	return nil, false
 }
 
-func (r *RabbitmqSerivce) GetQueue(topic string) (amqp.Queue, error) {
+func (r *RabbitmqSerivce) GetQueue(ctx context.Context, topic string) (amqp.Queue, error) {
 	return r.channel.QueueDeclare(
 		topic, // name
 		false, // durable
@@ -78,7 +78,7 @@ func (r *RabbitmqSerivce) GetQueue(topic string) (amqp.Queue, error) {
 	)
 }
 
-func (r *RabbitmqSerivce) Publish(queue amqp.Queue, message string) error {
+func (r *RabbitmqSerivce) Publish(ctx context.Context, queue amqp.Queue, message string) error {
 	return r.channel.Publish(
 		"",         // exchange
 		queue.Name, // routing key
@@ -90,8 +90,8 @@ func (r *RabbitmqSerivce) Publish(queue amqp.Queue, message string) error {
 		})
 }
 
-func (r *RabbitmqSerivce) PublishWithTopic(topic string, data interface{}) error {
-	queue, queueErr := r.GetQueue(topic)
+func (r *RabbitmqSerivce) PublishWithTopic(ctx context.Context, topic string, data interface{}) error {
+	queue, queueErr := r.GetQueue(ctx, topic)
 	if queueErr != nil {
 		return queueErr
 	}
@@ -99,7 +99,7 @@ func (r *RabbitmqSerivce) PublishWithTopic(topic string, data interface{}) error
 	if convertMessageErr != nil {
 		return convertMessageErr
 	}
-	r.Publish(queue, message)
+	r.Publish(ctx, queue, message)
 	return nil
 }
 
