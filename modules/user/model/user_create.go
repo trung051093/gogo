@@ -30,6 +30,7 @@ func (u *UserCreate) AfterCreate(tx *gorm.DB) (err error) {
 	ctx := tx.Statement.Context
 	if rabbitmqService, ok := rabbitmq.FromContext(ctx); ok {
 		go func() {
+			defer common.Recovery()
 			if publishErr := rabbitmqService.PublishWithTopic(common.IndexingQueue, u); publishErr != nil {
 				log.Println("AfterCreate publish error:", publishErr)
 			}

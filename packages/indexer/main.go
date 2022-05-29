@@ -50,6 +50,7 @@ func main() {
 	forever := make(chan bool)
 
 	go func() {
+		defer common.Recovery()
 		for d := range msgs {
 			log.Printf("Received a message: %s", d.Body)
 		}
