@@ -31,28 +31,34 @@ var connErr error
 var channelErr error
 
 func NewRabbitMQ(config RabbitmqConfig) (*RabbitmqSerivce, error) {
-	once.Do(func() {
-		connStr := fmt.Sprintf("amqp://%s:%s@%s:%d/", config.User, config.Pass, config.Host, config.Port)
-		conn, connErr := amqp.Dial(connStr)
-		if connErr != nil {
-			log.Println("Failed to connect to RabbitMQ: ", connErr)
-		}
-		channel, channelErr := conn.Channel()
-		if channelErr != nil {
-			log.Println("Failed to open the channel RabbitMQ: ", channelErr)
-		}
-		instance = &RabbitmqSerivce{
-			conn:    conn,
-			channel: channel,
-		}
-	})
+	connStr := fmt.Sprintf("amqp://%s:%s@%s:%d/", config.User, config.Pass, config.Host, config.Port)
+	conn, connErr := amqp.Dial(connStr)
 	if connErr != nil {
+		log.Println("Failed to connect to RabbitMQ: ", connErr)
 		return nil, connErr
 	}
+
+	channel, channelErr := conn.Channel()
 	if channelErr != nil {
+		log.Println("Failed to open the channel RabbitMQ: ", channelErr)
 		return nil, channelErr
 	}
-	return instance, nil
+
+	return &RabbitmqSerivce{
+		conn:    conn,
+		channel: channel,
+	}, nil
+}
+
+func GetIntance(config RabbitmqConfig) *RabbitmqSerivce {
+	once.Do(func() {
+		service, err := NewRabbitMQ(config)
+		if err != nil {
+			return
+		}
+		instance = service
+	})
+	return instance
 }
 
 func WithContext(ctx context.Context, rabbitmq *RabbitmqSerivce) context.Context {

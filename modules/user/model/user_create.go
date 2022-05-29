@@ -29,6 +29,7 @@ func (UserCreate) TableName() string { return User{}.TableName() }
 func (u *UserCreate) AfterCreate(tx *gorm.DB) (err error) {
 	ctx := tx.Statement.Context
 	if rabbitmqService, ok := rabbitmq.FromContext(ctx); ok {
+		log.Println("AfterCreate rabbitmqService:", rabbitmqService)
 		go func() {
 			defer common.Recovery()
 			if publishErr := rabbitmqService.PublishWithTopic(ctx, common.IndexingQueue, u); publishErr != nil {
