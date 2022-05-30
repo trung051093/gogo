@@ -71,6 +71,7 @@ func main() {
 		v1.DELETE("/user/:id", user.DeleteUserHandler(appCtx))
 		v1.GET("/user/:id", user.GetUserHandler(appCtx))
 		v1.GET("/users", user.ListUserHandler(appCtx))
+		v1.GET("/user/search", user.SearchUserHandler(appCtx))
 
 		// authentication
 		v1.POST("/auth/register", auth.RegisterUserHandler(appCtx))

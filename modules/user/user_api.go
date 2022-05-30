@@ -112,7 +112,8 @@ func ListUserHandler(appCtx appctx.AppContext) func(*gin.Context) {
 		var filter usermodel.UserFilter
 		var paging common.Pagination
 
-		filter.Order = ginCtx.Query("order")
+		filter.SortField = ginCtx.Query("sortField")
+		filter.SortName = ginCtx.Query("sortName")
 
 		if err := filter.Process(); err != nil {
 			panic(common.ErrorInvalidRequest(usermodel.EntityName, err))
@@ -167,5 +168,53 @@ func DeleteUserHandler(appCtx appctx.AppContext) func(*gin.Context) {
 		}
 
 		ginCtx.JSON(http.StatusOK, common.SimpleSuccessResponse(true))
+	}
+}
+
+func SearchUserHandler(appCtx appctx.AppContext) func(*gin.Context) {
+	return func(ginCtx *gin.Context) {
+		var filter usermodel.UserFilter
+		var paging common.Pagination
+
+		query := ginCtx.Query("query")
+		lastIndex := ginCtx.Query("lastIndex")
+		filter.SortField = ginCtx.Query("sortField")
+		filter.SortName = ginCtx.Query("sortName")
+
+		if err := filter.Process(); err != nil {
+			panic(common.ErrorInvalidRequest(usermodel.EntityName, err))
+		}
+
+		if pageQuery, err := strconv.Atoi(ginCtx.Query("page")); err != nil {
+			paging.Page = common.DefaultPage
+		} else {
+			paging.Page = pageQuery
+		}
+
+		if limitQuery, err := strconv.Atoi(ginCtx.Query("limit")); err != nil {
+			paging.Limit = common.DefaultLimit
+		} else {
+			paging.Limit = limitQuery
+		}
+
+		if err := paging.Paginate(); err != nil {
+			panic(common.ErrorInvalidRequest(usermodel.EntityName, err))
+		}
+
+		esService := appCtx.GetESService()
+		userEsQuery := &usermodel.UserEsQuery{
+			Query:     query,
+			LastIndex: lastIndex,
+			Paging:    &paging,
+			Filter:    &filter,
+		}
+		esUserQuery := usermodel.GetUserESQuery(ginCtx.Request.Context(), userEsQuery)
+		data, err := esService.Search(ginCtx.Request.Context(), usermodel.User{}.TableIndex(), esUserQuery)
+
+		if err != nil {
+			panic(common.ErrorCannotFoundEntity(usermodel.EntityName, err))
+		}
+
+		ginCtx.JSON(http.StatusOK, common.SimpleSuccessResponse(data))
 	}
 }

@@ -1,8 +1,9 @@
 package usermodel
 
 type UserFilter struct {
-	Fields []string `json:"fields"`
-	Order  string   `json:"order"`
+	Fields    []string `json:"fields"`
+	SortField string   `json:"sortField"`
+	SortName  string   `json:"sortName"`
 }
 
 func (u *UserFilter) Process() error {
@@ -23,8 +24,12 @@ func (u *UserFilter) Process() error {
 		}
 	}
 
-	if u.Order == "" {
-		u.Order = "Id desc"
+	if u.SortField == "" {
+		u.SortField = "id"
+	}
+
+	if u.SortName == "" {
+		u.SortName = "desc"
 	}
 
 	return nil

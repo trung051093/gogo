@@ -2,6 +2,7 @@ package user
 
 import (
 	"context"
+	"fmt"
 	"user_management/common"
 	usermodel "user_management/modules/user/model"
 
@@ -49,12 +50,12 @@ func (r *userRepository) Get(ctx context.Context, id uint) (*usermodel.User, err
 
 func (r *userRepository) Search(ctx context.Context, cond map[string]interface{}, filter *usermodel.UserFilter, paging *common.Pagination) ([]usermodel.User, error) {
 	var users []usermodel.User
-
+	order := fmt.Sprintf("%s %s", filter.SortField, filter.SortName)
 	if err := r.db.WithContext(ctx).Model(&usermodel.User{}).Where(cond).Count(&paging.Total).Error; err != nil {
 		return nil, common.ErrorCannotListEntity(usermodel.EntityName, err)
 	}
 
-	if err := r.db.WithContext(ctx).Model(&usermodel.User{}).Limit(paging.Limit).Offset(paging.Offset).Where(cond).Order(filter.Order).Select(filter.Fields).Find(&users).Error; err != nil {
+	if err := r.db.WithContext(ctx).Model(&usermodel.User{}).Limit(paging.Limit).Offset(paging.Offset).Where(cond).Order(order).Select(filter.Fields).Find(&users).Error; err != nil {
 		return nil, common.ErrorCannotListEntity(usermodel.EntityName, err)
 	}
 

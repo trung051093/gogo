@@ -4,9 +4,11 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"fmt"
 	"log"
 	"strings"
 	"sync"
+	elasticsearchmodel "user_management/components/elasticsearch/model"
 
 	"github.com/elastic/go-elasticsearch/v8"
 	"github.com/elastic/go-elasticsearch/v8/esapi"
@@ -19,7 +21,7 @@ type ElasticSearchSevice interface {
 	GetClient(ctx context.Context) *elasticsearch.Client
 	Index(ctx context.Context, index string, id string, data []byte)
 	Delete(ctx context.Context, index string, id string)
-	Search()
+	Search(ctx context.Context, index string, query string) (*elasticsearchmodel.SearchResults, error)
 }
 
 type elasticSearchSevice struct {
@@ -149,6 +151,92 @@ func (es *elasticSearchSevice) Delete(ctx context.Context, index string, id stri
 	}
 }
 
-func (es *elasticSearchSevice) Search() {
+// Search returns results matching a query, paginated by after.
+func (es *elasticSearchSevice) Search(ctx context.Context, index string, query string) (*elasticsearchmodel.SearchResults, error) {
+	var results elasticsearchmodel.SearchResults
 
+	res, err := es.client.Search(
+		es.client.Search.WithIndex(index),
+		es.client.Search.WithBody(strings.NewReader(query)),
+	)
+	if err != nil {
+		return &results, err
+	}
+	defer res.Body.Close()
+
+	if res.IsError() {
+		var e map[string]interface{}
+		if err := json.NewDecoder(res.Body).Decode(&e); err != nil {
+			return &results, err
+		}
+		return &results, fmt.Errorf("[%s] %s: %s", res.Status(), e["error"].(map[string]interface{})["type"], e["error"].(map[string]interface{})["reason"])
+	}
+
+	type envelopeResponse struct {
+		Took int
+		Hits struct {
+			Total struct {
+				Value int
+			}
+			Hits []struct {
+				ID         string          `json:"_id"`
+				Source     json.RawMessage `json:"_source"`
+				Highlights json.RawMessage `json:"highlight"`
+				Sort       []interface{}   `json:"sort"`
+			}
+		}
+	}
+
+	var r envelopeResponse
+	if err := json.NewDecoder(res.Body).Decode(&r); err != nil {
+		return &results, err
+	}
+
+	results.Total = r.Hits.Total.Value
+
+	if len(r.Hits.Hits) < 1 {
+		results.Hits = []map[string]interface{}{}
+		return &results, nil
+	}
+
+	for _, hit := range r.Hits.Hits {
+		var data interface{}
+		var highlights interface{}
+		h := map[string]interface{}{
+			"sort": hit.Sort,
+		}
+
+		if err := json.Unmarshal(hit.Source, &data); err != nil {
+			return &results, err
+		}
+
+		if len(hit.Highlights) > 0 {
+			if err := json.Unmarshal(hit.Highlights, &highlights); err != nil {
+				return &results, err
+			}
+		}
+
+		h["highlights"] = highlights
+		h["data"] = data
+		results.Hits = append(results.Hits, h)
+	}
+
+	return &results, nil
+}
+
+func BuildQuery(ctx context.Context, query string, after ...string) string {
+	var b strings.Builder
+
+	b.WriteString("{\n")
+	b.WriteString(query)
+
+	if len(after) > 0 && after[0] != "" && after[0] != "null" {
+		b.WriteString(",\n")
+		b.WriteString(fmt.Sprintf(`	"search_after": %s`, after))
+	}
+
+	b.WriteString("\n}")
+
+	fmt.Printf("%s\n", b.String())
+	return b.String()
 }
