@@ -12,24 +12,24 @@ type AppContext interface {
 	GetMainDBConnection() *gorm.DB
 	GetValidator() *validator.Validate
 	GetConfig() *Config
-	GetESService() *elasticsearch.ElasticSearchSevice
-	GetRabbitMQService() *rabbitmq.RabbitmqSerivce
+	GetESService() elasticsearch.ElasticSearchSevice
+	GetRabbitMQService() rabbitmq.RabbitmqSerivce
 }
 
 type appContext struct {
 	config          *Config
 	db              *gorm.DB
 	validate        *validator.Validate
-	esService       *elasticsearch.ElasticSearchSevice
-	rabbitmqService *rabbitmq.RabbitmqSerivce
+	esService       elasticsearch.ElasticSearchSevice
+	rabbitmqService rabbitmq.RabbitmqSerivce
 }
 
 func NewAppContext(
 	db *gorm.DB,
 	validate *validator.Validate,
 	config *Config,
-	esService *elasticsearch.ElasticSearchSevice,
-	rabbitmqService *rabbitmq.RabbitmqSerivce,
+	esService elasticsearch.ElasticSearchSevice,
+	rabbitmqService rabbitmq.RabbitmqSerivce,
 ) *appContext {
 	return &appContext{
 		db:              db,
@@ -52,10 +52,10 @@ func (appCtx *appContext) GetConfig() *Config {
 	return appCtx.config
 }
 
-func (appCtx *appContext) GetESService() *elasticsearch.ElasticSearchSevice {
+func (appCtx *appContext) GetESService() elasticsearch.ElasticSearchSevice {
 	return appCtx.esService
 }
 
-func (appCtx *appContext) GetRabbitMQService() *rabbitmq.RabbitmqSerivce {
+func (appCtx *appContext) GetRabbitMQService() rabbitmq.RabbitmqSerivce {
 	return appCtx.rabbitmqService
 }

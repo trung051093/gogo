@@ -14,25 +14,33 @@ import (
 
 type key string
 
-type ElasticSearchSevice struct {
+type ElasticSearchSevice interface {
+	LogInfo(ctx context.Context)
+	GetClient(ctx context.Context) *elasticsearch.Client
+	Index(ctx context.Context, index string, id string, data []byte)
+	Delete(ctx context.Context, index string, id string)
+	Search()
+}
+
+type elasticSearchSevice struct {
 	client *elasticsearch.Client
 }
 
 var ElasticSearchServiceKey key = "ElasticSearchService"
 var once sync.Once
-var instance *ElasticSearchSevice
+var instance *elasticSearchSevice
 var instanceErr error
 
-func NewEsService(config elasticsearch.Config) (*ElasticSearchSevice, error) {
+func NewEsService(config elasticsearch.Config) (*elasticSearchSevice, error) {
 	client, err := elasticsearch.NewClient(config)
 	if err != nil {
 		log.Fatalf("Error creating the client: %s", err)
 	}
-	return &ElasticSearchSevice{client: client}, nil
+	return &elasticSearchSevice{client: client}, nil
 }
 
 // singleton
-func GetIntance(config elasticsearch.Config) (*ElasticSearchSevice, error) {
+func GetIntance(config elasticsearch.Config) (*elasticSearchSevice, error) {
 	once.Do(func() {
 		service, instanceErr := NewEsService(config)
 		if instanceErr != nil {
@@ -44,23 +52,23 @@ func GetIntance(config elasticsearch.Config) (*ElasticSearchSevice, error) {
 	return instance, instanceErr
 }
 
-func WithContext(ctx context.Context, es *ElasticSearchSevice) context.Context {
+func WithContext(ctx context.Context, es ElasticSearchSevice) context.Context {
 	return context.WithValue(ctx, ElasticSearchServiceKey, es)
 }
 
-func FromContext(ctx context.Context) (*ElasticSearchSevice, bool) {
+func FromContext(ctx context.Context) (*elasticSearchSevice, bool) {
 	esService := ctx.Value(ElasticSearchServiceKey)
-	if es, ok := esService.(*ElasticSearchSevice); ok {
+	if es, ok := esService.(*elasticSearchSevice); ok {
 		return es, true
 	}
 	return nil, false
 }
 
-func (es *ElasticSearchSevice) GetClient(ctx context.Context) *elasticsearch.Client {
+func (es *elasticSearchSevice) GetClient(ctx context.Context) *elasticsearch.Client {
 	return es.client
 }
 
-func (es *ElasticSearchSevice) LogInfo(ctx context.Context) {
+func (es *elasticSearchSevice) LogInfo(ctx context.Context) {
 	var (
 		r map[string]interface{}
 	)
@@ -84,7 +92,7 @@ func (es *ElasticSearchSevice) LogInfo(ctx context.Context) {
 	log.Println(strings.Repeat("~", 37))
 }
 
-func (es *ElasticSearchSevice) Index(ctx context.Context, index string, id string, data []byte) {
+func (es *elasticSearchSevice) Index(ctx context.Context, index string, id string, data []byte) {
 	// Set up the request object.
 	req := esapi.IndexRequest{
 		Index:      index,
@@ -114,7 +122,7 @@ func (es *ElasticSearchSevice) Index(ctx context.Context, index string, id strin
 }
 
 // delete document by ID
-func (es *ElasticSearchSevice) Delete(ctx context.Context, index string, id string) {
+func (es *elasticSearchSevice) Delete(ctx context.Context, index string, id string) {
 	// Set up the request object.
 	req := esapi.DeleteRequest{
 		Index:      index,
@@ -139,4 +147,8 @@ func (es *ElasticSearchSevice) Delete(ctx context.Context, index string, id stri
 			log.Printf("[%s] %s; version=%d", res.Status(), r["result"], int(r["_version"].(float64)))
 		}
 	}
+}
+
+func (es *elasticSearchSevice) Search() {
+
 }

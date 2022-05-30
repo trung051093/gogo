@@ -10,6 +10,14 @@ import (
 	"github.com/streadway/amqp"
 )
 
+type RabbitmqSerivce interface {
+	GetQueue(ctx context.Context, topic string) (amqp.Queue, error)
+	PublishWithTopic(ctx context.Context, topic string, data interface{}) error
+	Consume(ctx context.Context, q amqp.Queue) (<-chan amqp.Delivery, error)
+	QueuePurge(ctx context.Context, topic string) (int, error)
+	Close()
+}
+
 type RabbitmqConfig struct {
 	Host string
 	Port int
@@ -17,7 +25,7 @@ type RabbitmqConfig struct {
 	Pass string
 }
 
-type RabbitmqSerivce struct {
+type rabbitmqSerivce struct {
 	conn    *amqp.Connection
 	channel *amqp.Channel
 }
@@ -26,10 +34,10 @@ type key string
 
 var RabbitMQServiceKey key = "RabbitMQService"
 var once sync.Once
-var instance *RabbitmqSerivce
+var instance *rabbitmqSerivce
 var instanceErr error
 
-func NewRabbitMQ(config RabbitmqConfig) (*RabbitmqSerivce, error) {
+func NewRabbitMQ(config RabbitmqConfig) (*rabbitmqSerivce, error) {
 	connStr := fmt.Sprintf("amqp://%s:%s@%s:%d/", config.User, config.Pass, config.Host, config.Port)
 	conn, connErr := amqp.Dial(connStr)
 	if connErr != nil {
@@ -43,14 +51,14 @@ func NewRabbitMQ(config RabbitmqConfig) (*RabbitmqSerivce, error) {
 		return nil, channelErr
 	}
 
-	return &RabbitmqSerivce{
+	return &rabbitmqSerivce{
 		conn:    conn,
 		channel: channel,
 	}, nil
 }
 
 // singleton
-func GetIntance(config RabbitmqConfig) (*RabbitmqSerivce, error) {
+func GetIntance(config RabbitmqConfig) (*rabbitmqSerivce, error) {
 	once.Do(func() {
 		service, instanceErr := NewRabbitMQ(config)
 		if instanceErr != nil {
@@ -62,19 +70,19 @@ func GetIntance(config RabbitmqConfig) (*RabbitmqSerivce, error) {
 	return instance, instanceErr
 }
 
-func WithContext(ctx context.Context, rabbitmq *RabbitmqSerivce) context.Context {
+func WithContext(ctx context.Context, rabbitmq RabbitmqSerivce) context.Context {
 	return context.WithValue(ctx, RabbitMQServiceKey, rabbitmq)
 }
 
-func FromContext(ctx context.Context) (*RabbitmqSerivce, bool) {
+func FromContext(ctx context.Context) (*rabbitmqSerivce, bool) {
 	rabbitmqService := ctx.Value(RabbitMQServiceKey)
-	if es, ok := rabbitmqService.(*RabbitmqSerivce); ok {
+	if es, ok := rabbitmqService.(*rabbitmqSerivce); ok {
 		return es, true
 	}
 	return nil, false
 }
 
-func (r *RabbitmqSerivce) GetQueue(ctx context.Context, topic string) (amqp.Queue, error) {
+func (r *rabbitmqSerivce) GetQueue(ctx context.Context, topic string) (amqp.Queue, error) {
 	return r.channel.QueueDeclare(
 		topic, // name
 		false, // durable
@@ -85,7 +93,7 @@ func (r *RabbitmqSerivce) GetQueue(ctx context.Context, topic string) (amqp.Queu
 	)
 }
 
-func (r *RabbitmqSerivce) Publish(ctx context.Context, queue amqp.Queue, body []byte) error {
+func (r *rabbitmqSerivce) publish(ctx context.Context, queue amqp.Queue, body []byte) error {
 	return r.channel.Publish(
 		"",         // exchange
 		queue.Name, // routing key
@@ -97,7 +105,7 @@ func (r *RabbitmqSerivce) Publish(ctx context.Context, queue amqp.Queue, body []
 		})
 }
 
-func (r *RabbitmqSerivce) PublishWithTopic(ctx context.Context, topic string, data interface{}) error {
+func (r *rabbitmqSerivce) PublishWithTopic(ctx context.Context, topic string, data interface{}) error {
 	queue, queueErr := r.GetQueue(ctx, topic)
 	if queueErr != nil {
 		return queueErr
@@ -106,11 +114,11 @@ func (r *RabbitmqSerivce) PublishWithTopic(ctx context.Context, topic string, da
 	if dataErr != nil {
 		return dataErr
 	}
-	r.Publish(ctx, queue, databyte)
+	r.publish(ctx, queue, databyte)
 	return nil
 }
 
-func (r *RabbitmqSerivce) Consume(ctx context.Context, q amqp.Queue) (<-chan amqp.Delivery, error) {
+func (r *rabbitmqSerivce) Consume(ctx context.Context, q amqp.Queue) (<-chan amqp.Delivery, error) {
 	return r.channel.Consume(
 		q.Name, // queue
 		"",     // consumer
@@ -122,11 +130,11 @@ func (r *RabbitmqSerivce) Consume(ctx context.Context, q amqp.Queue) (<-chan amq
 	)
 }
 
-func (r *RabbitmqSerivce) QueuePurge(ctx context.Context, topic string) (int, error) {
+func (r *rabbitmqSerivce) QueuePurge(ctx context.Context, topic string) (int, error) {
 	return r.channel.QueuePurge(topic, false)
 }
 
-func (r *RabbitmqSerivce) Close() {
+func (r *rabbitmqSerivce) Close() {
 	r.channel.Close()
 	r.conn.Close()
 }
