@@ -5,7 +5,7 @@ import (
 	"log"
 	"user_management/components/appctx"
 	"user_management/components/elasticsearch"
-	"user_management/components/rabbitmq"
+	rabbitmqprovider "user_management/components/rabbitmq"
 	"user_management/middleware"
 	"user_management/modules/auth"
 	"user_management/modules/user"
@@ -48,12 +48,11 @@ func main() {
 	}
 
 	configRabbitMQ := config.GetRabbitMQConfig()
-	rabbitmqService, rabbitErr := rabbitmq.NewRabbitMQ(*configRabbitMQ)
+	rabbitmqService, rabbitErr := rabbitmqprovider.NewRabbitMQ(*configRabbitMQ)
 	if rabbitErr != nil {
 		return
 	}
-	defer rabbitmqService.Close()
-
+	// defer rabbitmqService.Close()
 	appCtx := appctx.NewAppContext(db, validate, config, esService, rabbitmqService)
 
 	router := gin.Default()

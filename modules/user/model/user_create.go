@@ -5,7 +5,7 @@ import (
 	"log"
 	"time"
 	"user_management/common"
-	"user_management/components/rabbitmq"
+	rabbitmqprovider "user_management/components/rabbitmq"
 
 	"gorm.io/gorm"
 )
@@ -31,8 +31,7 @@ func (UserCreate) TableIndex() string { return User{}.TableIndex() }
 
 func (u *UserCreate) AfterCreate(tx *gorm.DB) (err error) {
 	ctx := tx.Statement.Context
-	if rabbitmqService, ok := rabbitmq.FromContext(ctx); ok {
-		log.Println("AfterCreate rabbitmqService:", rabbitmqService)
+	if rabbitmqService, ok := rabbitmqprovider.FromContext(ctx); ok {
 		go func() {
 			defer common.Recovery()
 			dataIndex := &common.DataIndex{
@@ -42,7 +41,7 @@ func (u *UserCreate) AfterCreate(tx *gorm.DB) (err error) {
 				Data:     common.CompactJson(u),
 				SendTime: time.Now(),
 			}
-			if publishErr := rabbitmqService.PublishWithTopic(ctx, common.IndexingQueue, dataIndex); publishErr != nil {
+			if publishErr := rabbitmqService.Publish(ctx, common.JsonToByte(dataIndex), []string{common.IndexingQueue}); publishErr != nil {
 				log.Println("AfterCreate publish error:", publishErr)
 			}
 		}()

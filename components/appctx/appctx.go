@@ -2,7 +2,7 @@ package appctx
 
 import (
 	"user_management/components/elasticsearch"
-	"user_management/components/rabbitmq"
+	rabbitmqprovider "user_management/components/rabbitmq"
 
 	"github.com/go-playground/validator/v10"
 	"gorm.io/gorm"
@@ -13,7 +13,7 @@ type AppContext interface {
 	GetValidator() *validator.Validate
 	GetConfig() *Config
 	GetESService() elasticsearch.ElasticSearchSevice
-	GetRabbitMQService() rabbitmq.RabbitmqSerivce
+	GetRabbitMQService() rabbitmqprovider.RabbitmqSerivce
 }
 
 type appContext struct {
@@ -21,7 +21,7 @@ type appContext struct {
 	db              *gorm.DB
 	validate        *validator.Validate
 	esService       elasticsearch.ElasticSearchSevice
-	rabbitmqService rabbitmq.RabbitmqSerivce
+	rabbitmqService rabbitmqprovider.RabbitmqSerivce
 }
 
 func NewAppContext(
@@ -29,7 +29,7 @@ func NewAppContext(
 	validate *validator.Validate,
 	config *Config,
 	esService elasticsearch.ElasticSearchSevice,
-	rabbitmqService rabbitmq.RabbitmqSerivce,
+	rabbitmqService rabbitmqprovider.RabbitmqSerivce,
 ) *appContext {
 	return &appContext{
 		db:              db,
@@ -56,6 +56,6 @@ func (appCtx *appContext) GetESService() elasticsearch.ElasticSearchSevice {
 	return appCtx.esService
 }
 
-func (appCtx *appContext) GetRabbitMQService() rabbitmq.RabbitmqSerivce {
+func (appCtx *appContext) GetRabbitMQService() rabbitmqprovider.RabbitmqSerivce {
 	return appCtx.rabbitmqService
 }

@@ -3,7 +3,16 @@ package common
 import (
 	"encoding/json"
 	"errors"
+	"log"
 )
+
+func JsonSprint(msg string, data interface{}) {
+	out, err := json.Marshal(data)
+	if err != nil {
+		panic(err)
+	}
+	log.Println(msg + string(out))
+}
 
 func CompactJson(data interface{}) interface{} {
 	var dataJs interface{} = data
@@ -17,7 +26,7 @@ func CompactJson(data interface{}) interface{} {
 	return dataJs
 }
 
-func ConvertJsonToString(data interface{}) (string, error) {
+func JsonToString(data interface{}) (string, error) {
 	dataBytes, _ := json.Marshal(data)
 	if json.Valid(dataBytes) {
 		str := string(dataBytes)
@@ -26,10 +35,18 @@ func ConvertJsonToString(data interface{}) (string, error) {
 	return "", errors.New("Invalid json string")
 }
 
-func ConvertStringToJson(str string) (interface{}, error) {
+func StringToJson(str string) (interface{}, error) {
 	var data interface{}
 	if err := json.Unmarshal([]byte(str), &data); err != nil {
 		return nil, err
 	}
 	return data, nil
+}
+
+func JsonToByte(data interface{}) []byte {
+	dataByte, err := json.Marshal(data)
+	if err != nil {
+		return nil
+	}
+	return dataByte
 }

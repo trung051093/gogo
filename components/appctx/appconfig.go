@@ -5,7 +5,7 @@ import (
 	"os"
 	"path"
 	"runtime"
-	"user_management/components/rabbitmq"
+	rabbitmqprovider "user_management/components/rabbitmq"
 
 	es "github.com/elastic/go-elasticsearch/v8"
 	"gopkg.in/yaml.v3"
@@ -83,8 +83,8 @@ func GetConfig() *Config {
 	return &cfg
 }
 
-func (cfg *Config) GetRabbitMQConfig() *rabbitmq.RabbitmqConfig {
-	return &rabbitmq.RabbitmqConfig{
+func (cfg *Config) GetRabbitMQConfig() *rabbitmqprovider.RabbitmqConfig {
+	return &rabbitmqprovider.RabbitmqConfig{
 		Host: cfg.RabbitMQ.Host,
 		Port: cfg.RabbitMQ.Port,
 		User: cfg.RabbitMQ.Username,

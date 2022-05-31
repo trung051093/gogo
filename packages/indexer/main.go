@@ -2,14 +2,17 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
-	"sync"
+	"os"
+	"os/signal"
+	"syscall"
 	"user_management/common"
 	"user_management/components/appctx"
 	"user_management/components/elasticsearch"
-	"user_management/components/rabbitmq"
+	rabbitmqprovider "user_management/components/rabbitmq"
 
-	"github.com/streadway/amqp"
+	"github.com/wagslane/go-rabbitmq"
 )
 
 func main() {
@@ -24,39 +27,19 @@ func main() {
 	esService.LogInfo(ctx)
 
 	configRabbitMQ := config.GetRabbitMQConfig()
-	rabbitmqService, rabbitErr := rabbitmq.NewRabbitMQ(*configRabbitMQ)
+	rabbitmqService, rabbitErr := rabbitmqprovider.NewRabbitMQ(*configRabbitMQ)
 	if rabbitErr != nil {
 		return
 	}
-	defer rabbitmqService.Close()
 
-	queue, queueErr := rabbitmqService.GetQueue(ctx, common.IndexingQueue)
-	if queueErr != nil {
-		log.Println("Get Queue Failled: ", queueErr)
-		return
-	}
-	// remove all message in queue
-	rabbitmqService.QueuePurge(ctx, common.IndexingQueue)
-
-	msgs, consumErr := rabbitmqService.Consume(ctx, queue)
-	if consumErr != nil {
-		log.Println("Consume Queue Failled: ", consumErr)
-		return
-	}
-	forever := make(chan bool)
-	var wg sync.WaitGroup
-
-	for msg := range msgs {
-		wg.Add(1)
-		go func(message amqp.Delivery) {
-			defer common.Recovery()
-			defer wg.Done()
-			defer message.Ack(true)
-			log.Printf("Received a message: %s", message.Body)
-			dataIndex, dataByte, err := common.MessageToDataIndex(message.Body)
+	consumeErr := rabbitmqService.Consuming(
+		ctx,
+		func(d rabbitmq.Delivery) rabbitmq.Action {
+			log.Printf("Received a message: %v", string(d.Body))
+			dataIndex, dataByte, err := common.MessageToDataIndex(d.Body)
 			if err != nil {
 				log.Println("Error message: ", err)
-				return
+				return rabbitmq.NackRequeue
 			}
 			switch dataIndex.Action {
 			case common.Create:
@@ -66,10 +49,29 @@ func main() {
 			case common.Delete:
 				esService.Delete(ctx, dataIndex.Index, dataIndex.Id)
 			}
-		}(msg)
+			// rabbitmq.Ack, rabbitmq.NackDiscard, rabbitmq.NackRequeue
+			return rabbitmq.Ack
+		},
+		common.IndexingQueue,
+		[]string{},
+	)
+	if consumeErr != nil {
+		log.Println("Consuming error: ", consumeErr)
 	}
-	wg.Wait()
+	// block main thread - wait for shutdown signal
+	sigs := make(chan os.Signal, 1)
+	done := make(chan bool, 1)
 
-	log.Printf(" [*] Waiting for messages. To exit press CTRL+C")
-	<-forever
+	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
+
+	go func() {
+		sig := <-sigs
+		fmt.Println()
+		fmt.Println(sig)
+		done <- true
+	}()
+
+	fmt.Println("awaiting signal")
+	<-done
+	fmt.Println("stopping consumer")
 }

@@ -5,7 +5,7 @@ import (
 	"log"
 	"time"
 	"user_management/common"
-	"user_management/components/rabbitmq"
+	rabbitmqprovider "user_management/components/rabbitmq"
 
 	"gorm.io/gorm"
 )
@@ -30,7 +30,7 @@ func (UserUpdate) TableIndex() string { return User{}.TableIndex() }
 
 func (u *UserUpdate) AfterUpdate(tx *gorm.DB) (err error) {
 	ctx := tx.Statement.Context
-	if rabbitmqService, ok := rabbitmq.FromContext(ctx); ok {
+	if rabbitmqService, ok := rabbitmqprovider.FromContext(ctx); ok {
 		log.Println("AfterUpdate rabbitmqService:", rabbitmqService)
 		go func() {
 			defer common.Recovery()
@@ -41,7 +41,7 @@ func (u *UserUpdate) AfterUpdate(tx *gorm.DB) (err error) {
 				Data:     common.CompactJson(u),
 				SendTime: time.Now(),
 			}
-			if publishErr := rabbitmqService.PublishWithTopic(ctx, common.IndexingQueue, dataIndex); publishErr != nil {
+			if publishErr := rabbitmqService.Publish(ctx, common.JsonToByte(dataIndex), []string{common.IndexingQueue}); publishErr != nil {
 				log.Println("AfterUpdate publish error:", publishErr)
 			}
 		}()

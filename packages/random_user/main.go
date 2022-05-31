@@ -4,7 +4,10 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"sync"
+	"time"
 	"user_management/components/appctx"
+	rabbitmqprovider "user_management/components/rabbitmq"
 	usermodel "user_management/modules/user/model"
 
 	"user_management/modules/user"
@@ -37,6 +40,13 @@ func main() {
 
 	db.AutoMigrate(&usermodel.User{})
 
+	configRabbitMQ := config.GetRabbitMQConfig()
+	rabbitmqService, rabbitErr := rabbitmqprovider.NewRabbitMQ(*configRabbitMQ)
+	if rabbitErr != nil {
+		return
+	}
+	defer rabbitmqService.Close()
+
 	repository := user.NewUserRepository(db)
 
 	log.Println(repository)
@@ -45,27 +55,50 @@ func main() {
 		5000, "", "", "",
 	}
 	users, err := Generate(c)
+	log.Println("Number random", len(users))
 
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 
-	ctx := context.Background()
+	ctx := rabbitmqprovider.WithContext(context.Background(), rabbitmqService)
+	createCh := make(chan usermodel.UserCreate, 10)
+	done := make(chan int)
+	var wg sync.WaitGroup
 
-	for _, user := range users {
-		fmt.Println(user.Name.Title + " : " + user.Name.First + " " + user.Name.Last)
-		repository.Create(ctx, &usermodel.UserCreate{
-			FirstName:   user.Name.First,
-			LastName:    user.Name.Last,
-			Email:       user.Email,
-			PhoneNumber: user.Phone,
-			Gender:      user.Gender,
-			Address: fmt.Sprintf("%d %s %s %s",
-				user.Location.Street.Number,
-				user.Location.Street.Name,
-				user.Location.City,
-				user.Location.State),
-		})
+	go func() {
+		for _, user := range users {
+			wg.Add(1)
+			fmt.Println(user.Name.Title + " : " + user.Name.First + " " + user.Name.Last)
+			createCh <- usermodel.UserCreate{
+				FirstName:   user.Name.First,
+				LastName:    user.Name.Last,
+				Email:       user.Email,
+				PhoneNumber: user.Phone,
+				Gender:      user.Gender,
+				Address: fmt.Sprintf("%d %s %s %s",
+					user.Location.Street.Number,
+					user.Location.Street.Name,
+					user.Location.City,
+					user.Location.State),
+			}
+			time.Sleep(time.Millisecond * 100)
+		}
+		done <- 0
+	}()
+
+	for {
+		select {
+		case userCreate := <-createCh:
+			go func(u usermodel.UserCreate) {
+				repository.Create(ctx, &u)
+				wg.Done()
+			}(userCreate)
+		case <-done:
+			wg.Wait()
+			println("Done !!!")
+			return
+		}
 	}
 }

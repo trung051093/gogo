@@ -1,20 +1,18 @@
-package rabbitmq
+package rabbitmqprovider
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"log"
 	"sync"
+	"time"
 
-	"github.com/streadway/amqp"
+	"github.com/wagslane/go-rabbitmq"
 )
 
 type RabbitmqSerivce interface {
-	GetQueue(ctx context.Context, topic string) (amqp.Queue, error)
-	PublishWithTopic(ctx context.Context, topic string, data interface{}) error
-	Consume(ctx context.Context, q amqp.Queue) (<-chan amqp.Delivery, error)
-	QueuePurge(ctx context.Context, topic string) (int, error)
+	Consuming(ctx context.Context, handler rabbitmq.Handler, queue string, routingKeys []string, optionFuncs ...func(*rabbitmq.ConsumeOptions)) error
+	Publish(ctx context.Context, data []byte, routingKeys []string, optionFuncs ...func(*rabbitmq.PublishOptions)) error
 	Close()
 }
 
@@ -26,8 +24,8 @@ type RabbitmqConfig struct {
 }
 
 type rabbitmqSerivce struct {
-	conn    *amqp.Connection
-	channel *amqp.Channel
+	consumer  rabbitmq.Consumer
+	publisher *rabbitmq.Publisher
 }
 
 type key string
@@ -39,21 +37,44 @@ var instanceErr error
 
 func NewRabbitMQ(config RabbitmqConfig) (*rabbitmqSerivce, error) {
 	connStr := fmt.Sprintf("amqp://%s:%s@%s:%d/", config.User, config.Pass, config.Host, config.Port)
-	conn, connErr := amqp.Dial(connStr)
-	if connErr != nil {
-		log.Println("Failed to connect to RabbitMQ: ", connErr)
-		return nil, connErr
+	consumer, err := rabbitmq.NewConsumer(
+		connStr,
+		rabbitmq.Config{},
+		rabbitmq.WithConsumerOptionsLogging,
+		rabbitmq.WithConsumerOptionsReconnectInterval(time.Second),
+	)
+	if err != nil {
+		log.Println("Cannot create consumer: ", err)
+		return nil, err
 	}
 
-	channel, channelErr := conn.Channel()
-	if channelErr != nil {
-		log.Println("Failed to open the channel RabbitMQ: ", channelErr)
-		return nil, channelErr
+	publisher, err := rabbitmq.NewPublisher(
+		connStr,
+		rabbitmq.Config{},
+		rabbitmq.WithPublisherOptionsLogging,
+	)
+	if err != nil {
+		log.Println("Cannot create publisher: ", err)
+		return nil, err
 	}
+
+	returns := publisher.NotifyReturn()
+	go func() {
+		for r := range returns {
+			log.Printf("message returned from server: %s", string(r.Body))
+		}
+	}()
+
+	confirmations := publisher.NotifyPublish()
+	go func() {
+		for c := range confirmations {
+			log.Printf("message confirmed from server. tag: %v, ack: %v", c.DeliveryTag, c.Ack)
+		}
+	}()
 
 	return &rabbitmqSerivce{
-		conn:    conn,
-		channel: channel,
+		consumer:  consumer,
+		publisher: publisher,
 	}, nil
 }
 
@@ -82,59 +103,24 @@ func FromContext(ctx context.Context) (*rabbitmqSerivce, bool) {
 	return nil, false
 }
 
-func (r *rabbitmqSerivce) GetQueue(ctx context.Context, topic string) (amqp.Queue, error) {
-	return r.channel.QueueDeclare(
-		topic, // name
-		false, // durable
-		false, // delete when unused
-		false, // exclusive
-		false, // no-wait
-		nil,   // arguments
+func (r *rabbitmqSerivce) Consuming(ctx context.Context, handler rabbitmq.Handler, queue string, routingKeys []string, optionFuncs ...func(*rabbitmq.ConsumeOptions)) error {
+	return r.consumer.StartConsuming(
+		handler,
+		queue,
+		routingKeys,
+		rabbitmq.WithConsumeOptionsConcurrency(10),
 	)
 }
 
-func (r *rabbitmqSerivce) publish(ctx context.Context, queue amqp.Queue, body []byte) error {
-	return r.channel.Publish(
-		"",         // exchange
-		queue.Name, // routing key
-		false,      // mandatory
-		false,      // immediate
-		amqp.Publishing{
-			ContentType: "text/plain",
-			Body:        body,
-		})
-}
-
-func (r *rabbitmqSerivce) PublishWithTopic(ctx context.Context, topic string, data interface{}) error {
-	queue, queueErr := r.GetQueue(ctx, topic)
-	if queueErr != nil {
-		return queueErr
-	}
-	databyte, dataErr := json.Marshal(data)
-	if dataErr != nil {
-		return dataErr
-	}
-	r.publish(ctx, queue, databyte)
-	return nil
-}
-
-func (r *rabbitmqSerivce) Consume(ctx context.Context, q amqp.Queue) (<-chan amqp.Delivery, error) {
-	return r.channel.Consume(
-		q.Name, // queue
-		"",     // consumer
-		false,  // auto-ack
-		false,  // exclusive
-		false,  // no-local
-		false,  // no-wait
-		nil,    // args
+func (r *rabbitmqSerivce) Publish(ctx context.Context, data []byte, routingKeys []string, optionFuncs ...func(*rabbitmq.PublishOptions)) error {
+	return r.publisher.Publish(
+		data,
+		routingKeys,
+		optionFuncs...,
 	)
-}
-
-func (r *rabbitmqSerivce) QueuePurge(ctx context.Context, topic string) (int, error) {
-	return r.channel.QueuePurge(topic, false)
 }
 
 func (r *rabbitmqSerivce) Close() {
-	r.channel.Close()
-	r.conn.Close()
+	r.consumer.Close()
+	r.publisher.Close()
 }
