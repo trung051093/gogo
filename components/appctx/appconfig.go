@@ -11,6 +11,13 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+type Environment string
+
+const (
+	EnvDev  Environment = "dev"
+	EnvProd Environment = "prod"
+)
+
 type Config struct {
 	Server struct {
 		Host string `yaml:"host"`
@@ -49,11 +56,20 @@ func RootDir() string {
 	return d
 }
 
+func GetFileConfig() string {
+	environment := os.Getenv("env")
+	rootDir := RootDir()
+	if environment == "" {
+		environment = string(EnvDev)
+	}
+	file := fmt.Sprintf("%s/config_%s.yml", rootDir, environment)
+	fmt.Println("File Config:", file)
+	return file
+}
+
 func GetConfig() *Config {
 	var cfg Config
-	rootDir := RootDir()
-	fmt.Sprintln("root dir:", rootDir)
-	f, err := os.Open(rootDir + "/config.yml")
+	f, err := os.Open(GetFileConfig())
 	if err != nil {
 		fmt.Sprintln(err)
 	}
