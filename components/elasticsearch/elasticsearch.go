@@ -200,13 +200,13 @@ func (es *elasticSearchSevice) Search(ctx context.Context, index string, query s
 	}
 
 	for _, hit := range r.Hits.Hits {
-		var data interface{}
+		var source interface{}
 		var highlights interface{}
 		h := map[string]interface{}{
 			"sort": hit.Sort,
 		}
 
-		if err := json.Unmarshal(hit.Source, &data); err != nil {
+		if err := json.Unmarshal(hit.Source, &source); err != nil {
 			return &results, err
 		}
 
@@ -217,7 +217,7 @@ func (es *elasticSearchSevice) Search(ctx context.Context, index string, query s
 		}
 
 		h["highlights"] = highlights
-		h["data"] = data
+		h["source"] = source
 		results.Hits = append(results.Hits, h)
 	}
 
