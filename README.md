@@ -8,11 +8,26 @@
 go get
 ```
 
-- Run Redis, RabbitMQ, ElasticSearch, Postgres database
+
+# Running with docker compose
 
 ```bash
-cd ./servers && docker-compose up
+# build rest_api package
+docker build -t api:multistage -f Dockerfile.multistage.api .
+
+# tag rest_api to api:v1.0
+docker image tag api:multistage api:v1.0
+
+# build indexer package
+docker build -t indexer:multistage -f Dockerfile.multistage.indexer .
+
+# tag rest_api to api:v1.0
+docker image tag indexer:multistage indexer:v1.0
+
+# run api with Redis, RabbitMQ, ElasticSearch, Postgres database
+docker-compose up
 ```
+
 ## Running indexer app
 The app will help indexing data into elastic search.
 

@@ -1,11 +1,11 @@
 # Server configurations
 server:
-  host: "localhost"
+  host: "0.0.0.0"
   port: 8080
 
 # Database credentials
 database:
-  host: "127.0.0.1"
+  host: "postgres"
   username: "root"
   password: "root"
   name: "demo"
@@ -15,13 +15,13 @@ database:
 
 # Elastic search
 elasticsearch:
-  host: "http://localhost:9200"
+  host: "http://elasticsearch:9200"
   username: elastic
   password: elastic
 
 # Rabbit MQ
 rabbitmq:
-  host: "localhost"
+  host: "rabbitmq"
   port: 5672
   username: root
   password: root

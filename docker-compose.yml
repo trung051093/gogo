@@ -1,5 +1,45 @@
 version: '3'
 services:
+  indexer:
+    image: indexer:v1.0
+    container_name: indexer
+    environment:
+      ENV: local
+    volumes:
+      - api_data:/data
+    networks:
+      - all
+    depends_on:
+      - rabbitmq
+      - elasticsearch
+    logging:
+      driver: 'gelf'
+      options:
+        gelf-address: 'udp://127.0.0.1:12201'
+    restart: unless-stopped
+
+  rest_api:
+    image: api:v1.0
+    container_name: api
+    environment:
+      ENV: local
+    ports:
+      - '8080:8080'
+    volumes:
+      - api_data:/data
+    networks:
+      - all
+    depends_on:
+      - redis
+      - postgres
+      - rabbitmq
+      - elasticsearch
+    logging:
+      driver: 'gelf'
+      options:
+        gelf-address: 'udp://127.0.0.1:12201'
+    restart: unless-stopped
+
   redis:
     image: redis
     container_name: redis
@@ -26,6 +66,7 @@ services:
     ports:
       - '5432:5432'
     networks:
+      - all
       - graylog
     logging:
       driver: 'gelf'
@@ -45,6 +86,8 @@ services:
     ports:
       - 5672:5672
       - 15672:15672
+    networks:
+      - all
     restart: unless-stopped
 
   elasticsearch:
@@ -73,14 +116,19 @@ services:
       - '9200:9200'
       - '9300:9300'
     networks:
+      - all
       - graylog
     restart: unless-stopped
 
 networks:
+  all:
+    driver: bridge
   graylog:
     driver: bridge
 volumes:
-  redis_data: 
+  api_data:
+    driver: local
+  redis_data:
     driver: local
   postgres_data:
     driver: local
