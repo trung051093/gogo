@@ -9,6 +9,7 @@ import (
 	"user_management/components/appctx"
 	rabbitmqprovider "user_management/components/rabbitmq"
 	usermodel "user_management/modules/user/model"
+	randomuserapi "user_management/packages/random_user/api"
 
 	"user_management/modules/user"
 
@@ -51,10 +52,13 @@ func main() {
 
 	log.Println(repository)
 
-	c := &QueryConfig{
-		5000, "", "", "",
+	c := &randomuserapi.QueryConfig{
+		MaxResults: 5000,
+		Gender:     "",
+		Password:   "",
+		Seed:       "",
 	}
-	users, err := Generate(c)
+	users, err := randomuserapi.Generate(c)
 	log.Println("Number random", len(users))
 
 	if err != nil {

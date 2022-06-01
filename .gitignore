@@ -16,7 +16,8 @@
 
 # Dependency directories (remove the comment below to include it)
 # vendor/
-/components/appctx/*.yml
+/components/appctx/config_dev.yml
+/components/appctx/config_prod.yml
 
 # Go workspace file
 go.work

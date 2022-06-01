@@ -1,4 +1,4 @@
-package main
+package randomuserapi
 
 import (
 	"net/url"

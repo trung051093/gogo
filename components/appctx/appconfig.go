@@ -14,8 +14,9 @@ import (
 type Environment string
 
 const (
-	EnvDev  Environment = "dev"
-	EnvProd Environment = "prod"
+	EnvLocal Environment = "local"
+	EnvDev   Environment = "dev"
+	EnvProd  Environment = "prod"
 )
 
 type Config struct {
@@ -60,7 +61,7 @@ func GetFileConfig() string {
 	environment := os.Getenv("env")
 	rootDir := RootDir()
 	if environment == "" {
-		environment = string(EnvDev)
+		environment = string(EnvLocal)
 	}
 	file := fmt.Sprintf("%s/config_%s.yml", rootDir, environment)
 	fmt.Println("File Config:", file)

@@ -1,28 +1,40 @@
+# Requirement:
+- Go v1.18.
+- Docker v20.10.14.
+- Docker-compose v2.5.1.
 # Installation
 
 ```bash
 go get
 ```
 
-- Create a postgres localhost
+- Run Redis, RabbitMQ, ElasticSearch, Postgres database
 
 ```bash
-docker run --restart unless-stopped -d -p 5432:5432 --name postgres -e POSTGRES_USER=root -e POSTGRES_PASSWORD=root -e POSTGRES_DB=example  postgres
+cd ./servers && docker-compose up
 ```
-
-- Create a rabbitmq localhost
+## Running indexer app
+The app will help indexing data into elastic search.
 
 ```bash
-docker run --restart unless-stopped -d -p 5432:5432 --name postgres -e POSTGRES_USER=root -e POSTGRES_PASSWORD=root -e POSTGRES_DB=example  postgres
+$ go run ./packages/indexer/main.go
 ```
 
-- Create an elastic search localhost
+## Running tool insert fake user
+The app will help get users ramdom from "https://randomuser.me/api/", then insert to Postgres database
 
 ```bash
-docker run --restart unless-stopped -d -p 5432:5432 --name postgres -e POSTGRES_USER=root -e POSTGRES_PASSWORD=root -e POSTGRES_DB=example  postgres
+$ go run ./packages/random_user/main.go
 ```
 
-## Running the app
+## Running the rest API local
+
+```bash
+$ go run ./packages/rest_api/main.go
+```
+
+
+## Build the app
 
 ```bash
 # build

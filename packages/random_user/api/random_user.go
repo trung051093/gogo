@@ -1,4 +1,4 @@
-package main
+package randomuserapi
 
 type JsonRandomUser struct {
 	Results []User `json:"results"`
