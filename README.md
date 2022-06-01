@@ -15,14 +15,14 @@ go get
 # build rest_api package
 $ docker build -t api:multistage -f Dockerfile.multistage.api .
 
-# tag rest_api to api:v1.0
-$ docker image tag api:multistage api:v1.0
+# tag api
+$ docker image tag api:multistage api
 
 # build indexer package
 $ docker build -t indexer:multistage -f Dockerfile.multistage.indexer .
 
-# tag rest_api to api:v1.0
-$ docker image tag indexer:multistage indexer:v1.0
+# tag indexer
+$ docker image tag indexer:multistage indexer
 
 # run api with Redis, RabbitMQ, ElasticSearch, Postgres database
 $ docker-compose up
@@ -37,6 +37,7 @@ $ docker-compose up redis rabbitmq elasticsearch postgres
 
 ## Running indexer app
 The app will help indexing data into elastic search.
+
 Require: RabbitMQ, ElasticSearch
 
 ```bash
@@ -44,7 +45,8 @@ $ go run ./packages/indexer/main.go
 ```
 
 ## Running tool insert fake user
-The app will help get users ramdom from "https://randomuser.me/api/", then insert to Postgres database
+The app will help get users ramdom from "https://randomuser.me/api/", then insert to Postgres database.
+
 Require: RabbitMQ, Postgres
 
 ```bash
