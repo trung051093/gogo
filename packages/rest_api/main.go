@@ -7,7 +7,7 @@ import (
 	"user_management/components/dbprovider"
 	"user_management/components/elasticsearch"
 	rabbitmqprovider "user_management/components/rabbitmq"
-	"user_management/middleware"
+	middleware "user_management/middlewares"
 	"user_management/modules/auth"
 	"user_management/modules/user"
 	usermodel "user_management/modules/user/model"
