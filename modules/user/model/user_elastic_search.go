@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"user_management/common"
-	"user_management/components/elasticsearch"
+	esprovider "user_management/components/elasticsearch"
 )
 
 const ElasticSearchQuery = `
@@ -41,7 +41,7 @@ func GetUserESQuery(ctx context.Context, userEsQuery *UserEsQuery) string {
 		userEsQuery.Filter.SortField,
 		userEsQuery.Filter.SortName,
 	)
-	return elasticsearch.BuildQuery(
+	return esprovider.BuildQuery(
 		ctx,
 		q,
 		userEsQuery.LastIndex,

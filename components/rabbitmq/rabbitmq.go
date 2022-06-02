@@ -35,7 +35,7 @@ var once sync.Once
 var instance *rabbitmqSerivce
 var instanceErr error
 
-func NewRabbitMQ(config RabbitmqConfig) (*rabbitmqSerivce, error) {
+func NewRabbitMQ(config *RabbitmqConfig) (*rabbitmqSerivce, error) {
 	connStr := fmt.Sprintf("amqp://%s:%s@%s:%d/", config.User, config.Pass, config.Host, config.Port)
 	consumer, err := rabbitmq.NewConsumer(
 		connStr,
@@ -79,7 +79,7 @@ func NewRabbitMQ(config RabbitmqConfig) (*rabbitmqSerivce, error) {
 }
 
 // singleton
-func GetIntance(config RabbitmqConfig) (*rabbitmqSerivce, error) {
+func GetIntance(config *RabbitmqConfig) (*rabbitmqSerivce, error) {
 	once.Do(func() {
 		service, instanceErr := NewRabbitMQ(config)
 		if instanceErr != nil {

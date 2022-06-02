@@ -8,6 +8,7 @@ import (
 	rabbitmqprovider "user_management/components/rabbitmq"
 
 	es "github.com/elastic/go-elasticsearch/v8"
+	redis "github.com/go-redis/redis/v8"
 	"gopkg.in/yaml.v3"
 )
 
@@ -24,6 +25,12 @@ type Config struct {
 		Host string `yaml:"host"`
 		Port int    `yaml:"port"`
 	} `yaml:"server"`
+	Redis struct {
+		Host     string `yaml:"host"`
+		Password string `yaml:"password"`
+		Port     int    `yaml:"port"`
+		DB       int    `yaml:"db"`
+	} `yaml:"redis"`
 	Database struct {
 		Host     string `yaml:"host"`
 		Name     string `yaml:"name"`
@@ -98,5 +105,13 @@ func (cfg *Config) GetElasticSearchConfig() *es.Config {
 		Addresses: []string{cfg.ElasticSearch.Host},
 		Username:  cfg.ElasticSearch.Username,
 		Password:  cfg.ElasticSearch.Password,
+	}
+}
+
+func (cfg *Config) GetRedisConfig() *redis.Options {
+	return &redis.Options{
+		Addr:     fmt.Sprintf("%s:%d", cfg.Redis.Host, cfg.Redis.Port),
+		Password: cfg.Redis.Password,
+		DB:       cfg.Redis.DB,
 	}
 }

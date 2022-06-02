@@ -9,7 +9,7 @@ import (
 	"syscall"
 	"user_management/common"
 	"user_management/components/appctx"
-	"user_management/components/elasticsearch"
+	esprovider "user_management/components/elasticsearch"
 	rabbitmqprovider "user_management/components/rabbitmq"
 
 	"github.com/wagslane/go-rabbitmq"
@@ -20,14 +20,14 @@ func main() {
 	ctx := context.Background()
 
 	configEs := config.GetElasticSearchConfig()
-	esService, esErr := elasticsearch.NewEsService(*configEs)
+	esService, esErr := esprovider.NewEsService(configEs)
 	if esErr != nil {
 		return
 	}
 	esService.LogInfo(ctx)
 
 	configRabbitMQ := config.GetRabbitMQConfig()
-	rabbitmqService, rabbitErr := rabbitmqprovider.NewRabbitMQ(*configRabbitMQ)
+	rabbitmqService, rabbitErr := rabbitmqprovider.NewRabbitMQ(configRabbitMQ)
 	if rabbitErr != nil {
 		return
 	}

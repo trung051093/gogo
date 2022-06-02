@@ -1,8 +1,9 @@
 package appctx
 
 import (
-	"user_management/components/elasticsearch"
+	esprovider "user_management/components/elasticsearch"
 	rabbitmqprovider "user_management/components/rabbitmq"
+	"user_management/components/redisprovider"
 
 	"github.com/go-playground/validator/v10"
 	"gorm.io/gorm"
@@ -12,24 +13,27 @@ type AppContext interface {
 	GetMainDBConnection() *gorm.DB
 	GetValidator() *validator.Validate
 	GetConfig() *Config
-	GetESService() elasticsearch.ElasticSearchSevice
+	GetESService() esprovider.ElasticSearchSevice
 	GetRabbitMQService() rabbitmqprovider.RabbitmqSerivce
+	GetRedisService() redisprovider.RedisService
 }
 
 type appContext struct {
 	config          *Config
 	db              *gorm.DB
 	validate        *validator.Validate
-	esService       elasticsearch.ElasticSearchSevice
+	esService       esprovider.ElasticSearchSevice
 	rabbitmqService rabbitmqprovider.RabbitmqSerivce
+	redisService    redisprovider.RedisService
 }
 
 func NewAppContext(
 	db *gorm.DB,
 	validate *validator.Validate,
 	config *Config,
-	esService elasticsearch.ElasticSearchSevice,
+	esService esprovider.ElasticSearchSevice,
 	rabbitmqService rabbitmqprovider.RabbitmqSerivce,
+	redisService redisprovider.RedisService,
 ) *appContext {
 	return &appContext{
 		db:              db,
@@ -37,6 +41,7 @@ func NewAppContext(
 		config:          config,
 		esService:       esService,
 		rabbitmqService: rabbitmqService,
+		redisService:    redisService,
 	}
 }
 
@@ -52,10 +57,14 @@ func (appCtx *appContext) GetConfig() *Config {
 	return appCtx.config
 }
 
-func (appCtx *appContext) GetESService() elasticsearch.ElasticSearchSevice {
+func (appCtx *appContext) GetESService() esprovider.ElasticSearchSevice {
 	return appCtx.esService
 }
 
 func (appCtx *appContext) GetRabbitMQService() rabbitmqprovider.RabbitmqSerivce {
 	return appCtx.rabbitmqService
+}
+
+func (appCtx *appContext) GetRedisService() redisprovider.RedisService {
+	return appCtx.redisService
 }

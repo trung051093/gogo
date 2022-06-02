@@ -35,12 +35,11 @@ func JsonToString(data interface{}) (string, error) {
 	return "", errors.New("Invalid json string")
 }
 
-func StringToJson(str string) (interface{}, error) {
-	var data interface{}
+func StringToJson(str string, data interface{}) error {
 	if err := json.Unmarshal([]byte(str), &data); err != nil {
-		return nil, err
+		return err
 	}
-	return data, nil
+	return nil
 }
 
 func JsonToByte(data interface{}) []byte {

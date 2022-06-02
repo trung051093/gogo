@@ -8,6 +8,7 @@ import (
 )
 
 type DBProvider interface {
+	GetDBConnection()
 }
 
 type DBConfig struct {
@@ -48,7 +49,7 @@ func NewDBProvider(config *DBConfig, optionsFunc ...func(*dbOptions)) (*dbprovid
 		provider.config = config
 		provider.db = db
 	}
-	provider.handleOptions()
+	provider.handleOptions(optionsFunc...)
 	return provider, nil
 }
 

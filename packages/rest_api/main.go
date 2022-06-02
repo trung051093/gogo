@@ -5,8 +5,9 @@ import (
 	"log"
 	"user_management/components/appctx"
 	"user_management/components/dbprovider"
-	"user_management/components/elasticsearch"
+	esprovider "user_management/components/elasticsearch"
 	rabbitmqprovider "user_management/components/rabbitmq"
+	"user_management/components/redisprovider"
 	"user_management/middleware"
 	"user_management/modules/auth"
 	"user_management/modules/user"
@@ -41,17 +42,20 @@ func main() {
 	validate := validator.New()
 
 	configEs := config.GetElasticSearchConfig()
-	esService, esErr := elasticsearch.NewEsService(*configEs)
+	esService, esErr := esprovider.NewEsService(configEs)
 	if esErr != nil {
 		return
 	}
 
 	configRabbitMQ := config.GetRabbitMQConfig()
-	rabbitmqService, rabbitErr := rabbitmqprovider.NewRabbitMQ(*configRabbitMQ)
+	rabbitmqService, rabbitErr := rabbitmqprovider.NewRabbitMQ(configRabbitMQ)
 	if rabbitErr != nil {
 		return
 	}
-	appCtx := appctx.NewAppContext(dbprovider.GetDBConnection(), validate, config, esService, rabbitmqService)
+	configRedis := config.GetRedisConfig()
+	redisProvider := redisprovider.NewRedisService(configRedis)
+
+	appCtx := appctx.NewAppContext(dbprovider.GetDBConnection(), validate, config, esService, rabbitmqService, redisProvider)
 
 	router := gin.Default()
 	corsConfig := cors.DefaultConfig()
@@ -69,6 +73,8 @@ func main() {
 		v1.GET("/user/:id", user.GetUserHandler(appCtx))
 		v1.GET("/users", user.ListUserHandler(appCtx))
 		v1.GET("/user/search", user.SearchUserHandler(appCtx))
+		// cache request
+		// v1.GET("/users", cacheprovider.Cache(appCtx, "user", 15*time.Minute, user.ListUserHandler))
 
 		// authentication
 		v1.POST("/auth/register", auth.RegisterUserHandler(appCtx))
