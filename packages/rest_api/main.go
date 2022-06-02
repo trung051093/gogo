@@ -74,7 +74,7 @@ func main() {
 		v1.GET("/users", user.ListUserHandler(appCtx))
 		v1.GET("/user/search", user.SearchUserHandler(appCtx))
 		// cache request
-		// v1.GET("/users", cacheprovider.CacheRequest(appCtx, "user", 15*time.Minute, user.ListUserHandler))
+		// v1.GET("/users", cachedecorator.CacheRequest(appCtx, "user", 15*time.Minute, user.ListUserHandler))
 
 		// authentication
 		v1.POST("/auth/register", auth.RegisterUserHandler(appCtx))

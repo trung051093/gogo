@@ -1,4 +1,4 @@
-package cacheprovider
+package cachedecorator
 
 import (
 	"bytes"
