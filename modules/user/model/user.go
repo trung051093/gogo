@@ -50,19 +50,19 @@ func (u *User) AfterDelete(tx *gorm.DB) (err error) {
 	ctx := tx.Statement.Context
 	if rabbitmqService, ok := rabbitmqprovider.FromContext(ctx); ok {
 		log.Println("AfterDelete rabbitmqService:", rabbitmqService)
-		go func() {
+		go func(user *User) {
 			defer common.Recovery()
 			dataIndex := &common.DataIndex{
-				Id:       fmt.Sprintf("%d", u.Id),
+				Id:       fmt.Sprintf("%d", user.Id),
 				Index:    u.TableIndex(),
 				Action:   common.Delete,
-				Data:     common.CompactJson(u),
+				Data:     common.CompactJson(user),
 				SendTime: time.Now(),
 			}
 			if publishErr := rabbitmqService.Publish(ctx, common.JsonToByte(dataIndex), []string{common.IndexingQueue}); publishErr != nil {
 				log.Println("AfterDelete publish error:", publishErr)
 			}
-		}()
+		}(u)
 	}
 	return
 }

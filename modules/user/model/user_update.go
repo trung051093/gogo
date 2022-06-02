@@ -32,19 +32,19 @@ func (u *UserUpdate) AfterUpdate(tx *gorm.DB) (err error) {
 	ctx := tx.Statement.Context
 	if rabbitmqService, ok := rabbitmqprovider.FromContext(ctx); ok {
 		log.Println("AfterUpdate rabbitmqService:", rabbitmqService)
-		go func() {
+		go func(user *UserUpdate) {
 			defer common.Recovery()
 			dataIndex := &common.DataIndex{
-				Id:       fmt.Sprintf("%d", u.Id),
+				Id:       fmt.Sprintf("%d", user.Id),
 				Index:    u.TableIndex(),
 				Action:   common.Update,
-				Data:     common.CompactJson(u),
+				Data:     common.CompactJson(user),
 				SendTime: time.Now(),
 			}
 			if publishErr := rabbitmqService.Publish(ctx, common.JsonToByte(dataIndex), []string{common.IndexingQueue}); publishErr != nil {
 				log.Println("AfterUpdate publish error:", publishErr)
 			}
-		}()
+		}(u)
 	}
 	return
 }

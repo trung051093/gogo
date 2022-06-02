@@ -43,10 +43,10 @@ func CacheRequest(
 			blw := &bodyLogWriter{body: bytes.NewBufferString(""), ResponseWriter: ginCtx.Writer}
 			ginCtx.Writer = blw
 			funcHandler(appCtx)(ginCtx)
-			go func() {
+			go func(bodyWriter *bodyLogWriter) {
 				json := &dataReponse{
-					Code: ginCtx.Writer.Status(),
-					Data: blw.body.String(),
+					Code: bodyWriter.Status(),
+					Data: bodyWriter.body.String(),
 				}
 				jsonStr, jsonErr := common.JsonToString(json)
 				if jsonErr != nil {
@@ -64,7 +64,7 @@ func CacheRequest(
 				} else {
 					log.Println("Cache SetValue:", str)
 				}
-			}()
+			}(blw)
 		} else {
 			dataCache := &dataReponse{}
 			err = common.StringToJson(cacheString, &dataCache)

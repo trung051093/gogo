@@ -32,19 +32,19 @@ func (UserCreate) TableIndex() string { return User{}.TableIndex() }
 func (u *UserCreate) AfterCreate(tx *gorm.DB) (err error) {
 	ctx := tx.Statement.Context
 	if rabbitmqService, ok := rabbitmqprovider.FromContext(ctx); ok {
-		go func() {
+		go func(user *UserCreate) {
 			defer common.Recovery()
 			dataIndex := &common.DataIndex{
-				Id:       fmt.Sprintf("%d", u.Id),
+				Id:       fmt.Sprintf("%d", user.Id),
 				Index:    u.TableIndex(),
 				Action:   common.Create,
-				Data:     common.CompactJson(u),
+				Data:     common.CompactJson(user),
 				SendTime: time.Now(),
 			}
 			if publishErr := rabbitmqService.Publish(ctx, common.JsonToByte(dataIndex), []string{common.IndexingQueue}); publishErr != nil {
 				log.Println("AfterCreate publish error:", publishErr)
 			}
-		}()
+		}(u)
 	}
 	return
 }
