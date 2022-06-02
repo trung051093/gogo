@@ -1,7 +1,7 @@
 version: '3'
 services:
   indexer:
-    image: indexer:v1.0
+    image: indexer
     container_name: indexer
     environment:
       ENV: local
@@ -19,7 +19,7 @@ services:
     restart: unless-stopped
 
   rest_api:
-    image: api:v1.0
+    image: api
     container_name: api
     environment:
       ENV: local

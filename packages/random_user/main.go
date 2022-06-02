@@ -7,39 +7,34 @@ import (
 	"sync"
 	"time"
 	"user_management/components/appctx"
+	"user_management/components/dbprovider"
 	rabbitmqprovider "user_management/components/rabbitmq"
+	randomuserapi "user_management/components/randomuserapi"
 	usermodel "user_management/modules/user/model"
-	randomuserapi "user_management/packages/random_user/api"
 
 	"user_management/modules/user"
-
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
 )
 
 func main() {
 	config := appctx.GetConfig()
-	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%d sslmode=%s TimeZone=%s",
-		config.Database.Host,
-		config.Database.Username,
-		config.Database.Password,
-		config.Database.Name,
-		config.Database.Port,
-		config.Database.SSLMode,
-		config.Database.TimeZone)
-
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	dbprovider, err := dbprovider.NewDBProvider(
+		&dbprovider.DBConfig{
+			Host:     config.Database.Host,
+			Username: config.Database.Username,
+			Password: config.Database.Password,
+			Name:     config.Database.Name,
+			Port:     config.Database.Port,
+			SSLMode:  config.Database.SSLMode,
+			TimeZone: config.Database.TimeZone,
+		},
+		dbprovider.WithDebug,
+		dbprovider.WithAutoMigration(&usermodel.User{}),
+	)
 
 	if err != nil {
 		log.Println("Connect Database Error: ", err)
 		return
 	}
-
-	log.Println(db)
-
-	db = db.Debug()
-
-	db.AutoMigrate(&usermodel.User{})
 
 	configRabbitMQ := config.GetRabbitMQConfig()
 	rabbitmqService, rabbitErr := rabbitmqprovider.NewRabbitMQ(*configRabbitMQ)
@@ -48,7 +43,7 @@ func main() {
 	}
 	defer rabbitmqService.Close()
 
-	repository := user.NewUserRepository(db)
+	repository := user.NewUserRepository(dbprovider.GetDBConnection())
 
 	log.Println(repository)
 

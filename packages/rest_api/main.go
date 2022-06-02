@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"user_management/components/appctx"
+	"user_management/components/dbprovider"
 	"user_management/components/elasticsearch"
 	rabbitmqprovider "user_management/components/rabbitmq"
 	"user_management/middleware"
@@ -14,32 +15,30 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
 )
 
 func main() {
 	config := appctx.GetConfig()
-	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%d sslmode=%s TimeZone=%s",
-		config.Database.Host,
-		config.Database.Username,
-		config.Database.Password,
-		config.Database.Name,
-		config.Database.Port,
-		config.Database.SSLMode,
-		config.Database.TimeZone)
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	dbprovider, err := dbprovider.NewDBProvider(
+		&dbprovider.DBConfig{
+			Host:     config.Database.Host,
+			Username: config.Database.Username,
+			Password: config.Database.Password,
+			Name:     config.Database.Name,
+			Port:     config.Database.Port,
+			SSLMode:  config.Database.SSLMode,
+			TimeZone: config.Database.TimeZone,
+		},
+		dbprovider.WithDebug,
+		dbprovider.WithAutoMigration(&usermodel.User{}),
+	)
 
 	if err != nil {
 		log.Println("Connect Database Error: ", err)
 		return
 	}
 
-	db = db.Debug()
-
 	validate := validator.New()
-
-	db.AutoMigrate(&usermodel.User{})
 
 	configEs := config.GetElasticSearchConfig()
 	esService, esErr := elasticsearch.NewEsService(*configEs)
@@ -52,8 +51,7 @@ func main() {
 	if rabbitErr != nil {
 		return
 	}
-	// defer rabbitmqService.Close()
-	appCtx := appctx.NewAppContext(db, validate, config, esService, rabbitmqService)
+	appCtx := appctx.NewAppContext(dbprovider.GetDBConnection(), validate, config, esService, rabbitmqService)
 
 	router := gin.Default()
 	corsConfig := cors.DefaultConfig()
