@@ -76,6 +76,14 @@ func (p *dbprovider) handleOptions(optionsFunc ...func(options *dbOptions)) *dbO
 		optionFunc(options)
 	}
 
+	if options.Debug {
+		p.db.Debug()
+	}
+
+	if len(options.DstMigration) > 0 {
+		p.db.AutoMigrate(options.DstMigration...)
+	}
+
 	return options
 }
 

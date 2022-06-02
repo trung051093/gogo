@@ -68,7 +68,7 @@ func GetFileConfig() string {
 	environment := os.Getenv("env")
 	rootDir := RootDir()
 	if environment == "" {
-		environment = string(EnvDev)
+		environment = string(EnvLocal)
 	}
 	file := fmt.Sprintf("%s/config_%s.yml", rootDir, environment)
 	fmt.Println("File Config:", file)

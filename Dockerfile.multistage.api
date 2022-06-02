@@ -3,7 +3,7 @@
 ##
 ## Build
 ##
-FROM golang:1.18.2-buster AS build
+FROM --platform=linux/amd64 golang:1.18.2-buster AS build
 
 WORKDIR /app
 
@@ -18,7 +18,7 @@ RUN go build -o ./build/rest_api ./packages/rest_api
 ##
 ## Deploy
 ##
-FROM gcr.io/distroless/base-debian10
+FROM --platform=linux/amd64 gcr.io/distroless/base-debian10
 
 WORKDIR /
 

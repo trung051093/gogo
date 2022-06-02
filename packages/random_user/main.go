@@ -37,7 +37,7 @@ func main() {
 	}
 
 	configRabbitMQ := config.GetRabbitMQConfig()
-	rabbitmqService, rabbitErr := rabbitmqprovider.NewRabbitMQ(*configRabbitMQ)
+	rabbitmqService, rabbitErr := rabbitmqprovider.NewRabbitMQ(configRabbitMQ)
 	if rabbitErr != nil {
 		return
 	}

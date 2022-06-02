@@ -3,11 +3,13 @@ package main
 import (
 	"fmt"
 	"log"
+	"time"
 	"user_management/components/appctx"
 	"user_management/components/dbprovider"
 	esprovider "user_management/components/elasticsearch"
 	rabbitmqprovider "user_management/components/rabbitmq"
 	"user_management/components/redisprovider"
+	cachedecorator "user_management/decorators/cache"
 	"user_management/middleware"
 	"user_management/modules/auth"
 	"user_management/modules/user"
@@ -74,7 +76,7 @@ func main() {
 		v1.GET("/users", user.ListUserHandler(appCtx))
 		v1.GET("/user/search", user.SearchUserHandler(appCtx))
 		// cache request
-		// v1.GET("/users", cachedecorator.CacheRequest(appCtx, "user", 15*time.Minute, user.ListUserHandler))
+		v1.GET("/users-cache", cachedecorator.CacheRequest(appCtx, "user", 15*time.Minute, user.ListUserHandler))
 
 		// authentication
 		v1.POST("/auth/register", auth.RegisterUserHandler(appCtx))

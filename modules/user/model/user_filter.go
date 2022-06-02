@@ -13,6 +13,8 @@ func (u *UserFilter) Process() error {
 			UserField["firstName"],
 			UserField["lastName"],
 			UserField["email"],
+			UserField["address"],
+			UserField["company"],
 			UserField["gender"],
 			UserField["phoneNumber"],
 		}
