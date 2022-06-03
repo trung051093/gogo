@@ -21,7 +21,7 @@ func (r *userRepository) Create(ctx context.Context, user *usermodel.UserCreate)
 	if err := r.db.WithContext(ctx).Create(&user).Error; err != nil {
 		return -1, common.ErrorCannotCreateEntity(usermodel.EntityName, err)
 	}
-	return user.Id, nil
+	return *user.Id, nil
 }
 
 func (r *userRepository) Update(ctx context.Context, id uint, userUpdate *usermodel.UserUpdate) error {

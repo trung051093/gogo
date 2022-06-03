@@ -1,17 +1,21 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"time"
+	"user_management/common"
 	"user_management/components/appctx"
 	"user_management/components/dbprovider"
 	esprovider "user_management/components/elasticsearch"
 	rabbitmqprovider "user_management/components/rabbitmq"
 	"user_management/components/redisprovider"
+	"user_management/components/storage"
 	cachedecorator "user_management/decorators/cache"
 	"user_management/middleware"
 	"user_management/modules/auth"
+	"user_management/modules/file"
 	"user_management/modules/user"
 	usermodel "user_management/modules/user/model"
 
@@ -56,8 +60,25 @@ func main() {
 	}
 	configRedis := config.GetRedisConfig()
 	redisProvider := redisprovider.NewRedisService(configRedis)
+	configStorage := config.GetStorageConfig()
 
-	appCtx := appctx.NewAppContext(dbprovider.GetDBConnection(), validate, config, esService, rabbitmqService, redisProvider)
+	storageService, storageErr := storage.NewStorage(configStorage)
+	if storageErr != nil {
+		return
+	}
+	createBucketErr := storageService.CreateBucket(context.Background(), common.PhotoBucket, "us-east-1")
+	if createBucketErr != nil {
+		log.Println("Create bucket error: ", createBucketErr)
+	}
+	appCtx := appctx.NewAppContext(
+		dbprovider.GetDBConnection(),
+		validate,
+		config,
+		esService,
+		rabbitmqService,
+		redisProvider,
+		storageService,
+	)
 
 	router := gin.Default()
 	corsConfig := cors.DefaultConfig()
@@ -81,6 +102,9 @@ func main() {
 		// authentication
 		v1.POST("/auth/register", auth.RegisterUserHandler(appCtx))
 		v1.POST("/auth/login", auth.LoginUserHandler(appCtx))
+
+		// photo
+		v1.GET("/file/presign-url", file.GetPresignedUrlToUpload(appCtx))
 	}
 	router.Run(fmt.Sprintf(":%d", config.Server.Port)) // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
 }

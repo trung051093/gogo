@@ -11,7 +11,7 @@ import (
 )
 
 type UserUpdate struct {
-	Id           int        `json:"id" gorm:"column:id;"`
+	common.SQLModel
 	FirstName    string     `validate:"omitempty" json:"firstName" gorm:"column:first_name;"`
 	LastName     string     `validate:"omitempty" json:"lastName" gorm:"column:last_name;"`
 	Email        *string    `validate:"omitempty,email" json:"email" gorm:"column:email;"`

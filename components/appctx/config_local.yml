@@ -26,6 +26,14 @@ elasticsearch:
   username: elastic
   password: elastic
 
+# Minio
+minio:
+  host: "minio"
+  port: 10000
+  accessKeyID: minio
+  secretAccessKey: minio
+  useSSL: false
+
 # Rabbit MQ
 rabbitmq:
   host: "rabbitmq"

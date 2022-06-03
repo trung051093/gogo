@@ -4,6 +4,7 @@ import (
 	esprovider "user_management/components/elasticsearch"
 	rabbitmqprovider "user_management/components/rabbitmq"
 	"user_management/components/redisprovider"
+	"user_management/components/storage"
 
 	"github.com/go-playground/validator/v10"
 	"gorm.io/gorm"
@@ -16,6 +17,7 @@ type AppContext interface {
 	GetESService() esprovider.ElasticSearchSevice
 	GetRabbitMQService() rabbitmqprovider.RabbitmqSerivce
 	GetRedisService() redisprovider.RedisService
+	GetStorageService() storage.StorageService
 }
 
 type appContext struct {
@@ -25,6 +27,7 @@ type appContext struct {
 	esService       esprovider.ElasticSearchSevice
 	rabbitmqService rabbitmqprovider.RabbitmqSerivce
 	redisService    redisprovider.RedisService
+	storageService  storage.StorageService
 }
 
 func NewAppContext(
@@ -34,6 +37,7 @@ func NewAppContext(
 	esService esprovider.ElasticSearchSevice,
 	rabbitmqService rabbitmqprovider.RabbitmqSerivce,
 	redisService redisprovider.RedisService,
+	storageService storage.StorageService,
 ) *appContext {
 	return &appContext{
 		db:              db,
@@ -42,6 +46,7 @@ func NewAppContext(
 		esService:       esService,
 		rabbitmqService: rabbitmqService,
 		redisService:    redisService,
+		storageService:  storageService,
 	}
 }
 
@@ -67,4 +72,8 @@ func (appCtx *appContext) GetRabbitMQService() rabbitmqprovider.RabbitmqSerivce 
 
 func (appCtx *appContext) GetRedisService() redisprovider.RedisService {
 	return appCtx.redisService
+}
+
+func (appCtx *appContext) GetStorageService() storage.StorageService {
+	return appCtx.storageService
 }

@@ -11,7 +11,7 @@ import (
 )
 
 type UserCreate struct {
-	Id           int       `json:"id" gorm:"column:id;"`
+	common.SQLModel
 	FirstName    string    `validate:"required" json:"firstName" gorm:"column:first_name;"`
 	LastName     string    `validate:"required" json:"lastName" gorm:"column:last_name;"`
 	Email        string    `validate:"required,email" json:"email" gorm:"column:email;"`

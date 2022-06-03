@@ -5,4 +5,5 @@ const (
 	CurrentUser      = "CurrentUser"
 	IndexingQueue    = "ElasticSearchService"
 	IndexingQueueKey = "ElasticSearchServiceKey"
+	PhotoBucket      = "photo"
 )

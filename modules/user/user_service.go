@@ -35,7 +35,7 @@ func (s *userService) UpdateUser(ctx context.Context, id uint, userUpdate *userm
 	if user == nil || err != nil {
 		return err
 	}
-	userUpdate.Id = *user.Id
+	userUpdate.Id = user.Id
 	return s.repo.Update(ctx, id, userUpdate)
 }
 

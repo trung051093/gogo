@@ -6,6 +6,7 @@ import (
 	"path"
 	"runtime"
 	rabbitmqprovider "user_management/components/rabbitmq"
+	"user_management/components/storage"
 
 	es "github.com/elastic/go-elasticsearch/v8"
 	redis "github.com/go-redis/redis/v8"
@@ -51,6 +52,13 @@ type Config struct {
 		Username string `yaml:"username"`
 		Password string `yaml:"password"`
 	} `yaml:"elasticsearch"`
+	Minio struct {
+		Host            string `yaml:"host"`
+		Port            int    `yaml:"port"`
+		AccessKeyID     string `yaml:"accessKeyID"`
+		SecretAccessKey string `yaml:"secretAccessKey"`
+		UseSSL          bool   `yaml:"useSSL"`
+	} `yaml:"minio"`
 	JWT struct {
 		Secret             string `yaml:"secret"`
 		PasswordSaltLength int    `yaml:"pass_salt_length"`
@@ -113,5 +121,14 @@ func (cfg *Config) GetRedisConfig() *redis.Options {
 		Addr:     fmt.Sprintf("%s:%d", cfg.Redis.Host, cfg.Redis.Port),
 		Password: cfg.Redis.Password,
 		DB:       cfg.Redis.DB,
+	}
+}
+
+func (cfg *Config) GetStorageConfig() *storage.StorageConfig {
+	return &storage.StorageConfig{
+		Endpoint:        fmt.Sprintf("%s:%d", cfg.Minio.Host, cfg.Minio.Port),
+		AccessKeyID:     cfg.Minio.AccessKeyID,
+		SecretAccessKey: cfg.Minio.SecretAccessKey,
+		UseSSL:          cfg.Minio.UseSSL,
 	}
 }
