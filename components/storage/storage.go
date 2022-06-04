@@ -8,13 +8,16 @@ import (
 
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
+	"github.com/minio/minio-go/v7/pkg/notification"
 )
 
 type StorageService interface {
 	FGetObject(ctx context.Context, bucketName string, objectName string, filePath string, options minio.GetObjectOptions) error
 	FPutObject(ctx context.Context, bucketName string, objectName string, fileName string, option minio.PutObjectOptions) (info minio.UploadInfo, err error)
 	PresignedPutObject(ctx context.Context, bucketName string, objectName string, expires time.Duration) (*url.URL, error)
+	PresignedPostObject(ctx context.Context, policy *minio.PostPolicy) (u *url.URL, formData map[string]string, err error)
 	PresignedGetObject(ctx context.Context, bucketName string, objectName string, expires time.Duration, reqParams url.Values) (*url.URL, error)
+	ListenNotification(ctx context.Context, bucketName, prefix, suffix string, events []string, handler func(*notification.Info))
 }
 
 type StorageConfig struct {
@@ -65,10 +68,28 @@ func (s *storageService) FPutObject(ctx context.Context, bucketName string, obje
 	return s.client.FPutObject(ctx, bucketName, objectName, fileName, options)
 }
 
+func NewPostPolicy() *minio.PostPolicy {
+	return minio.NewPostPolicy()
+}
+
+func (s *storageService) PresignedPostObject(ctx context.Context, policy *minio.PostPolicy) (u *url.URL, formData map[string]string, err error) {
+	return s.client.PresignedPostPolicy(ctx, policy)
+}
+
 func (s *storageService) PresignedPutObject(ctx context.Context, bucketName string, objectName string, expires time.Duration) (*url.URL, error) {
 	return s.client.PresignedPutObject(ctx, bucketName, objectName, expires)
 }
 
 func (s *storageService) PresignedGetObject(ctx context.Context, bucketName string, objectName string, expires time.Duration, reqParams url.Values) (*url.URL, error) {
 	return s.client.PresignedGetObject(ctx, bucketName, objectName, expires, reqParams)
+}
+
+func (s *storageService) ListenNotification(ctx context.Context, bucketName, prefix, suffix string, events []string, handler func(*notification.Info)) {
+	for notificationInfo := range s.client.ListenBucketNotification(context.Background(), bucketName, prefix, suffix, events) {
+		if notificationInfo.Err != nil {
+			log.Println("minio notification error:", notificationInfo.Err)
+		}
+		handler(&notificationInfo)
+		time.Sleep(time.Millisecond * 100)
+	}
 }
