@@ -17,6 +17,7 @@ import (
 	"user_management/middleware"
 	"user_management/modules/auth"
 	"user_management/modules/file"
+	"user_management/modules/indexer"
 	"user_management/modules/notificator"
 	"user_management/modules/user"
 
@@ -105,7 +106,11 @@ func main() {
 		storageService,
 		socketService,
 	)
-	notificator.Handler(appCtx)
+
+	// handler background
+	go notificator.Handler(appCtx)
+	go indexer.Handler(appCtx)
+
 	router := gin.Default()
 	corsConfig := cors.DefaultConfig()
 	corsConfig.AllowAllOrigins = true
