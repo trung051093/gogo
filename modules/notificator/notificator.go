@@ -2,12 +2,14 @@ package notificator
 
 import (
 	"fmt"
+	"user_management/common"
 	"user_management/components/appctx"
 
 	socketio "github.com/googollee/go-socket.io"
 )
 
 func Handler(appctx appctx.AppContext) {
+	defer common.Recovery()
 	socketService := appctx.GetSocketService()
 	socketService.OnConnect("/", func(s socketio.Conn) error {
 		s.SetContext("")

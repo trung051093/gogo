@@ -10,6 +10,7 @@ import (
 )
 
 func Handler(appctx appctx.AppContext) {
+	defer common.Recovery()
 	ctx := context.Background()
 
 	esService := appctx.GetESService()

@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/url"
 	"time"
+	"user_management/common"
 
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
@@ -85,6 +86,7 @@ func (s *storageService) PresignedGetObject(ctx context.Context, bucketName stri
 }
 
 func (s *storageService) ListenNotification(ctx context.Context, bucketName, prefix, suffix string, events []string, handler func(*notification.Info)) {
+	defer common.Recovery()
 	for notificationInfo := range s.client.ListenBucketNotification(context.Background(), bucketName, prefix, suffix, events) {
 		if notificationInfo.Err != nil {
 			log.Println("minio notification error:", notificationInfo.Err)
