@@ -10,17 +10,20 @@ import (
 	"user_management/components/dbprovider"
 	esprovider "user_management/components/elasticsearch"
 	rabbitmqprovider "user_management/components/rabbitmq"
-	"user_management/components/redisprovider"
+	redisprovider "user_management/components/redis"
+	socketprovider "user_management/components/socketio"
 	"user_management/components/storage"
 	cachedecorator "user_management/decorators/cache"
 	"user_management/middleware"
 	"user_management/modules/auth"
 	"user_management/modules/file"
+	"user_management/modules/notificator"
 	"user_management/modules/user"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
+	socketio "github.com/googollee/go-socket.io"
 	"github.com/minio/minio-go/v7/pkg/notification"
 )
 
@@ -83,6 +86,15 @@ func main() {
 	if createBucketErr != nil {
 		log.Println("Create bucket error: ", createBucketErr)
 	}
+
+	socketService := socketprovider.NewSocketProvider(
+		nil,
+		socketprovider.WithRedisAdapter(&socketio.RedisAdapterOptions{
+			Addr:     configRedis.Addr,
+			Password: configRedis.Password,
+			Prefix:   "socketio",
+		}),
+	)
 	appCtx := appctx.NewAppContext(
 		dbprovider.GetDBConnection(),
 		validate,
@@ -91,8 +103,9 @@ func main() {
 		rabbitmqService,
 		redisProvider,
 		storageService,
+		socketService,
 	)
-
+	notificator.Handler(appCtx)
 	router := gin.Default()
 	corsConfig := cors.DefaultConfig()
 	corsConfig.AllowAllOrigins = true
@@ -100,6 +113,16 @@ func main() {
 	router.Use(middleware.ErrorHandler(appCtx))
 	router.Use(middleware.SetElasticSearch(appCtx))
 	router.Use(middleware.SetRabbitMQ(appCtx))
+
+	socketRouter := router.Group("/socket.io")
+	{
+		socketRouter.GET("/", gin.WrapH(socketService.GetServer()))
+		// Method 2 using server.ServerHTTP(Writer, Request) and also you can simply this by using gin.WrapH
+		socketRouter.POST("/", func(context *gin.Context) {
+			socketService.GetServer().ServeHTTP(context.Writer, context.Request)
+		})
+	}
+
 	v1 := router.Group("/api/v1")
 	{
 		// user

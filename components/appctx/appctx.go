@@ -3,7 +3,8 @@ package appctx
 import (
 	esprovider "user_management/components/elasticsearch"
 	rabbitmqprovider "user_management/components/rabbitmq"
-	"user_management/components/redisprovider"
+	redisprovider "user_management/components/redis"
+	socketprovider "user_management/components/socketio"
 	"user_management/components/storage"
 
 	"github.com/go-playground/validator/v10"
@@ -18,6 +19,7 @@ type AppContext interface {
 	GetRabbitMQService() rabbitmqprovider.RabbitmqSerivce
 	GetRedisService() redisprovider.RedisService
 	GetStorageService() storage.StorageService
+	GetSocketService() socketprovider.SocketService
 }
 
 type appContext struct {
@@ -28,6 +30,7 @@ type appContext struct {
 	rabbitmqService rabbitmqprovider.RabbitmqSerivce
 	redisService    redisprovider.RedisService
 	storageService  storage.StorageService
+	socketService   socketprovider.SocketService
 }
 
 func NewAppContext(
@@ -38,6 +41,7 @@ func NewAppContext(
 	rabbitmqService rabbitmqprovider.RabbitmqSerivce,
 	redisService redisprovider.RedisService,
 	storageService storage.StorageService,
+	socketService socketprovider.SocketService,
 ) *appContext {
 	return &appContext{
 		db:              db,
@@ -47,6 +51,7 @@ func NewAppContext(
 		rabbitmqService: rabbitmqService,
 		redisService:    redisService,
 		storageService:  storageService,
+		socketService:   socketService,
 	}
 }
 
@@ -76,4 +81,8 @@ func (appCtx *appContext) GetRedisService() redisprovider.RedisService {
 
 func (appCtx *appContext) GetStorageService() storage.StorageService {
 	return appCtx.storageService
+}
+
+func (appCtx *appContext) GetSocketService() socketprovider.SocketService {
+	return appCtx.socketService
 }
