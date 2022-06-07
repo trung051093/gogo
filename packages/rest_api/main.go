@@ -121,10 +121,12 @@ func main() {
 
 	socketRouter := router.Group("/socket.io")
 	{
-		socketRouter.GET("/", gin.WrapH(socketService.GetServer()))
+		socketRouter.GET("/", func(ginCtx *gin.Context) {
+			gin.WrapH(socketService.GetServer())
+		})
 		// Method 2 using server.ServerHTTP(Writer, Request) and also you can simply this by using gin.WrapH
-		socketRouter.POST("/", func(context *gin.Context) {
-			socketService.GetServer().ServeHTTP(context.Writer, context.Request)
+		socketRouter.POST("/", func(ginCtx *gin.Context) {
+			socketService.GetServer().ServeHTTP(ginCtx.Writer, ginCtx.Request)
 		})
 	}
 
