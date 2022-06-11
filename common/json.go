@@ -6,7 +6,7 @@ import (
 	"log"
 )
 
-func JsonSprint(msg string, data interface{}) {
+func JsonSprint[T any](msg string, data T) {
 	out, err := json.Marshal(data)
 	if err != nil {
 		panic(err)
@@ -14,8 +14,8 @@ func JsonSprint(msg string, data interface{}) {
 	log.Println(msg + string(out))
 }
 
-func CompactJson(data interface{}) interface{} {
-	var dataJs interface{} = data
+func CompactJson[T any](data T) T {
+	var dataJs T = data
 
 	dataBytes, _ := json.Marshal(data)
 
@@ -26,23 +26,23 @@ func CompactJson(data interface{}) interface{} {
 	return dataJs
 }
 
-func JsonToString(data interface{}) (string, error) {
+func JsonToString[T any](data T) (string, error) {
 	dataBytes, _ := json.Marshal(data)
 	if json.Valid(dataBytes) {
 		str := string(dataBytes)
 		return str, nil
 	}
-	return "", errors.New("Invalid json string")
+	return "", errors.New("invalid json string")
 }
 
-func StringToJson(str string, data interface{}) error {
+func StringToJson[T any](str string, data T) error {
 	if err := json.Unmarshal([]byte(str), &data); err != nil {
 		return err
 	}
 	return nil
 }
 
-func JsonToByte(data interface{}) []byte {
+func JsonToByte[T any](data T) []byte {
 	dataByte, err := json.Marshal(data)
 	if err != nil {
 		return nil

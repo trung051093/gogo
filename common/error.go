@@ -9,7 +9,7 @@ import (
 )
 
 var (
-	ErrNotFound = errors.New("Not found")
+	ErrNotFound = errors.New("not found")
 )
 
 type AppError struct {
@@ -170,7 +170,7 @@ func ErrorEntityDeleted(entity string, err error) *AppError {
 func ErrorUnauthorized() *AppError {
 	return NewUnauthorized(
 		errors.New("Unauthorized"),
-		fmt.Sprintf("Unauthorized"),
-		fmt.Sprintf("UNAUTHORIZED"),
+		"Unauthorized",
+		"UNAUTHORIZED",
 	)
 }

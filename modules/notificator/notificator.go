@@ -20,6 +20,10 @@ func Handler(appctx appctx.AppContext) {
 		fmt.Println("Receive Message : " + msg)
 		s.Emit("reply", "OK")
 	})
+	socketService.OnEvent("/", "msg", func(s socketio.Conn, msg string) {
+		fmt.Println("Receive Message : " + msg)
+		s.Emit("reply", "OK")
+	})
 	socketService.OnDisconnect("/", func(s socketio.Conn, msg string) {
 		fmt.Println("Somebody just close the connection ")
 	})

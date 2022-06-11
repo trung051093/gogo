@@ -24,7 +24,6 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
-	socketio "github.com/googollee/go-socket.io"
 	"github.com/minio/minio-go/v7/pkg/notification"
 )
 
@@ -40,7 +39,7 @@ func main() {
 			SSLMode:  config.Database.SSLMode,
 			TimeZone: config.Database.TimeZone,
 		},
-		// dbprovider.WithDebug,
+		dbprovider.WithDebug,
 		// dbprovider.WithAutoMigration(&usermodel.User{}),
 	)
 
@@ -89,12 +88,12 @@ func main() {
 	}
 
 	socketService := socketprovider.NewSocketProvider(
-		nil,
-		socketprovider.WithRedisAdapter(&socketio.RedisAdapterOptions{
+		socketprovider.WithRedisAdapter(&socketprovider.SocketRedisAdapterConfig{
 			Addr:     configRedis.Addr,
 			Password: configRedis.Password,
 			Prefix:   "socketio",
 		}),
+		socketprovider.WithWebsocketTransport,
 	)
 	appCtx := appctx.NewAppContext(
 		dbprovider.GetDBConnection(),
@@ -107,10 +106,6 @@ func main() {
 		socketService,
 	)
 
-	// handler background
-	go notificator.Handler(appCtx)
-	go indexer.Handler(appCtx)
-
 	router := gin.Default()
 	corsConfig := cors.DefaultConfig()
 	corsConfig.AllowAllOrigins = true
@@ -119,16 +114,18 @@ func main() {
 	router.Use(middleware.SetElasticSearch(appCtx))
 	router.Use(middleware.SetRabbitMQ(appCtx))
 
-	socketRouter := router.Group("/socket.io")
-	{
-		socketRouter.GET("/", func(ginCtx *gin.Context) {
-			gin.WrapH(socketService.GetServer())
-		})
-		// Method 2 using server.ServerHTTP(Writer, Request) and also you can simply this by using gin.WrapH
-		socketRouter.POST("/", func(ginCtx *gin.Context) {
-			socketService.GetServer().ServeHTTP(ginCtx.Writer, ginCtx.Request)
-		})
-	}
+	// handler background
+	go notificator.Handler(appCtx)
+	go indexer.Handler(appCtx)
+	socketServer := socketService.GetServer()
+
+	router.GET("/socket.io/*any", func(ginCtx *gin.Context) {
+		gin.WrapH(socketServer)
+	})
+	// Method 2 using server.ServerHTTP(Writer, Request) and also you can simply this by using gin.WrapH
+	router.POST("/socket.io/*any", func(ginCtx *gin.Context) {
+		gin.WrapH(socketServer)
+	})
 
 	v1 := router.Group("/api/v1")
 	{
@@ -149,5 +146,6 @@ func main() {
 		// photo
 		v1.GET("/file/presign-url", file.GetUploadPresignedUrl(appCtx))
 	}
+
 	router.Run(fmt.Sprintf(":%d", config.Server.Port)) // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
 }
