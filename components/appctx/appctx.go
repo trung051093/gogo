@@ -9,6 +9,7 @@ import (
 
 	"github.com/go-playground/validator/v10"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
 type AppContext interface {
@@ -56,7 +57,10 @@ func NewAppContext(
 }
 
 func (appCtx *appContext) GetMainDBConnection() *gorm.DB {
-	return appCtx.db
+	return appCtx.db.Session(&gorm.Session{
+		NewDB:  true,
+		Logger: appCtx.db.Logger.LogMode(logger.Error),
+	})
 }
 
 func (appCtx *appContext) GetValidator() *validator.Validate {

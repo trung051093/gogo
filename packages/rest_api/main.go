@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"time"
 	"user_management/common"
 	"user_management/components/appctx"
 	"user_management/components/dbprovider"
@@ -13,18 +12,14 @@ import (
 	redisprovider "user_management/components/redis"
 	socketprovider "user_management/components/socketio"
 	"user_management/components/storage"
-	cachedecorator "user_management/decorators/cache"
 	"user_management/middleware"
-	"user_management/modules/auth"
-	"user_management/modules/file"
 	"user_management/modules/indexer"
 	"user_management/modules/notificator"
-	"user_management/modules/user"
+	usermodel "user_management/modules/user/model"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
-	"github.com/minio/minio-go/v7/pkg/notification"
 )
 
 func main() {
@@ -39,8 +34,8 @@ func main() {
 			SSLMode:  config.Database.SSLMode,
 			TimeZone: config.Database.TimeZone,
 		},
-		dbprovider.WithDebug,
-		// dbprovider.WithAutoMigration(&usermodel.User{}),
+		// dbprovider.WithDebug,
+		dbprovider.WithAutoMigration(&usermodel.User{}),
 	)
 
 	if err != nil {
@@ -69,19 +64,6 @@ func main() {
 	if storageErr != nil {
 		return
 	}
-	go storageService.ListenNotification(
-		context.Background(),
-		common.PhotoBucket,
-		"",
-		"",
-		[]string{
-			"s3:ObjectCreated:*",
-			"s3:ObjectRemoved:*",
-		},
-		func(noti *notification.Info) {
-			log.Println("minio notification info:", noti)
-		},
-	)
 	createBucketErr := storageService.CreateBucket(context.Background(), common.PhotoBucket, common.PhotoBucketRegion)
 	if createBucketErr != nil {
 		log.Println("Create bucket error: ", createBucketErr)
@@ -115,37 +97,11 @@ func main() {
 	router.Use(middleware.SetRabbitMQ(appCtx))
 
 	// handler background
+	go notificator.FileHandler(appCtx)
 	go notificator.Handler(appCtx)
 	go indexer.Handler(appCtx)
-	socketServer := socketService.GetServer()
 
-	router.GET("/socket.io/*any", func(ginCtx *gin.Context) {
-		gin.WrapH(socketServer)
-	})
-	// Method 2 using server.ServerHTTP(Writer, Request) and also you can simply this by using gin.WrapH
-	router.POST("/socket.io/*any", func(ginCtx *gin.Context) {
-		gin.WrapH(socketServer)
-	})
-
-	v1 := router.Group("/api/v1")
-	{
-		// user
-		v1.POST("/user", user.CreateUserHandler(appCtx))
-		v1.PATCH("/user/:id", user.UpdateUserHandler(appCtx))
-		v1.DELETE("/user/:id", user.DeleteUserHandler(appCtx))
-		v1.GET("/user/:id", user.GetUserHandler(appCtx))
-		v1.GET("/users", user.ListUserHandler(appCtx))
-		v1.GET("/user/search", user.SearchUserHandler(appCtx))
-		// cache request
-		v1.GET("/users-cache", cachedecorator.CacheRequest(appCtx, "user", 15*time.Minute, user.ListUserHandler))
-
-		// authentication
-		v1.POST("/auth/register", auth.RegisterUserHandler(appCtx))
-		v1.POST("/auth/login", auth.LoginUserHandler(appCtx))
-
-		// photo
-		v1.GET("/file/presign-url", file.GetUploadPresignedUrl(appCtx))
-	}
-
+	socketRoutes(appCtx, router)
+	mainRoutes(appCtx, router)
 	router.Run(fmt.Sprintf(":%d", config.Server.Port)) // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
 }

@@ -2,7 +2,6 @@ package common
 
 import (
 	"encoding/json"
-	"log"
 	"time"
 )
 
@@ -30,7 +29,7 @@ func MessageToDataIndex(msg []byte) (*DataIndex, []byte, error) {
 	}
 	dataByte, dataErr := json.Marshal(dataIndex.Data)
 	if dataErr != nil {
-		log.Println("Error message: ", dataErr)
+		return nil, nil, dataErr
 	}
 	return dataIndex, dataByte, nil
 }
