@@ -2,6 +2,7 @@ package notificator
 
 import (
 	"fmt"
+	"log"
 	"user_management/common"
 	"user_management/components/appctx"
 
@@ -11,22 +12,32 @@ import (
 func Handler(appctx appctx.AppContext) {
 	defer common.Recovery()
 	socketService := appctx.GetSocketService()
-	socketService.OnConnect("/", func(s socketio.Conn) error {
-		s.SetContext("")
-		fmt.Println("Connected:", s.ID())
+	socketService.OnConnect(func(s socketio.Conn) error {
+		log.Println("Connected:", s.ID())
 		return nil
 	})
-	socketService.OnEvent("/", "msg", func(s socketio.Conn, msg string) {
-		fmt.Println("Receive Message : " + msg)
+	socketService.OnEvent("msg", func(s socketio.Conn, msg string) {
+		log.Println("Receive Message : " + msg)
 		s.Emit("reply", "OK")
 	})
-	socketService.OnEvent("/", "msg", func(s socketio.Conn, msg string) {
-		fmt.Println("Receive Message : " + msg)
+	socketService.OnEvent("msg", func(s socketio.Conn, msg string) {
+		log.Println("Receive Message : " + msg)
 		s.Emit("reply", "OK")
 	})
-	socketService.OnDisconnect("/", func(s socketio.Conn, msg string) {
-		fmt.Println("Somebody just close the connection ")
+	socketService.OnEvent("join:notification", func(s socketio.Conn, msg string) {
+		log.Println("join:notification: " + msg)
+		ok := socketService.JoinRoom("notification", s)
+		s.Emit("reply", fmt.Sprintf("%s join room 'notification' %v", s.ID(), ok))
 	})
-	go socketService.Serve()
+	socketService.OnEvent("leave:notification", func(s socketio.Conn, msg string) {
+		log.Println("leave:notification: " + msg)
+		ok := socketService.LeaveRoom("notification", s)
+		s.Emit("reply", fmt.Sprintf("%s leave room 'notification' %v", s.ID(), ok))
+	})
+	socketService.OnDisconnect(func(s socketio.Conn, msg string) {
+		log.Println("Somebody just close the connection ")
+		s.Close()
+	})
+	socketService.Serve()
 	defer socketService.Close()
 }

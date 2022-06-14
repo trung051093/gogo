@@ -15,7 +15,6 @@ import (
 	"user_management/middleware"
 	"user_management/modules/indexer"
 	"user_management/modules/notificator"
-	usermodel "user_management/modules/user/model"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -35,7 +34,7 @@ func main() {
 			TimeZone: config.Database.TimeZone,
 		},
 		// dbprovider.WithDebug,
-		dbprovider.WithAutoMigration(&usermodel.User{}),
+		// dbprovider.WithAutoMigration(&usermodel.User{}),
 	)
 
 	if err != nil {
@@ -95,13 +94,14 @@ func main() {
 	router.Use(middleware.ErrorHandler(appCtx))
 	router.Use(middleware.SetElasticSearch(appCtx))
 	router.Use(middleware.SetRabbitMQ(appCtx))
+	router.Use(middleware.SetSocketIO(appCtx))
 
 	// handler background
 	go notificator.FileHandler(appCtx)
 	go notificator.Handler(appCtx)
 	go indexer.Handler(appCtx)
 
-	socketRoutes(appCtx, router)
 	mainRoutes(appCtx, router)
+	socketRoutes(appCtx, router)
 	router.Run(fmt.Sprintf(":%d", config.Server.Port)) // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
 }

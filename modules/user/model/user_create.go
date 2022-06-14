@@ -6,7 +6,9 @@ import (
 	"time"
 	"user_management/common"
 	rabbitmqprovider "user_management/components/rabbitmq"
+	socketprovider "user_management/components/socketio"
 
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
@@ -44,6 +46,22 @@ func (u *UserCreate) AfterCreate(tx *gorm.DB) (err error) {
 			if publishErr := rabbitmqService.Publish(ctx, common.JsonToByte(dataIndex), []string{common.IndexingQueue}); publishErr != nil {
 				log.Println("AfterCreate publish error:", publishErr)
 			}
+		}(u)
+	}
+
+	if socketService, ok := socketprovider.FromContext(ctx); ok {
+		go func(user *UserCreate) {
+			defer common.Recovery()
+			data := &common.Notification{
+				Id: uuid.New().String(),
+				Data: common.CompactJson(map[string]interface{}{
+					"Id": user.Id,
+				}),
+				Event:       "user-created",
+				Message:     "New user has been created",
+				CreatedTime: time.Now(),
+			}
+			socketService.BroadcastToRoom(common.NotificationRoom, common.NotificationEvent, data)
 		}(u)
 	}
 	return
