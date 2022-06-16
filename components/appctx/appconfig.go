@@ -5,6 +5,7 @@ import (
 	"os"
 	"path"
 	"runtime"
+	jaegerprovider "user_management/components/jaeger"
 	rabbitmqprovider "user_management/components/rabbitmq"
 	"user_management/components/storage"
 
@@ -55,8 +56,8 @@ type Config struct {
 	Minio struct {
 		Host            string `yaml:"host"`
 		Port            int    `yaml:"port"`
-		AccessKeyID     string `yaml:"accessKeyID"`
-		SecretAccessKey string `yaml:"secretAccessKey"`
+		AccessKeyID     string `yaml:"access_key_id"`
+		SecretAccessKey string `yaml:"secret_access_key"`
 		UseSSL          bool   `yaml:"useSSL"`
 	} `yaml:"minio"`
 	JWT struct {
@@ -64,6 +65,11 @@ type Config struct {
 		PasswordSaltLength int    `yaml:"pass_salt_length"`
 		ExpireDays         int    `yaml:"expire_days"`
 	} `yaml:"jwt"`
+	Jaeger struct {
+		ServiceName       string `yaml:"service_name"`
+		AgentEndpoint     string `yaml:"agent_endpoint"`
+		CollectorEndpoint string `yaml:"collector_endpoint"`
+	} `yaml:"jaeger"`
 }
 
 func RootDir() string {
@@ -130,5 +136,13 @@ func (cfg *Config) GetStorageConfig() *storage.StorageConfig {
 		AccessKeyID:     cfg.Minio.AccessKeyID,
 		SecretAccessKey: cfg.Minio.SecretAccessKey,
 		UseSSL:          cfg.Minio.UseSSL,
+	}
+}
+
+func (cfg *Config) GetJaegerConfig() *jaegerprovider.JaegerConfig {
+	return &jaegerprovider.JaegerConfig{
+		ServiceName:       cfg.Jaeger.ServiceName,
+		AgentEndpoint:     cfg.Jaeger.AgentEndpoint,
+		CollectorEndpoint: cfg.Jaeger.CollectorEndpoint,
 	}
 }

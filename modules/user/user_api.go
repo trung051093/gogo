@@ -12,10 +12,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type UserHandler struct {
-	ctx *gin.Context
-}
-
 func CreateUserHandler(appCtx appctx.AppContext) func(*gin.Context) {
 	return func(ginCtx *gin.Context) {
 		var newData usermodel.UserCreate
@@ -142,7 +138,7 @@ func ListUserHandler(appCtx appctx.AppContext) func(*gin.Context) {
 		userRepo := NewUserRepository(appCtx.GetMainDBConnection())
 		userService := NewUserService(userRepo)
 
-		data, err := userService.SearchUsers(ginCtx.Request.Context(), map[string]interface{}{}, &filter, &paging)
+		data, err := userService.SearchUsersTrace(ginCtx.Request.Context(), map[string]interface{}{}, &filter, &paging)
 
 		if err != nil {
 			panic(err)

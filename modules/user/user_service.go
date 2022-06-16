@@ -3,6 +3,7 @@ package user
 import (
 	"context"
 	"user_management/common"
+	decorator "user_management/decorators"
 	usermodel "user_management/modules/user/model"
 )
 
@@ -12,6 +13,11 @@ type userService struct {
 
 func NewUserService(repo *userRepository) *userService {
 	return &userService{repo: repo}
+}
+
+func (s *userService) SearchUsersTrace(ctx context.Context, cond map[string]interface{}, f *usermodel.UserFilter, p *common.Pagination) ([]usermodel.User, error) {
+	data, err := decorator.TraceService(ctx, "userService.SearchUsers")(s, "SearchUsers")(ctx, cond, f, p)
+	return data.([]usermodel.User), err
 }
 
 func (s *userService) SearchUsers(ctx context.Context, cond map[string]interface{}, f *usermodel.UserFilter, p *common.Pagination) ([]usermodel.User, error) {

@@ -3,7 +3,7 @@ package main
 import (
 	"time"
 	"user_management/components/appctx"
-	cachedecorator "user_management/decorators/cache"
+	decorator "user_management/decorators"
 	"user_management/modules/auth"
 	"user_management/modules/file"
 	"user_management/modules/user"
@@ -22,7 +22,7 @@ func mainRoutes(appCtx appctx.AppContext, router *gin.Engine) {
 		v1.GET("/users", user.ListUserHandler(appCtx))
 		v1.GET("/user/search", user.SearchUserHandler(appCtx))
 		// cache request
-		v1.GET("/users-cache", cachedecorator.CacheRequest(appCtx, "user", 15*time.Minute, user.ListUserHandler))
+		v1.GET("/users-cache", decorator.CacheRequest(appCtx, "user", 15*time.Minute, user.ListUserHandler))
 
 		// authentication
 		v1.POST("/auth/register", auth.RegisterUserHandler(appCtx))

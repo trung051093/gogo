@@ -8,6 +8,7 @@ import (
 	"user_management/components/appctx"
 	"user_management/components/dbprovider"
 	esprovider "user_management/components/elasticsearch"
+	jaegerprovider "user_management/components/jaeger"
 	rabbitmqprovider "user_management/components/rabbitmq"
 	redisprovider "user_management/components/redis"
 	socketprovider "user_management/components/socketio"
@@ -19,10 +20,12 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
+	"go.opencensus.io/trace"
 )
 
 func main() {
 	config := appctx.GetConfig()
+
 	dbprovider, err := dbprovider.NewDBProvider(
 		&dbprovider.DBConfig{
 			Host:     config.Database.Host,
@@ -76,6 +79,8 @@ func main() {
 		}),
 		socketprovider.WithWebsocketTransport,
 	)
+	jaegerService := jaegerprovider.NewExporter(config.GetJaegerConfig())
+
 	appCtx := appctx.NewAppContext(
 		dbprovider.GetDBConnection(),
 		validate,
@@ -85,6 +90,7 @@ func main() {
 		redisProvider,
 		storageService,
 		socketService,
+		jaegerService,
 	)
 
 	router := gin.Default()
@@ -92,9 +98,7 @@ func main() {
 	corsConfig.AllowAllOrigins = true
 	router.Use(cors.New(corsConfig))
 	router.Use(middleware.ErrorHandler(appCtx))
-	router.Use(middleware.SetElasticSearch(appCtx))
-	router.Use(middleware.SetRabbitMQ(appCtx))
-	router.Use(middleware.SetSocketIO(appCtx))
+	router.Use(middleware.SetAppContextIntoRequest(appCtx))
 
 	// handler background
 	go notificator.FileHandler(appCtx)
@@ -103,5 +107,8 @@ func main() {
 
 	mainRoutes(appCtx, router)
 	socketRoutes(appCtx, router)
+
+	// And now finally register it as a Trace Exporter
+	trace.RegisterExporter(jaegerService.GetExporter())
 	router.Run(fmt.Sprintf(":%d", config.Server.Port)) // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
 }

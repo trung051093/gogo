@@ -25,12 +25,12 @@ func Handler(appctx appctx.AppContext) {
 		s.Emit("reply", "OK")
 	})
 	socketService.OnEvent("join:notification", func(s socketio.Conn, msg string) {
-		log.Println("join:notification: " + msg)
+		log.Println("join notification: " + msg)
 		ok := socketService.JoinRoom("notification", s)
 		s.Emit("reply", fmt.Sprintf("%s join room 'notification' %v", s.ID(), ok))
 	})
 	socketService.OnEvent("leave:notification", func(s socketio.Conn, msg string) {
-		log.Println("leave:notification: " + msg)
+		log.Println("leave notification: " + msg)
 		ok := socketService.LeaveRoom("notification", s)
 		s.Emit("reply", fmt.Sprintf("%s leave room 'notification' %v", s.ID(), ok))
 	})

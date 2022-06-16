@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 	"user_management/common"
-	rabbitmqprovider "user_management/components/rabbitmq"
+	"user_management/components/appctx"
 
 	"gorm.io/gorm"
 )
@@ -48,8 +48,9 @@ func (User) TableIndex() string {
 
 func (u *User) AfterDelete(tx *gorm.DB) (err error) {
 	ctx := tx.Statement.Context
-	if rabbitmqService, ok := rabbitmqprovider.FromContext(ctx); ok {
-		log.Println("AfterDelete rabbitmqService:", rabbitmqService)
+
+	if appCtx, ok := appctx.FromContext(ctx); ok {
+		rabbitmqService := appCtx.GetRabbitMQService()
 		go func(user *User) {
 			defer common.Recovery()
 			dataIndex := &common.DataIndex{

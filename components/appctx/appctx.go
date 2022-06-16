@@ -1,7 +1,9 @@
 package appctx
 
 import (
+	"context"
 	esprovider "user_management/components/elasticsearch"
+	jaegerprovider "user_management/components/jaeger"
 	rabbitmqprovider "user_management/components/rabbitmq"
 	redisprovider "user_management/components/redis"
 	socketprovider "user_management/components/socketio"
@@ -32,7 +34,12 @@ type appContext struct {
 	redisService    redisprovider.RedisService
 	storageService  storage.StorageService
 	socketService   socketprovider.SocketService
+	jaegerService   jaegerprovider.JaegerService
 }
+
+type key string
+
+var AppContextKey key = "AppContextKey"
 
 func NewAppContext(
 	db *gorm.DB,
@@ -43,6 +50,7 @@ func NewAppContext(
 	redisService redisprovider.RedisService,
 	storageService storage.StorageService,
 	socketService socketprovider.SocketService,
+	jaegerService jaegerprovider.JaegerService,
 ) *appContext {
 	return &appContext{
 		db:              db,
@@ -53,7 +61,20 @@ func NewAppContext(
 		redisService:    redisService,
 		storageService:  storageService,
 		socketService:   socketService,
+		jaegerService:   jaegerService,
 	}
+}
+
+func WithContext(ctx context.Context, appCtx AppContext) context.Context {
+	return context.WithValue(ctx, AppContextKey, appCtx)
+}
+
+func FromContext(ctx context.Context) (*appContext, bool) {
+	appCtx := ctx.Value(AppContextKey)
+	if c, ok := appCtx.(*appContext); ok {
+		return c, true
+	}
+	return nil, false
 }
 
 func (appCtx *appContext) GetMainDBConnection() *gorm.DB {
@@ -89,4 +110,8 @@ func (appCtx *appContext) GetStorageService() storage.StorageService {
 
 func (appCtx *appContext) GetSocketService() socketprovider.SocketService {
 	return appCtx.socketService
+}
+
+func (appCtx *appContext) GetJaegerService() jaegerprovider.JaegerService {
+	return appCtx.jaegerService
 }

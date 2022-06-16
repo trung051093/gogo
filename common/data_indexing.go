@@ -16,7 +16,7 @@ const (
 type DataIndex struct {
 	Index    string
 	Action   Action
-	Data     interface{}
+	Data     any
 	Id       string
 	SendTime time.Time
 }

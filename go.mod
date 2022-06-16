@@ -3,6 +3,7 @@ module user_management
 go 1.18
 
 require (
+	contrib.go.opencensus.io/exporter/jaeger v0.2.1
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/elastic/go-elasticsearch/v8 v8.2.0
 	github.com/gin-contrib/cors v1.3.1
@@ -13,6 +14,7 @@ require (
 	github.com/googollee/go-socket.io v1.6.2
 	github.com/minio/minio-go/v7 v7.0.27
 	github.com/wagslane/go-rabbitmq v0.10.0
+	go.opencensus.io v0.23.0
 	gopkg.in/yaml.v3 v3.0.0
 	gorm.io/driver/postgres v1.3.1
 	gorm.io/gorm v1.23.1
@@ -28,6 +30,7 @@ require (
 	github.com/go-playground/locales v0.14.0 // indirect
 	github.com/go-playground/universal-translator v0.18.0 // indirect
 	github.com/gofrs/uuid v4.0.0+incompatible // indirect
+	github.com/golang/groupcache v0.0.0-20200121045136-8c9f03a8e57e // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/gomodule/redigo v2.0.0+incompatible // indirect
 	github.com/google/go-cmp v0.5.8 // indirect
@@ -57,11 +60,14 @@ require (
 	github.com/rs/xid v1.2.1 // indirect
 	github.com/sirupsen/logrus v1.8.1 // indirect
 	github.com/stretchr/testify v1.7.1 // indirect
+	github.com/uber/jaeger-client-go v2.25.0+incompatible // indirect
 	github.com/ugorji/go/codec v1.2.6 // indirect
 	golang.org/x/crypto v0.0.0-20220411220226-7b82a4e95df4 // indirect
 	golang.org/x/net v0.0.0-20220520000938-2e3eb7b945c2 // indirect
+	golang.org/x/sync v0.0.0-20200625203802-6e8e738ad208 // indirect
 	golang.org/x/sys v0.0.0-20220520151302-bc2c85ada10a // indirect
 	golang.org/x/text v0.3.7 // indirect
+	google.golang.org/api v0.29.0 // indirect
 	google.golang.org/protobuf v1.28.0 // indirect
 	gopkg.in/ini.v1 v1.66.4 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect

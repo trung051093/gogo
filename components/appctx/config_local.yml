@@ -46,3 +46,9 @@ jwt:
   secret: "jwt"
   pass_salt_length: 12
   expire_days: 30 #days
+
+# Trace
+jaeger:
+  service_name: "user-management"
+  agent_endpoint: "95.111.248.127:6831"
+  collector_endpoint: "95.111.248.127:14268/api/traces"

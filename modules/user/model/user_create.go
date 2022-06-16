@@ -5,8 +5,7 @@ import (
 	"log"
 	"time"
 	"user_management/common"
-	rabbitmqprovider "user_management/components/rabbitmq"
-	socketprovider "user_management/components/socketio"
+	"user_management/components/appctx"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
@@ -33,7 +32,12 @@ func (UserCreate) TableIndex() string { return User{}.TableIndex() }
 
 func (u *UserCreate) AfterCreate(tx *gorm.DB) (err error) {
 	ctx := tx.Statement.Context
-	if rabbitmqService, ok := rabbitmqprovider.FromContext(ctx); ok {
+	if appCtx, ok := appctx.FromContext(ctx); ok {
+		log.Println("🚀 ~ file: user.go ~ line 53 ~ ifappCtx,ok:=appctx.FromContext ~ ok", ok)
+
+		rabbitmqService := appCtx.GetRabbitMQService()
+		socketService := appCtx.GetSocketService()
+
 		go func(user *UserCreate) {
 			defer common.Recovery()
 			dataIndex := &common.DataIndex{
@@ -47,17 +51,15 @@ func (u *UserCreate) AfterCreate(tx *gorm.DB) (err error) {
 				log.Println("AfterCreate publish error:", publishErr)
 			}
 		}(u)
-	}
 
-	if socketService, ok := socketprovider.FromContext(ctx); ok {
 		go func(user *UserCreate) {
 			defer common.Recovery()
 			data := &common.Notification{
 				Id: uuid.New().String(),
 				Data: common.CompactJson(map[string]interface{}{
-					"Id": user.Id,
+					"id": user.Id,
 				}),
-				Event:       "user-created",
+				Event:       fmt.Sprintf("%s-%s", user.TableName(), common.Create),
 				Message:     "New user has been created",
 				CreatedTime: time.Now(),
 			}
