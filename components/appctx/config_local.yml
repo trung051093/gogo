@@ -12,7 +12,7 @@ redis:
 
 # Database credentials
 database:
-  host: "postgres"
+  host: "localhost"
   username: "root"
   password: "root"
   name: "demo"
@@ -22,21 +22,21 @@ database:
 
 # Elastic search
 elasticsearch:
-  host: "http://elasticsearch:9200"
+  host: "http://localhost:9200"
   username: elastic
   password: elastic
 
 # Minio
 minio:
-  host: "minio"
+  host: "localhost"
   port: 10000
-  accessKeyID: minio
-  secretAccessKey: minio
+  accessKeyID: minioadmin
+  secretAccessKey: minioadmin
   useSSL: false
 
 # Rabbit MQ
 rabbitmq:
-  host: "rabbitmq"
+  host: "localhost"
   port: 5672
   username: root
   password: root
@@ -50,5 +50,5 @@ jwt:
 # Trace
 jaeger:
   service_name: "user-management"
-  agent_endpoint: "95.111.248.127:6831"
-  collector_endpoint: "95.111.248.127:14268/api/traces"
+  agent_endpoint: "127.0.0.1:6831"
+  collector_endpoint: "127.0.0.1:14268/api/traces"

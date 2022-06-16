@@ -16,6 +16,7 @@ import (
 	"user_management/middleware"
 	"user_management/modules/indexer"
 	"user_management/modules/notificator"
+	usermodel "user_management/modules/user/model"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -36,8 +37,8 @@ func main() {
 			SSLMode:  config.Database.SSLMode,
 			TimeZone: config.Database.TimeZone,
 		},
-		// dbprovider.WithDebug,
-		// dbprovider.WithAutoMigration(&usermodel.User{}),
+		dbprovider.WithDebug,
+		dbprovider.WithAutoMigration(&usermodel.User{}),
 	)
 
 	if err != nil {
@@ -101,7 +102,7 @@ func main() {
 	router.Use(middleware.SetAppContextIntoRequest(appCtx))
 
 	// handler background
-	go notificator.FileHandler(appCtx)
+	// go notificator.FileHandler(appCtx)
 	go notificator.Handler(appCtx)
 	go indexer.Handler(appCtx)
 
@@ -110,5 +111,7 @@ func main() {
 
 	// And now finally register it as a Trace Exporter
 	trace.RegisterExporter(jaegerService.GetExporter())
+	trace.ApplyConfig(trace.Config{DefaultSampler: trace.ProbabilitySampler(1)})
+
 	router.Run(fmt.Sprintf(":%d", config.Server.Port)) // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
 }

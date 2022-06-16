@@ -1,44 +1,52 @@
 version: '3'
 services:
-  indexer:
-    image: indexer
-    container_name: indexer
-    environment:
-      ENV: local
-    volumes:
-      - api_data:/data
-    networks:
-      - all
-    depends_on:
-      - rabbitmq
-      - elasticsearch
-    logging:
-      driver: 'gelf'
-      options:
-        gelf-address: 'udp://127.0.0.1:12201'
-    restart: unless-stopped
-
-  rest_api:
-    image: api
-    container_name: api
-    environment:
-      ENV: local
+  jaeger:
+    image: jaegertracing/all-in-one:latest
     ports:
-      - '8080:8080'
-    volumes:
-      - api_data:/data
+      - "6831:6831/udp"
+      - "16686:16686"
     networks:
       - all
-    depends_on:
-      - redis
-      - postgres
-      - rabbitmq
-      - elasticsearch
-    logging:
-      driver: 'gelf'
-      options:
-        gelf-address: 'udp://127.0.0.1:12201'
-    restart: unless-stopped
+
+  # indexer:
+  #   image: indexer
+  #   container_name: indexer
+  #   environment:
+  #     ENV: local
+  #   volumes:
+  #     - api_data:/data
+  #   networks:
+  #     - all
+  #   depends_on:
+  #     - rabbitmq
+  #     - elasticsearch
+  #   logging:
+  #     driver: 'gelf'
+  #     options:
+  #       gelf-address: 'udp://127.0.0.1:12201'
+  #   restart: unless-stopped
+
+  # rest_api:
+  #   image: api
+  #   container_name: api
+  #   environment:
+  #     ENV: local
+  #   ports:
+  #     - '8080:8080'
+  #   volumes:
+  #     - api_data:/data
+  #   networks:
+  #     - all
+  #   depends_on:
+  #     - redis
+  #     - postgres
+  #     - rabbitmq
+  #     - elasticsearch
+  #   logging:
+  #     driver: 'gelf'
+  #     options:
+  #       gelf-address: 'udp://127.0.0.1:12201'
+  #   restart: unless-stopped
 
   minio:
     image: quay.io/minio/minio
@@ -48,8 +56,8 @@ services:
       - '10000:9000'
       - '10001:9001'
     environment:
-      MINIO_ROOT_USER: minio
-      MINIO_ROOT_PASSWORD: minio
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
     healthcheck:
       test:
         [
@@ -71,7 +79,7 @@ services:
     container_name: redis
     environment:
       # ALLOW_EMPTY_PASSWORD is recommended only for development.
-      ALLOW_EMPTY_PASSWORD: yes
+      ALLOW_EMPTY_PASSWORD: "yes"
       REDIS_REPLICATION_MODE: master
     ports:
       - '6379:6379'
@@ -163,4 +171,10 @@ volumes:
   es_data:
     driver: local
   minio_data:
+    driver: local
+  netdataconfig:
+    driver: local
+  netdatalib:
+    driver: local
+  netdatacache:
     driver: local

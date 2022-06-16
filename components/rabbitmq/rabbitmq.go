@@ -16,6 +16,11 @@ type RabbitmqSerivce interface {
 	Close()
 }
 
+type RabbitmqOptions struct {
+	NotifyReturn  bool
+	NotifyPublish bool
+}
+
 type RabbitmqConfig struct {
 	Host string
 	Port int
@@ -26,6 +31,7 @@ type RabbitmqConfig struct {
 type rabbitmqSerivce struct {
 	consumer  rabbitmq.Consumer
 	publisher *rabbitmq.Publisher
+	options   *RabbitmqOptions
 }
 
 type key string
@@ -44,7 +50,6 @@ func NewRabbitMQ(config *RabbitmqConfig) (*rabbitmqSerivce, error) {
 		rabbitmq.WithConsumerOptionsReconnectInterval(time.Second),
 	)
 	if err != nil {
-		log.Println("Cannot create consumer: ", err)
 		return nil, err
 	}
 
@@ -53,29 +58,20 @@ func NewRabbitMQ(config *RabbitmqConfig) (*rabbitmqSerivce, error) {
 		rabbitmq.Config{},
 		rabbitmq.WithPublisherOptionsLogging,
 	)
+
 	if err != nil {
 		log.Println("Cannot create publisher: ", err)
 		return nil, err
 	}
 
-	returns := publisher.NotifyReturn()
-	go func() {
-		for r := range returns {
-			log.Printf("message returned from server: %s", string(r.Body))
-		}
-	}()
-
-	confirmations := publisher.NotifyPublish()
-	go func() {
-		for c := range confirmations {
-			log.Printf("message confirmed from server. tag: %v, ack: %v", c.DeliveryTag, c.Ack)
-		}
-	}()
-
-	return &rabbitmqSerivce{
+	rabbitmqSerivce := &rabbitmqSerivce{
 		consumer:  consumer,
 		publisher: publisher,
-	}, nil
+	}
+	options := rabbitmqSerivce.handlerOptions()
+	rabbitmqSerivce.options = options
+
+	return rabbitmqSerivce, nil
 }
 
 // singleton
@@ -101,6 +97,46 @@ func FromContext(ctx context.Context) (*rabbitmqSerivce, bool) {
 		return es, true
 	}
 	return nil, false
+}
+
+func WithNotifyReturn(ro *RabbitmqOptions) {
+	ro.NotifyReturn = true
+}
+
+func WithNotifyPublish(ro *RabbitmqOptions) {
+	ro.NotifyPublish = true
+}
+
+func initOptions() *RabbitmqOptions {
+	return &RabbitmqOptions{}
+}
+
+func (r *rabbitmqSerivce) handlerOptions(funcOptions ...func(*RabbitmqOptions)) *RabbitmqOptions {
+	options := initOptions()
+
+	for _, optionFunc := range funcOptions {
+		optionFunc(options)
+	}
+
+	if options.NotifyPublish {
+		confirmations := r.publisher.NotifyPublish()
+		go func() {
+			for c := range confirmations {
+				log.Printf("message confirmed from server. tag: %v, ack: %v", c.DeliveryTag, c.Ack)
+			}
+		}()
+	}
+
+	if options.NotifyReturn {
+		returns := r.publisher.NotifyReturn()
+		go func() {
+			for r := range returns {
+				log.Printf("message returned from server: %s", string(r.Body))
+			}
+		}()
+	}
+
+	return options
 }
 
 func (r *rabbitmqSerivce) Consuming(ctx context.Context, handler rabbitmq.Handler, queue string, routingKeys []string, optionFuncs ...func(*rabbitmq.ConsumeOptions)) error {

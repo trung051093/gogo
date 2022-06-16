@@ -22,9 +22,8 @@ type jaegerService struct {
 
 func NewExporter(config *JaegerConfig) *jaegerService {
 	je, err := jaeger.NewExporter(jaeger.Options{
-		AgentEndpoint:     config.AgentEndpoint,
-		CollectorEndpoint: config.CollectorEndpoint,
-		Process:           jaeger.Process{ServiceName: config.ServiceName},
+		AgentEndpoint: config.AgentEndpoint,
+		Process:       jaeger.Process{ServiceName: config.ServiceName},
 	})
 	if err != nil {
 		log.Fatalf("Failed to create the Jaeger exporter: %v", err)
