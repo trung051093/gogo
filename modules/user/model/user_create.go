@@ -33,8 +33,6 @@ func (UserCreate) TableIndex() string { return User{}.TableIndex() }
 func (u *UserCreate) AfterCreate(tx *gorm.DB) (err error) {
 	ctx := tx.Statement.Context
 	if appCtx, ok := appctx.FromContext(ctx); ok {
-		log.Println("🚀 ~ file: user.go ~ line 53 ~ ifappCtx,ok:=appctx.FromContext ~ ok", ok)
-
 		rabbitmqService := appCtx.GetRabbitMQService()
 		socketService := appCtx.GetSocketService()
 

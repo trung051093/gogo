@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"net/http"
 	"user_management/common"
 	"user_management/components/appctx"
 	"user_management/components/dbprovider"
@@ -21,6 +22,7 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
+	"go.opencensus.io/plugin/ochttp"
 	"go.opencensus.io/trace"
 )
 
@@ -113,5 +115,6 @@ func main() {
 	trace.RegisterExporter(jaegerService.GetExporter())
 	trace.ApplyConfig(trace.Config{DefaultSampler: trace.ProbabilitySampler(1)})
 
-	router.Run(fmt.Sprintf(":%d", config.Server.Port)) // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
+	// listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
+	http.ListenAndServe(fmt.Sprintf(":%d", config.Server.Port), &ochttp.Handler{Handler: router})
 }

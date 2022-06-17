@@ -14,7 +14,7 @@ func (s *userService) SearchUsersTrace(ctx context.Context, cond map[string]inte
 }
 
 func (s *userService) SearchUserTrace(ctx context.Context, cond map[string]interface{}) (*usermodel.User, error) {
-	data, err := decorator.TraceService(ctx, "userService.SearchOne")(s, "SearchOne")(ctx, cond)
+	data, err := decorator.TraceService(ctx, "userService.SearchUser")(s, "SearchUser")(ctx, cond)
 	return data.(*usermodel.User), err
 }
 

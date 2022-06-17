@@ -13,7 +13,7 @@ func TraceService(ctx context.Context, name string) func(interface{}, string) fu
 		return func(agrs ...interface{}) (interface{}, error) {
 			_, span := trace.StartSpan(ctx, name)
 			result, err := Invoke(service, method, agrs...)
-			defer span.End()
+			span.End()
 			return result.Interface(), err
 		}
 	}
