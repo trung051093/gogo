@@ -34,7 +34,7 @@ func (s *authService) Register(ctx context.Context, payload *authmodel.AuthRegis
 	condFindWithEmail := map[string]interface{}{"email": payload.Email}
 	user, searchErr := s.userService.SearchUser(ctx, condFindWithEmail)
 	if user != nil && searchErr == nil {
-		return common.ErrorEntityExisted(usermodel.EntityName, errors.New("User already exists"))
+		return common.ErrorEntityExisted(usermodel.EntityName, errors.New("user already exists"))
 	}
 
 	passwordSalt := s.hashService.GenerateRandomString(s.config.JWT.PasswordSaltLength)
@@ -63,7 +63,7 @@ func (s *authService) Login(ctx context.Context, payload *authmodel.AuthLogin) (
 
 	hashPassword := s.hashService.GenerateSHA256(payload.Password, user.PasswordSalt)
 	if user.Password != hashPassword {
-		return nil, common.ErrorInvalidRequest(usermodel.EntityName, errors.New("Email or Password wrong !!!"))
+		return nil, common.ErrorInvalidRequest(usermodel.EntityName, errors.New("email or password wrong"))
 	}
 
 	token, gererateTokenErr := s.jwtProvider.Generate(authprovider.TokenPayload{

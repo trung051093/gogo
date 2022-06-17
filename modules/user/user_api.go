@@ -28,14 +28,15 @@ func CreateUserHandler(appCtx appctx.AppContext) func(*gin.Context) {
 		appConfig := appCtx.GetConfig()
 
 		userRepo := NewUserRepository(appCtx.GetMainDBConnection())
-		userService := NewUserService(userRepo)
+		esService := appCtx.GetESService()
+		userService := NewUserService(userRepo, esService)
 		hashService := hasher.NewHashService()
 
 		passwordSalt := hashService.GenerateRandomString(appConfig.JWT.PasswordSaltLength)
 		hashPassword := hashService.GenerateSHA256(newData.Password, passwordSalt)
 		newData.Password = hashPassword
 
-		userId, err := userService.CreateUser(ginCtx.Request.Context(), &newData)
+		userId, err := userService.CreateUserTrace(ginCtx.Request.Context(), &newData)
 
 		if err != nil {
 			panic(err)
@@ -67,14 +68,15 @@ func UpdateUserHandler(appCtx appctx.AppContext) func(*gin.Context) {
 		appConfig := appCtx.GetConfig()
 
 		userRepo := NewUserRepository(appCtx.GetMainDBConnection())
-		userService := NewUserService(userRepo)
+		esService := appCtx.GetESService()
+		userService := NewUserService(userRepo, esService)
 		hashService := hasher.NewHashService()
 
 		passwordSalt := hashService.GenerateRandomString(appConfig.JWT.PasswordSaltLength)
 		hashPassword := hashService.GenerateSHA256(updateData.Password, passwordSalt)
 		updateData.Password = hashPassword
 
-		if err := userService.UpdateUser(ginCtx.Request.Context(), uint(id), &updateData); err != nil {
+		if _, err := userService.UpdateUserTrace(ginCtx.Request.Context(), id, &updateData); err != nil {
 			panic(err)
 		}
 
@@ -91,9 +93,10 @@ func GetUserHandler(appCtx appctx.AppContext) func(*gin.Context) {
 		}
 
 		userRepo := NewUserRepository(appCtx.GetMainDBConnection())
-		userService := NewUserService(userRepo)
+		esService := appCtx.GetESService()
+		userService := NewUserService(userRepo, esService)
 
-		user, err := userService.GetUser(ginCtx.Request.Context(), uint(id))
+		user, err := userService.GetUserTrace(ginCtx.Request.Context(), id)
 
 		if err != nil {
 			panic(err)
@@ -136,7 +139,8 @@ func ListUserHandler(appCtx appctx.AppContext) func(*gin.Context) {
 		}
 
 		userRepo := NewUserRepository(appCtx.GetMainDBConnection())
-		userService := NewUserService(userRepo)
+		esService := appCtx.GetESService()
+		userService := NewUserService(userRepo, esService)
 
 		data, err := userService.SearchUsersTrace(ginCtx.Request.Context(), map[string]interface{}{}, &filter, &paging)
 
@@ -157,9 +161,10 @@ func DeleteUserHandler(appCtx appctx.AppContext) func(*gin.Context) {
 		}
 
 		userRepo := NewUserRepository(appCtx.GetMainDBConnection())
-		userService := NewUserService(userRepo)
+		esService := appCtx.GetESService()
+		userService := NewUserService(userRepo, esService)
 
-		if err := userService.DeleteUser(ginCtx.Request.Context(), uint(id)); err != nil {
+		if _, err := userService.DeleteUser(ginCtx.Request.Context(), id); err != nil {
 			panic(common.ErrorCannotDeleteEntity(usermodel.EntityName, err))
 		}
 
@@ -197,15 +202,10 @@ func SearchUserHandler(appCtx appctx.AppContext) func(*gin.Context) {
 			panic(common.ErrorInvalidRequest(usermodel.EntityName, err))
 		}
 
+		userRepo := NewUserRepository(appCtx.GetMainDBConnection())
 		esService := appCtx.GetESService()
-		userEsQuery := &usermodel.UserEsQuery{
-			Query:     query,
-			LastIndex: lastIndex,
-			Paging:    &paging,
-			Filter:    &filter,
-		}
-		esUserQuery := usermodel.GetUserESQuery(ginCtx.Request.Context(), userEsQuery)
-		data, err := esService.Search(ginCtx.Request.Context(), usermodel.User{}.TableIndex(), esUserQuery)
+		userService := NewUserService(userRepo, esService)
+		data, err := userService.EsSearchTrace(ginCtx.Request.Context(), query, lastIndex, &filter, &paging)
 
 		if err != nil {
 			panic(common.ErrorCannotFoundEntity(usermodel.EntityName, err))

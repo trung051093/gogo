@@ -13,10 +13,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type AuthHandler struct {
-	ctx *gin.Context
-}
-
 func RegisterUserHandler(appCtx appctx.AppContext) func(*gin.Context) {
 	return func(ginCtx *gin.Context) {
 		var newData authmodel.AuthRegister
@@ -32,8 +28,9 @@ func RegisterUserHandler(appCtx appctx.AppContext) func(*gin.Context) {
 
 		appConfig := appCtx.GetConfig()
 		userRepo := user.NewUserRepository(appCtx.GetMainDBConnection())
+		esService := appCtx.GetESService()
 		hashService := hasher.NewHashService()
-		userService := user.NewUserService(userRepo)
+		userService := user.NewUserService(userRepo, esService)
 		jwtProvider := jwtauthprovider.NewJWTProvider(appCtx.GetConfig().JWT.Secret)
 		authService := NewAuthService(jwtProvider, userService, hashService, appConfig)
 
@@ -62,7 +59,8 @@ func LoginUserHandler(appCtx appctx.AppContext) func(*gin.Context) {
 
 		appConfig := appCtx.GetConfig()
 		userRepo := user.NewUserRepository(appCtx.GetMainDBConnection())
-		userService := user.NewUserService(userRepo)
+		esService := appCtx.GetESService()
+		userService := user.NewUserService(userRepo, esService)
 		hashService := hasher.NewHashService()
 		jwtProvider := jwtauthprovider.NewJWTProvider(appConfig.JWT.Secret)
 		authService := NewAuthService(jwtProvider, userService, hashService, appConfig)

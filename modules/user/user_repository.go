@@ -24,21 +24,21 @@ func (r *userRepository) Create(ctx context.Context, user *usermodel.UserCreate)
 	return *user.Id, nil
 }
 
-func (r *userRepository) Update(ctx context.Context, id uint, userUpdate *usermodel.UserUpdate) error {
+func (r *userRepository) Update(ctx context.Context, id int, userUpdate *usermodel.UserUpdate) (int, error) {
 	if err := r.db.WithContext(ctx).Where(map[string]interface{}{"id": id}).Updates(&userUpdate).Error; err != nil {
-		return common.ErrorCannotUpdateEntity(usermodel.EntityName, err)
+		return -1, common.ErrorCannotUpdateEntity(usermodel.EntityName, err)
 	}
-	return nil
+	return *userUpdate.Id, nil
 }
 
-func (r *userRepository) Delete(ctx context.Context, user *usermodel.User) error {
+func (r *userRepository) Delete(ctx context.Context, user *usermodel.User) (int, error) {
 	if err := r.db.WithContext(ctx).Delete(user).Error; err != nil {
-		return common.ErrorCannotDeleteEntity(usermodel.EntityName, err)
+		return -1, common.ErrorCannotDeleteEntity(usermodel.EntityName, err)
 	}
-	return nil
+	return *user.Id, nil
 }
 
-func (r *userRepository) Get(ctx context.Context, id uint) (*usermodel.User, error) {
+func (r *userRepository) Get(ctx context.Context, id int) (*usermodel.User, error) {
 	var user *usermodel.User
 
 	if err := r.db.WithContext(ctx).Model(&usermodel.User{}).Where("id = ?", id).First(&user).Error; err != nil {
