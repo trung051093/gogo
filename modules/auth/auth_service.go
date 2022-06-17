@@ -32,7 +32,7 @@ func NewAuthService(
 
 func (s *authService) Register(ctx context.Context, payload *authmodel.AuthRegister) error {
 	condFindWithEmail := map[string]interface{}{"email": payload.Email}
-	user, searchErr := s.userService.SearchUser(ctx, condFindWithEmail)
+	user, searchErr := s.userService.SearchUserTrace(ctx, condFindWithEmail)
 	if user != nil && searchErr == nil {
 		return common.ErrorEntityExisted(usermodel.EntityName, errors.New("user already exists"))
 	}
@@ -45,7 +45,7 @@ func (s *authService) Register(ctx context.Context, payload *authmodel.AuthRegis
 		PasswordSalt: passwordSalt,
 	}
 
-	_, createErr := s.userService.CreateUser(ctx, newUser)
+	_, createErr := s.userService.CreateUserTrace(ctx, newUser)
 
 	if createErr != nil {
 		return createErr
@@ -56,7 +56,7 @@ func (s *authService) Register(ctx context.Context, payload *authmodel.AuthRegis
 
 func (s *authService) Login(ctx context.Context, payload *authmodel.AuthLogin) (*authprovider.TokenProvider, error) {
 	condFindWithEmail := map[string]interface{}{"email": payload.Email}
-	user, searchErr := s.userService.SearchUser(ctx, condFindWithEmail)
+	user, searchErr := s.userService.SearchUserTrace(ctx, condFindWithEmail)
 	if searchErr != nil {
 		return nil, common.ErrorCannotFoundEntity(usermodel.EntityName, searchErr)
 	}
