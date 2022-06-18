@@ -6,6 +6,7 @@ require (
 	contrib.go.opencensus.io/exporter/jaeger v0.2.1
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/elastic/go-elasticsearch/v8 v8.2.0
+	github.com/gemnasium/logrus-graylog-hook/v3 v3.1.0
 	github.com/gin-contrib/cors v1.3.1
 	github.com/gin-gonic/gin v1.7.7
 	github.com/go-playground/validator/v10 v10.10.0
@@ -13,6 +14,7 @@ require (
 	github.com/google/uuid v1.3.0
 	github.com/googollee/go-socket.io v1.6.2
 	github.com/minio/minio-go/v7 v7.0.27
+	github.com/sirupsen/logrus v1.8.1
 	github.com/wagslane/go-rabbitmq v0.10.0
 	go.opencensus.io v0.23.0
 	gopkg.in/yaml.v3 v3.0.0
@@ -58,7 +60,6 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/rabbitmq/amqp091-go v1.3.4 // indirect
 	github.com/rs/xid v1.2.1 // indirect
-	github.com/sirupsen/logrus v1.8.1 // indirect
 	github.com/stretchr/testify v1.7.1 // indirect
 	github.com/uber/jaeger-client-go v2.25.0+incompatible // indirect
 	github.com/ugorji/go/codec v1.2.6 // indirect

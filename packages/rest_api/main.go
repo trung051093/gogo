@@ -10,6 +10,7 @@ import (
 	"user_management/components/dbprovider"
 	esprovider "user_management/components/elasticsearch"
 	jaegerprovider "user_management/components/jaeger"
+	graylog "user_management/components/log"
 	rabbitmqprovider "user_management/components/rabbitmq"
 	redisprovider "user_management/components/redis"
 	socketprovider "user_management/components/socketio"
@@ -29,6 +30,9 @@ import (
 func main() {
 	config := appctx.GetConfig()
 
+	// graylog
+	graylog.Integrate(config.GetGraylogConfig())
+
 	dbprovider, err := dbprovider.NewDBProvider(
 		&dbprovider.DBConfig{
 			Host:     config.Database.Host,
@@ -44,8 +48,7 @@ func main() {
 	)
 
 	if err != nil {
-		log.Println("Connect Database Error: ", err)
-		return
+		log.Fatalln("Connect Database Error: ", err)
 	}
 
 	validate := validator.New()
@@ -53,13 +56,13 @@ func main() {
 	configEs := config.GetElasticSearchConfig()
 	esService, esErr := esprovider.NewEsService(configEs)
 	if esErr != nil {
-		return
+		log.Fatalln("Connect Elastic Search Error: ", esErr)
 	}
 
 	configRabbitMQ := config.GetRabbitMQConfig()
 	rabbitmqService, rabbitErr := rabbitmqprovider.NewRabbitMQ(configRabbitMQ)
 	if rabbitErr != nil {
-		return
+		log.Fatalln("Connect RabbitMQ Error: ", rabbitErr)
 	}
 	configRedis := config.GetRedisConfig()
 	redisProvider := redisprovider.NewRedisService(configRedis)
@@ -67,7 +70,7 @@ func main() {
 
 	storageService, storageErr := storage.NewStorage(configStorage)
 	if storageErr != nil {
-		return
+		log.Fatalln("Connect Minio Error: ", storageErr)
 	}
 	createBucketErr := storageService.CreateBucket(context.Background(), common.PhotoBucket, common.PhotoBucketRegion)
 	if createBucketErr != nil {

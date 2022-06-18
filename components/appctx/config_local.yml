@@ -52,3 +52,9 @@ jaeger:
   service_name: "user-management"
   agent_endpoint: "127.0.0.1:6831"
   collector_endpoint: "127.0.0.1:14268/api/traces"
+
+# Log
+graylog:
+  host: "localhost"
+  port: 12201
+  key: testkey

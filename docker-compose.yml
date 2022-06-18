@@ -101,13 +101,12 @@ services:
       - '5432:5432'
     networks:
       - all
-      - graylog
     logging:
       driver: 'gelf'
       options:
         gelf-address: 'udp://127.0.0.1:12201'
     restart: unless-stopped
-
+    
   rabbitmq:
     image: rabbitmq:3-management-alpine
     container_name: rabbitmq
@@ -151,13 +150,10 @@ services:
       - '9300:9300'
     networks:
       - all
-      - graylog
     restart: unless-stopped
 
 networks:
   all:
-    driver: bridge
-  graylog:
     driver: bridge
 volumes:
   api_data:

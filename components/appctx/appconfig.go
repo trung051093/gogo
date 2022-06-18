@@ -6,6 +6,7 @@ import (
 	"path"
 	"runtime"
 	jaegerprovider "user_management/components/jaeger"
+	graylog "user_management/components/log"
 	rabbitmqprovider "user_management/components/rabbitmq"
 	"user_management/components/storage"
 
@@ -70,6 +71,11 @@ type Config struct {
 		AgentEndpoint     string `yaml:"agent_endpoint"`
 		CollectorEndpoint string `yaml:"collector_endpoint"`
 	} `yaml:"jaeger"`
+	Graylog struct {
+		Host string `yaml:"host"`
+		Port int    `yaml:"port"`
+		Key  string `yaml:"key"`
+	} `yaml:"graylog"`
 }
 
 func RootDir() string {
@@ -144,5 +150,13 @@ func (cfg *Config) GetJaegerConfig() *jaegerprovider.JaegerConfig {
 		ServiceName:       cfg.Jaeger.ServiceName,
 		AgentEndpoint:     cfg.Jaeger.AgentEndpoint,
 		CollectorEndpoint: cfg.Jaeger.CollectorEndpoint,
+	}
+}
+
+func (cfg *Config) GetGraylogConfig() *graylog.GraylogConfig {
+	return &graylog.GraylogConfig{
+		Host: cfg.Graylog.Host,
+		Port: cfg.Graylog.Port,
+		Key:  cfg.Graylog.Key,
 	}
 }

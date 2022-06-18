@@ -15,7 +15,7 @@ type HashService interface {
 	GenerateSHA512(str string, salt string) string
 	GenerateSHA256(str string, salt string) string
 	GenerateSHA1(str string, salt string) string
-	CreatePassword(password string, length int) (salt string, sha512 string)
+	HashPassword(password string, length int) (salt string, sha512 string)
 }
 
 type hashService struct{}
@@ -62,7 +62,7 @@ func (hashS *hashService) GenerateRandomString(length int) string {
 	return string(b)
 }
 
-func (hashS *hashService) CreatePassword(password string, length int) (salt string, sha512 string) {
+func (hashS *hashService) HashPassword(password string, length int) (salt string, sha512 string) {
 	salt = hashS.GenerateRandomString(length)
 	sha512 = hashS.GenerateSHA512(password, salt)
 	return salt, sha512
