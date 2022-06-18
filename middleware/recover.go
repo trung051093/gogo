@@ -5,6 +5,7 @@ import (
 	"user_management/components/appctx"
 
 	"github.com/gin-gonic/gin"
+	log "github.com/sirupsen/logrus"
 )
 
 func ErrorHandler(appCtx appctx.AppContext) gin.HandlerFunc {
@@ -15,11 +16,13 @@ func ErrorHandler(appCtx appctx.AppContext) gin.HandlerFunc {
 
 				if appErr, ok := err.(*common.AppError); ok {
 					ginCtx.AbortWithStatusJSON(appErr.StatusCode, appErr)
+					log.Error(appErr)
 					panic(appErr)
 				}
 
 				appErr := common.ErrorInternal(err.(error))
 				ginCtx.AbortWithStatusJSON(appErr.StatusCode, appErr)
+				log.Error(appErr)
 				panic(appErr)
 			}
 		}()

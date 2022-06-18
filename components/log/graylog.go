@@ -25,8 +25,8 @@ func Integrate(config *GraylogConfig) {
 		"_host":        hostname,
 	})
 
+	logrus.AddHook(hook)
 	logger.AddHook(hook)
 	logger.SetFormatter(&logrus.JSONFormatter{})
-
 	log.SetOutput(logger.Writer())
 }
