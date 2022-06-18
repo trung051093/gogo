@@ -36,7 +36,7 @@ var instanceErr error
 func NewEsService(config *elasticsearch.Config) (*elasticSearchSevice, error) {
 	client, err := elasticsearch.NewClient(*config)
 	if err != nil {
-		log.Fatalf("Error creating the client: %s", err)
+		log.Printf("Error creating the client: %s", err)
 	}
 	return &elasticSearchSevice{client: client}, nil
 }
@@ -77,21 +77,20 @@ func (es *elasticSearchSevice) LogInfo(ctx context.Context) {
 	// 1. Get cluster info
 	res, err := es.client.Info()
 	if err != nil {
-		log.Fatalf("Error getting response: %s", err)
+		log.Printf("Error getting response: %s", err)
 	}
 	defer res.Body.Close()
 	// Check response status
 	if res.IsError() {
-		log.Fatalf("Error: %s", res.String())
+		log.Printf("Error: %s", res.String())
 	}
 	// Deserialize the response into a map.
 	if err := json.NewDecoder(res.Body).Decode(&r); err != nil {
-		log.Fatalf("Error parsing the response body: %s", err)
+		log.Printf("Error parsing the response body: %s", err)
 	}
 	// Print client and server version numbers.
-	log.Printf("Client: %s", elasticsearch.Version)
-	log.Printf("Server: %s", r["version"].(map[string]interface{})["number"])
-	log.Println(strings.Repeat("~", 37))
+	log.Printf("ES Client: %s", elasticsearch.Version)
+	log.Printf("ES Server: %s", r["version"].(map[string]interface{})["number"])
 }
 
 func (es *elasticSearchSevice) Index(ctx context.Context, index string, id string, data []byte) {
@@ -106,7 +105,7 @@ func (es *elasticSearchSevice) Index(ctx context.Context, index string, id strin
 	// Perform the request with the client.
 	res, err := req.Do(ctx, es.client)
 	if err != nil {
-		log.Fatalf("Error getting response: %s", err)
+		log.Printf("Error getting response: %s", err)
 	}
 	defer res.Body.Close()
 	if res.IsError() {
@@ -134,7 +133,7 @@ func (es *elasticSearchSevice) Delete(ctx context.Context, index string, id stri
 	// Perform the request with the client.
 	res, err := req.Do(ctx, es.client)
 	if err != nil {
-		log.Fatalf("Error getting response: %s", err)
+		log.Printf("Error getting response: %s", err)
 	}
 	defer res.Body.Close()
 	if res.IsError() {
