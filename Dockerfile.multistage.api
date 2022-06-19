@@ -3,7 +3,10 @@
 ##
 ## Build
 ##
-FROM --platform=linux/amd64 golang:1.18.2-buster AS build
+FROM --platform=linux/amd64 golang:1.18.2-alpine AS build
+
+COPY --from=golang:1.18.2-alpine /usr/local/go/ /usr/local/go/
+ENV PATH="/usr/local/go/bin:${PATH}"
 
 WORKDIR /app
 
