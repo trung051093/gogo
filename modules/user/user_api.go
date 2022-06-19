@@ -12,6 +12,16 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// CreateUser godoc
+// @Summary      Create user
+// @Description  create user
+// @Tags         users
+// @Accept       json
+// @Produce      json
+// @Param        user                                       body  usermodel.UserCreate  true  "Add user"
+// @Success      200   {object}  common.Response{data=int}  "desc"
+// @Failure      400   {object}  common.AppError
+// @Router       /api/v1/user [post]
 func CreateUserHandler(appCtx appctx.AppContext) func(*gin.Context) {
 	return func(ginCtx *gin.Context) {
 		var newData usermodel.UserCreate
@@ -42,10 +52,20 @@ func CreateUserHandler(appCtx appctx.AppContext) func(*gin.Context) {
 			panic(err)
 		}
 
-		ginCtx.JSON(http.StatusOK, common.SimpleSuccessResponse(userId))
+		ginCtx.JSON(http.StatusOK, common.SuccessResponse(userId))
 	}
 }
 
+// UpdateUser godoc
+// @Summary      Update an user
+// @Description  update user
+// @Tags         users
+// @Accept       json
+// @Produce      json
+// @Param        user  body      usermodel.UserUpdate        true  "Add account"
+// @Success      200   {object}  common.Response{data=bool}  "desc"
+// @Failure      400   {object}  common.AppError
+// @Router       /api/v1/user [patch]
 func UpdateUserHandler(appCtx appctx.AppContext) func(*gin.Context) {
 	return func(ginCtx *gin.Context) {
 		var updateData usermodel.UserUpdate
@@ -80,10 +100,20 @@ func UpdateUserHandler(appCtx appctx.AppContext) func(*gin.Context) {
 			panic(err)
 		}
 
-		ginCtx.JSON(http.StatusOK, common.SimpleSuccessResponse(true))
+		ginCtx.JSON(http.StatusOK, common.SuccessResponse(true))
 	}
 }
 
+// GetUser godoc
+// @Summary      Get an user
+// @Description  get user by ID
+// @Tags         users
+// @Accept       json
+// @Produce      json
+// @Param        id   path      int                                   true  "User ID"
+// @Success      200  {object}  common.Response{data=usermodel.User}  "desc"
+// @Failure      400        {object}  common.AppError
+// @Router       /api/v1/user/{id} [get]
 func GetUserHandler(appCtx appctx.AppContext) func(*gin.Context) {
 	return func(ginCtx *gin.Context) {
 		id, err := strconv.Atoi(ginCtx.Param("id"))
@@ -102,14 +132,28 @@ func GetUserHandler(appCtx appctx.AppContext) func(*gin.Context) {
 			panic(err)
 		}
 
-		ginCtx.JSON(http.StatusOK, common.SimpleSuccessResponse(user))
+		ginCtx.JSON(http.StatusOK, common.SuccessResponse(user))
 	}
 }
 
+// GetListUser godoc
+// @Summary      Get list of user
+// @Description  get string by ID
+// @Tags         users
+// @Accept       json
+// @Produce      json
+// @Param        fields               query                                                                                     int    false  "fields"
+// @Param        page                 query                                                                                     int    true   "page"
+// @Param        limit                query                                                                                     int    true   "limit"
+// @Param        sortField  query     string                                                                                    false  "sort by field"
+// @Param        sortName   query     string                                                                                    false  "sort by field"
+// @Success      200        {object}  common.ResponsePagination{data=[]usermodel.User,pagination=common.Pagination,filter=usermodel.UserFilter}  "desc"
+// @Failure      400  {object}  common.AppError
+// @Router       /api/v1/users [get]
 func ListUserHandler(appCtx appctx.AppContext) func(*gin.Context) {
 	return func(ginCtx *gin.Context) {
-		var filter usermodel.UserFilter
-		var paging common.Pagination
+		filter := &usermodel.UserFilter{}
+		paging := &common.Pagination{}
 
 		filter.SortField = ginCtx.Query("sortField")
 		filter.SortName = ginCtx.Query("sortName")
@@ -142,16 +186,26 @@ func ListUserHandler(appCtx appctx.AppContext) func(*gin.Context) {
 		esService := appCtx.GetESService()
 		userService := NewUserService(userRepo, esService)
 
-		data, err := userService.SearchUsersTrace(ginCtx.Request.Context(), map[string]interface{}{}, &filter, &paging)
+		data, err := userService.SearchUsersTrace(ginCtx.Request.Context(), nil, filter, paging)
 
 		if err != nil {
 			panic(err)
 		}
 
-		ginCtx.JSON(http.StatusOK, common.SuccessResponse(data, paging, nil))
+		ginCtx.JSON(http.StatusOK, common.SuccessResponsePagination(data, paging, filter))
 	}
 }
 
+// DeleteUser godoc
+// @Summary      Delete an user
+// @Description  delete user
+// @Tags         users
+// @Accept       json
+// @Produce      json
+// @Param        id   path      int                         true  "User ID"
+// @Success      200  {object}  common.Response{data=bool}  "desc"
+// @Failure      400  {object}  common.AppError
+// @Router       /api/v1/user/{id} [delete]
 func DeleteUserHandler(appCtx appctx.AppContext) func(*gin.Context) {
 	return func(ginCtx *gin.Context) {
 		id, err := strconv.Atoi(ginCtx.Param("id"))
@@ -168,10 +222,24 @@ func DeleteUserHandler(appCtx appctx.AppContext) func(*gin.Context) {
 			panic(common.ErrorCannotDeleteEntity(usermodel.EntityName, err))
 		}
 
-		ginCtx.JSON(http.StatusOK, common.SimpleSuccessResponse(true))
+		ginCtx.JSON(http.StatusOK, common.SuccessResponse(true))
 	}
 }
 
+// SearchUser godoc
+// @Summary      Search an user
+// @Description  search user
+// @Tags         users
+// @Accept       json
+// @Produce      json
+// @Param        query                query                                               int    true   "query"
+// @Param        lastIndex            query                                               int    false  "lastIndex"
+// @Param        sortField  query     string                                              false  "sort by field"
+// @Param        sortName   query     string                                              false  "sort by field"
+// @Param        id         path      int                                                 true   "User ID"
+// @Success      200        {object}  common.Response{data=usermodel.UserEsSearchResult}  "desc"
+// @Failure      400        {object}  common.AppError
+// @Router       /api/v1/user/search [get]
 func SearchUserHandler(appCtx appctx.AppContext) func(*gin.Context) {
 	return func(ginCtx *gin.Context) {
 		var filter usermodel.UserFilter
@@ -211,6 +279,6 @@ func SearchUserHandler(appCtx appctx.AppContext) func(*gin.Context) {
 			panic(common.ErrorCannotFoundEntity(usermodel.EntityName, err))
 		}
 
-		ginCtx.JSON(http.StatusOK, common.SimpleSuccessResponse(data))
+		ginCtx.JSON(http.StatusOK, common.SuccessResponse(data))
 	}
 }

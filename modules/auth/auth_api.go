@@ -13,6 +13,16 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// Register godoc
+// @Summary      Register
+// @Description  Register
+// @Tags         auth
+// @Accept       json
+// @Produce      json
+// @Param        user  body      authmodel.AuthRegister      true  "register"
+// @Success      200   {object}  common.Response{data=bool}  "desc"
+// @Failure      400   {object}  common.AppError
+// @Router       /api/v1/auth/register [post]
 func RegisterUserHandler(appCtx appctx.AppContext) func(*gin.Context) {
 	return func(ginCtx *gin.Context) {
 		var newData authmodel.AuthRegister
@@ -40,10 +50,20 @@ func RegisterUserHandler(appCtx appctx.AppContext) func(*gin.Context) {
 			panic(err)
 		}
 
-		ginCtx.JSON(http.StatusOK, common.SimpleSuccessResponse(true))
+		ginCtx.JSON(http.StatusOK, common.SuccessResponse(true))
 	}
 }
 
+// Login godoc
+// @Summary      Login
+// @Description  Login
+// @Tags         auth
+// @Accept       json
+// @Produce      json
+// @Param        user  body      authmodel.AuthLogin                           true  "login"
+// @Success      200   {object}  common.Response{data=authmodel.AuthResponse}  "desc"
+// @Failure      400   {object}  common.AppError
+// @Router       /api/v1/auth/login [post]
 func LoginUserHandler(appCtx appctx.AppContext) func(*gin.Context) {
 	return func(ginCtx *gin.Context) {
 		var loginData authmodel.AuthLogin
@@ -71,6 +91,6 @@ func LoginUserHandler(appCtx appctx.AppContext) func(*gin.Context) {
 			panic(err)
 		}
 
-		ginCtx.JSON(http.StatusOK, common.SimpleSuccessResponse(token))
+		ginCtx.JSON(http.StatusOK, common.SuccessResponse(token))
 	}
 }

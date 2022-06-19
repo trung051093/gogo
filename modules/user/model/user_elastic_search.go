@@ -5,7 +5,19 @@ import (
 	"fmt"
 	"user_management/common"
 	esprovider "user_management/components/elasticsearch"
+	elasticsearchmodel "user_management/components/elasticsearch/model"
 )
+
+type UserEsSearchResult struct {
+	elasticsearchmodel.SearchResults
+}
+
+type UserEsQuery struct {
+	Query     string
+	LastIndex string // for pagination
+	Paging    *common.Pagination
+	Filter    *UserFilter
+}
 
 const ElasticSearchQuery = `
 "query" : {
@@ -25,13 +37,6 @@ const ElasticSearchQuery = `
 "size" : %d,
 "sort" : [ { "%s" : "%s" } ]
 `
-
-type UserEsQuery struct {
-	Query     string
-	LastIndex string // for pagination
-	Paging    *common.Pagination
-	Filter    *UserFilter
-}
 
 func GetUserESQuery(ctx context.Context, userEsQuery *UserEsQuery) string {
 	q := fmt.Sprintf(

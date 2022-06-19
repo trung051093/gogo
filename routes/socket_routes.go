@@ -1,4 +1,4 @@
-package main
+package routes
 
 import (
 	"user_management/components/appctx"
@@ -7,7 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func socketRoutes(appCtx appctx.AppContext, router *gin.Engine) {
+func SocketRoutes(appCtx appctx.AppContext, router *gin.Engine) {
 	socketService := appCtx.GetSocketService()
 	socketServer := socketService.GetServer()
 

@@ -7,15 +7,23 @@ import (
 	"user_management/common"
 	"user_management/components/appctx"
 	"user_management/components/storage"
+	filemodel "user_management/modules/file/model"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 )
 
-type FileHandler struct {
-	ctx *gin.Context
-}
-
+// GetUploadPresignedUrl godoc
+// @Summary      get a presigned url to upload
+// @Description  get a presigned url to upload
+// @Tags         file
+// @Accept       json
+// @Produce      json
+// @Param        fileName            query                                                string  true  "fileName"
+// @Param        fileType            query                                                string  true  "fileType"
+// @Success      200       {object}  common.Response{data=filemodel.PresignedPostObject}  "desc"
+// @Failure      400       {object}  common.AppError
+// @Router       /file/presign-url [get]
 func GetUploadPresignedUrl(appCtx appctx.AppContext) func(*gin.Context) {
 	return func(ginCtx *gin.Context) {
 		fileName := ginCtx.Query("fileName")
@@ -23,7 +31,7 @@ func GetUploadPresignedUrl(appCtx appctx.AppContext) func(*gin.Context) {
 		objectName := uuid.New().String()
 
 		if fileType == "" {
-			panic(common.NewCustomError(errors.New("Cannot found file type"), "Cannot found file type", "FILE"))
+			panic(common.NewCustomError(errors.New("cannot found file type"), "Cannot found file type", "FILE"))
 		}
 
 		if fileName == "" {
@@ -49,11 +57,11 @@ func GetUploadPresignedUrl(appCtx appctx.AppContext) func(*gin.Context) {
 			panic(common.NewCustomError(presignErr, "Cannot get presign url", "PRESIGN_URL"))
 		}
 
-		res := &map[string]interface{}{
-			"url":    url.String(),
-			"fields": formData,
+		res := &filemodel.PresignedPostObject{
+			Url:    url.String(),
+			Fields: formData,
 		}
 
-		ginCtx.JSON(http.StatusOK, common.SimpleSuccessResponse(res))
+		ginCtx.JSON(http.StatusOK, common.SuccessResponse(res))
 	}
 }

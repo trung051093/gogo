@@ -1,4 +1,4 @@
-package main
+package routes
 
 import (
 	"time"
@@ -11,7 +11,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func mainRoutes(appCtx appctx.AppContext, router *gin.Engine) {
+func MainRoutes(appCtx appctx.AppContext, router *gin.Engine) {
 	v1 := router.Group("/api/v1")
 	{
 		// user

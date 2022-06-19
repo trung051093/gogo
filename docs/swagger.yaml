@@ -1,0 +1,517 @@
+basePath: /api/v1
+definitions:
+  authmodel.AuthLogin:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  authmodel.AuthRegister:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  authmodel.AuthResponse:
+    properties:
+      created:
+        type: integer
+      expiry:
+        type: integer
+      token:
+        type: string
+    type: object
+  common.AppError:
+    properties:
+      errorKey:
+        type: string
+      log:
+        type: string
+      message:
+        type: string
+      statusCode:
+        type: integer
+    type: object
+  common.Pagination:
+    properties:
+      limit:
+        type: integer
+      offset:
+        type: integer
+      page:
+        type: integer
+      total:
+        type: integer
+    type: object
+  common.Response:
+    properties:
+      data: {}
+    type: object
+  common.ResponsePagination:
+    properties:
+      data: {}
+      filter: {}
+      pagination:
+        $ref: '#/definitions/common.Pagination'
+    type: object
+  filemodel.PresignedPostObject:
+    properties:
+      fields:
+        additionalProperties:
+          type: string
+        type: object
+      url:
+        type: string
+    type: object
+  usermodel.User:
+    properties:
+      address:
+        type: string
+      birthDate:
+        type: string
+      company:
+        type: string
+      createdAt:
+        type: string
+      deletedAt:
+        type: string
+      email:
+        type: string
+      firstName:
+        type: string
+      gender:
+        type: string
+      id:
+        type: integer
+      lastName:
+        type: string
+      phoneNumber:
+        type: string
+      role:
+        type: string
+      updatedAt:
+        type: string
+    type: object
+  usermodel.UserCreate:
+    properties:
+      address:
+        type: string
+      birthDate:
+        type: string
+      company:
+        type: string
+      createdAt:
+        type: string
+      deletedAt:
+        type: string
+      email:
+        type: string
+      firstName:
+        type: string
+      gender:
+        type: string
+      id:
+        type: integer
+      lastName:
+        type: string
+      phoneNumber:
+        type: string
+      role:
+        type: string
+      updatedAt:
+        type: string
+    required:
+    - email
+    - firstName
+    - lastName
+    type: object
+  usermodel.UserEsSearchResult:
+    properties:
+      hits:
+        items:
+          additionalProperties: true
+          type: object
+        type: array
+      total:
+        type: integer
+    type: object
+  usermodel.UserFilter:
+    properties:
+      fields:
+        items:
+          type: string
+        type: array
+      sortField:
+        type: string
+      sortName:
+        type: string
+    type: object
+  usermodel.UserUpdate:
+    properties:
+      address:
+        type: string
+      birthDate:
+        type: string
+      company:
+        type: string
+      createdAt:
+        type: string
+      deletedAt:
+        type: string
+      email:
+        type: string
+      firstName:
+        type: string
+      gender:
+        type: string
+      id:
+        type: integer
+      lastName:
+        type: string
+      phoneNumber:
+        type: string
+      role:
+        type: string
+      updatedAt:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  description: This is a sample server.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Swagger Example API
+  version: "1.0"
+paths:
+  /api/v1/auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Login
+      parameters:
+      - description: login
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/authmodel.AuthLogin'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: desc
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/authmodel.AuthResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/common.AppError'
+      summary: Login
+      tags:
+      - auth
+  /api/v1/auth/register:
+    post:
+      consumes:
+      - application/json
+      description: Register
+      parameters:
+      - description: register
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/authmodel.AuthRegister'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: desc
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.Response'
+            - properties:
+                data:
+                  type: boolean
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/common.AppError'
+      summary: Register
+      tags:
+      - auth
+  /api/v1/user:
+    patch:
+      consumes:
+      - application/json
+      description: update user
+      parameters:
+      - description: Add account
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/usermodel.UserUpdate'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: desc
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.Response'
+            - properties:
+                data:
+                  type: boolean
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/common.AppError'
+      summary: Update an user
+      tags:
+      - users
+    post:
+      consumes:
+      - application/json
+      description: create user
+      parameters:
+      - description: Add user
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/usermodel.UserCreate'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: desc
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.Response'
+            - properties:
+                data:
+                  type: integer
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/common.AppError'
+      summary: Create user
+      tags:
+      - users
+  /api/v1/user/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: delete user
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: desc
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.Response'
+            - properties:
+                data:
+                  type: boolean
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/common.AppError'
+      summary: Delete an user
+      tags:
+      - users
+    get:
+      consumes:
+      - application/json
+      description: get user by ID
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: desc
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/usermodel.User'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/common.AppError'
+      summary: Get an user
+      tags:
+      - users
+  /api/v1/user/search:
+    get:
+      consumes:
+      - application/json
+      description: search user
+      parameters:
+      - description: query
+        in: query
+        name: query
+        required: true
+        type: integer
+      - description: lastIndex
+        in: query
+        name: lastIndex
+        type: integer
+      - description: sort by field
+        in: query
+        name: sortField
+        type: string
+      - description: sort by field
+        in: query
+        name: sortName
+        type: string
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: desc
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/usermodel.UserEsSearchResult'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/common.AppError'
+      summary: Search an user
+      tags:
+      - users
+  /api/v1/users:
+    get:
+      consumes:
+      - application/json
+      description: get string by ID
+      parameters:
+      - description: fields
+        in: query
+        name: fields
+        type: integer
+      - description: page
+        in: query
+        name: page
+        required: true
+        type: integer
+      - description: limit
+        in: query
+        name: limit
+        required: true
+        type: integer
+      - description: sort by field
+        in: query
+        name: sortField
+        type: string
+      - description: sort by field
+        in: query
+        name: sortName
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: desc
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.ResponsePagination'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/usermodel.User'
+                  type: array
+                filter:
+                  $ref: '#/definitions/usermodel.UserFilter'
+                pagination:
+                  $ref: '#/definitions/common.Pagination'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/common.AppError'
+      summary: Get list of user
+      tags:
+      - users
+  /file/presign-url:
+    get:
+      consumes:
+      - application/json
+      description: get a presigned url to upload
+      parameters:
+      - description: fileName
+        in: query
+        name: fileName
+        required: true
+        type: string
+      - description: fileType
+        in: query
+        name: fileType
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: desc
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/filemodel.PresignedPostObject'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/common.AppError'
+      summary: get a presigned url to upload
+      tags:
+      - file
+swagger: "2.0"

@@ -19,6 +19,7 @@ import (
 	"user_management/modules/indexer"
 	"user_management/modules/notificator"
 	usermodel "user_management/modules/user/model"
+	"user_management/routes"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -27,6 +28,20 @@ import (
 	"go.opencensus.io/trace"
 )
 
+// @title           Swagger Example API
+// @version         1.0
+// @description     This is a sample server.
+// @termsOfService  http://swagger.io/terms/
+
+// @contact.name   API Support
+// @contact.url    http://www.swagger.io/support
+// @contact.email  support@swagger.io
+
+// @license.name  Apache 2.0
+// @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
+
+// @host      localhost:8080
+// @BasePath  /api/v1
 func main() {
 	config := appctx.GetConfig()
 
@@ -111,8 +126,9 @@ func main() {
 	go notificator.Handler(appCtx)
 	go indexer.Handler(appCtx)
 
-	mainRoutes(appCtx, router)
-	socketRoutes(appCtx, router)
+	routes.MainRoutes(appCtx, router)
+	routes.SocketRoutes(appCtx, router)
+	routes.SwaggerRoutes(appCtx, router)
 
 	// And now finally register it as a Trace Exporter
 	trace.RegisterExporter(jaegerService.GetExporter())
