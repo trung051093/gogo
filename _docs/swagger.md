@@ -34,10 +34,11 @@ func GetUserHandler(appCtx appctx.AppContext) func(*gin.Context) {
 			panic(err)
 		}
 
-		ginCtx.JSON(http.StatusOK, common.SimpleSuccessResponse(user))
+		ginCtx.JSON(http.StatusOK, common.SuccessResponse(user))
 	}
 }
 ```
+
 
 2. Download Swag for Go by using:
 ```bash
@@ -46,16 +47,13 @@ go install github.com/swaggo/swag/cmd/swag
 
 // config GOPATH (macos)
 export PATH=$(go env GOPATH)/bin:$PATH
+
+// test cmd
+swag init -h
 ```
 
-3. Run the Swag at your Go api (for instance ~/modules/user/user_api.go), Swag will parse comments and generate required files(docs folder and docs/doc.go) at ~/docs.
 
-```bash
-// for only one api
-swag init --parseDependency --parseInternal -d packages/rest_api
-```
-
-4. Download gin-swagger by using:
+3. Download gin-swagger by using:
 
 Import:
 
@@ -64,5 +62,37 @@ import "github.com/swaggo/gin-swagger" // gin-swagger middleware
 import "github.com/swaggo/files" // swagger embed files
 ```
 
+Create swagger route:
+
+```bash
+import (
+	"user_management/components/appctx"
+	"user_management/docs"
+
+	"github.com/gin-gonic/gin" // swagger embed files
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger" // gin-swagger middleware
+)
+
+func SwaggerRoutes(appCtx appctx.AppContext, router *gin.Engine) {
+	// programmatically set swagger info
+	docs.SwaggerInfo.Title = "Example API"
+	docs.SwaggerInfo.Description = "This is a sample server"
+	docs.SwaggerInfo.Version = "1.0"
+	docs.SwaggerInfo.Schemes = []string{"http", "https"}
+
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+
+}
+
+```
+
+
+4. Run the Swag at your Go api (for instance ~/modules/user/user_api.go), Swag will parse comments and generate required files(docs folder and docs/doc.go) at ~/docs.
+
+```bash
+// for only one api
+swag init --parseDependency --parseInternal -d packages/rest_api
+```
 ## Demo:
  [http://localhost:8080/swagger/index.html#/](http://localhost:8080/swagger/index.html#/)
