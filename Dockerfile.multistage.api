@@ -13,7 +13,7 @@ RUN go mod download
 
 COPY ./ ./
 
-RUN CGO_ENABLED=0 GOOS=linux go build -v -a -installsuffix cgo -o ./build/rest_api ./packages/rest_api
+RUN go build -v -a -installsuffix cgo -o ./build/rest_api ./packages/rest_api
 
 ##
 ## Deploy
