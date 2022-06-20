@@ -5,6 +5,7 @@ import (
 	"os"
 	"path"
 	"runtime"
+	"user_management/common"
 	jaegerprovider "user_management/components/jaeger"
 	graylog "user_management/components/log"
 	rabbitmqprovider "user_management/components/rabbitmq"
@@ -76,6 +77,14 @@ type Config struct {
 		Port int    `yaml:"port"`
 		Key  string `yaml:"key"`
 	} `yaml:"graylog"`
+	Swagger struct {
+		Title       string   `yaml:"title"`
+		Description string   `yaml:"description"`
+		Version     string   `yaml:"version"`
+		Host        string   `yaml:"host"`
+		Schemes     []string `yaml:"schemes"`
+		BasePath    string   `yaml:"basepath"`
+	} `yaml:"swagger"`
 }
 
 func RootDir() string {
@@ -158,5 +167,16 @@ func (cfg *Config) GetGraylogConfig() *graylog.GraylogConfig {
 		Host: cfg.Graylog.Host,
 		Port: cfg.Graylog.Port,
 		Key:  cfg.Graylog.Key,
+	}
+}
+
+func (cfg *Config) GetSwaggerConfig() *common.SwaggerInfo {
+	return &common.SwaggerInfo{
+		Host:        cfg.Swagger.Host,
+		Title:       cfg.Swagger.Title,
+		Description: cfg.Swagger.Description,
+		Version:     cfg.Swagger.Version,
+		Schemes:     cfg.Swagger.Schemes,
+		BasePath:    cfg.Swagger.BasePath,
 	}
 }

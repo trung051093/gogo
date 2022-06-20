@@ -58,3 +58,12 @@ graylog:
   host: "localhost"
   port: 12201
   key: testkey
+
+# swagger info
+swagger:
+  title: "gogo API"
+  description: "This is a sample server"
+  version: "1.0"
+  host: "localhost:8080"
+  schemes: ["http"]
+  basepath: ""

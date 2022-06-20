@@ -10,11 +10,16 @@ import (
 )
 
 func SwaggerRoutes(appCtx appctx.AppContext, router *gin.Engine) {
+	config := appCtx.GetConfig()
+	swaggerInfo := config.GetSwaggerConfig()
+
 	// programmatically set swagger info
-	docs.SwaggerInfo.Title = "Example API"
-	docs.SwaggerInfo.Description = "This is a sample server"
-	docs.SwaggerInfo.Version = "1.0"
-	docs.SwaggerInfo.Schemes = []string{"http", "https"}
+	docs.SwaggerInfo.Title = swaggerInfo.Title
+	docs.SwaggerInfo.Description = swaggerInfo.Description
+	docs.SwaggerInfo.Version = swaggerInfo.Version
+	docs.SwaggerInfo.Schemes = swaggerInfo.Schemes
+	docs.SwaggerInfo.Host = swaggerInfo.Host
+	docs.SwaggerInfo.BasePath = swaggerInfo.BasePath
 
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
