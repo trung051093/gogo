@@ -3,9 +3,9 @@
 ##
 ## Build
 ##
-FROM golang:1.18.2-alpine AS build
+FROM golang:1.18.2-buster AS build
 
-COPY --from=golang:1.18.2-alpine /usr/local/go/ /usr/local/go/
+COPY --from=golang:1.18.2-buster /usr/local/go/ /usr/local/go/
 ENV PATH="/usr/local/go/bin:${PATH}"
 ENV env="prod"
 
@@ -13,12 +13,11 @@ WORKDIR /app
 
 COPY go.mod ./
 COPY go.sum ./
-RUN CGO_ENABLED=0 go install
-RUN CGO_ENABLED=0 go mod download
+RUN go mod download
 
 COPY ./ ./
 
-RUN go build -o ./build/rest_api ./packages/rest_api
+RUN CGO_ENABLED=0 GOOS=linux go build -v -a -installsuffix cgo -o ./build/rest_api ./packages/rest_api
 
 ##
 ## Deploy
