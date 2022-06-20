@@ -37,13 +37,13 @@ My approach is that we have a pre-existing application. Now QA reports some requ
 
 So I'm try write a decorator function, this will help end the current service, doing exactly what it does.
 
-- [Invoke func decorator](../decorators/invoke.go)
-The decorator function do exactly what it does.
+- [Invoke func decorator](../decorators/invoke.go):
+The decorator function help invoke a function and do exactly what it does.
 
-- [Trace decorator](../decorators/trace.go)
+- [Trace decorator](../decorators/trace.go):
 The decorator function wrap current service with a trace span.
 
-- [Service Trace](../modules/user/user_service_trace.go)
+- [Service Trace](../modules/user/user_service_trace.go):
 You can see I've just wrapper every User Service with a trace span. 
 
 - [Auth Trace](../modules/auth/auth_service.go)
