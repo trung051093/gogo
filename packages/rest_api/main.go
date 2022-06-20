@@ -58,7 +58,7 @@ func main() {
 			SSLMode:  config.Database.SSLMode,
 			TimeZone: config.Database.TimeZone,
 		},
-		dbprovider.WithDebug,
+		// dbprovider.WithDebug,
 		dbprovider.WithAutoMigration(&usermodel.User{}),
 	)
 
