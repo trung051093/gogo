@@ -3,11 +3,7 @@
 ##
 ## Build
 ##
-FROM golang:1.18.2-buster AS build
-
-COPY --from=golang:1.18.2-buster /usr/local/go/ /usr/local/go/
-ENV PATH="/usr/local/go/bin:${PATH}"
-ENV env="prod"
+FROM --platform=linux/amd64 golang:1.18.2-buster AS build
 
 WORKDIR /app
 
@@ -22,7 +18,7 @@ RUN CGO_ENABLED=0 GOOS=linux go build -v -a -installsuffix cgo -o ./build/rest_a
 ##
 ## Deploy
 ##
-FROM gcr.io/distroless/base-debian10
+FROM --platform=linux/amd64 gcr.io/distroless/base-debian10
 
 WORKDIR /
 
