@@ -17,7 +17,7 @@ RUN go mod download
 
 COPY ./ ./
 
-RUN go build -o ./build/rest_api ./packages/rest_api
+RUN go build -buildvcs=false -o ./build/rest_api ./packages/rest_api
 
 ##
 ## Deploy
