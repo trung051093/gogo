@@ -5,6 +5,10 @@
 ##
 FROM --platform=linux/amd64 golang:1.18.2-buster AS build
 
+COPY --from=golang:1.18.2-buster /usr/local/go/ /usr/local/go/
+ENV PATH="/usr/local/go/bin:${PATH}"
+ENV env="prod"
+
 WORKDIR /app
 
 COPY go.mod ./
