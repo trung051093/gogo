@@ -23,7 +23,7 @@ import (
 // @Param        fileType            query                                                string  true  "fileType"
 // @Success      200       {object}  common.Response{data=filemodel.PresignedPostObject}  "desc"
 // @Failure      400       {object}  common.AppError
-// @Router       /file/presign-url [get]
+// @Router       /api/v1/file/presign-url [get]
 func GetUploadPresignedUrl(appCtx appctx.AppContext) func(*gin.Context) {
 	return func(ginCtx *gin.Context) {
 		fileName := ginCtx.Query("fileName")

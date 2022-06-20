@@ -3,10 +3,26 @@
 - Docker v20.10.14.
 - Docker-compose v2.5.1.
 
+# Docs:
+- [Distributed tracing](https://github.com/trung051093/gogo/blob/main/_docs/tracing.md)
+- [Logging](https://github.com/trung051093/gogo/blob/main/_docs/logging.md)
+- [Swagger API](https://github.com/trung051093/gogo/blob/main/_docs/swagger.md)
+- [Docker build](https://github.com/trung051093/gogo/blob/main/_docs/build.md)
+
+# Demo:
+- [Api](https://api.tdo.works/swagger/index.html#/)
+- [Trace](https://trace.tdo.works/)
+- [Graylog](https://graylog.tdo.works/)
+```bash
+user: anonymous
+pass: anonymous
+```
+
 # Installation
 
 ```bash
-go get
+go mod download
+go mod tidy
 ```
 
 # Running with docker compose
@@ -60,13 +76,9 @@ Require: RabbitMQ, Postgres, ElasticSearch
 $ go run ./packages/rest_api/main.go
 ```
 
-## Load test
+## Load test:
+[Wrk](https://github.com/wg/wrk)
 
 ```bash
-# install package autocannon with nodejs
-$ npm i -g autocannon
-
-# run
-$ autocannon localhost:8080/api/v1/user
-
+wrk -t6 -c150 -d15s https://api.tdo.works/api/v1/users
 ```

@@ -1,57 +1,49 @@
 version: '3'
 services:
+  # Jaeger
   jaeger:
     image: jaegertracing/all-in-one:latest
     ports:
       - "6831:6831/udp"
       - "16686:16686"
     networks:
-      - all
+      - local
+    restart: unless-stopped
 
-  # indexer:
-  #   image: indexer
-  #   container_name: indexer
-  #   environment:
-  #     ENV: local
-  #   volumes:
-  #     - api_data:/data
-  #   networks:
-  #     - all
-  #   depends_on:
-  #     - rabbitmq
-  #     - elasticsearch
-  #   logging:
-  #     driver: 'gelf'
-  #     options:
-  #       gelf-address: 'udp://127.0.0.1:12201'
-  #   restart: unless-stopped
+  # Postgres
+  postgres:
+    container_name: postgres
+    image: postgres
+    environment:
+      POSTGRES_DB: demo
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+      PGDATA: /data/postgres
+    ports:
+      - '5432:5432'
+    networks:
+      - local
+    restart: unless-stopped
 
-  # rest_api:
-  #   image: api
-  #   container_name: api
-  #   environment:
-  #     ENV: local
-  #   ports:
-  #     - '8080:8080'
-  #   volumes:
-  #     - api_data:/data
-  #   networks:
-  #     - all
-  #   depends_on:
-  #     - redis
-  #     - postgres
-  #     - rabbitmq
-  #     - elasticsearch
-  #   logging:
-  #     driver: 'gelf'
-  #     options:
-  #       gelf-address: 'udp://127.0.0.1:12201'
-  #   restart: unless-stopped
+  # Rabbit MQ
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: rabbitmq
+    environment:
+      RABBITMQ_ERLANG_COOKIE: democookie
+      RABBITMQ_DEFAULT_USER: root
+      RABBITMQ_DEFAULT_PASS: root
+    ports:
+      - 5672:5672
+      - 15672:15672
+    networks:
+      - local
+    restart: unless-stopped
 
+  # Minio
   minio:
     image: quay.io/minio/minio
     container_name: minio
-    command: 'server --console-address ":9001" /minio_data'
     ports:
       - '10000:9000'
       - '10001:9001'
@@ -70,73 +62,23 @@ services:
       timeout: 20s
       retries: 3
     hostname: minio
-    volumes:
-      - 'minio_data:/data'
     restart: unless-stopped
 
-  redis:
-    image: redis
-    container_name: redis
-    environment:
-      # ALLOW_EMPTY_PASSWORD is recommended only for development.
-      ALLOW_EMPTY_PASSWORD: "yes"
-      REDIS_REPLICATION_MODE: master
-    ports:
-      - '6379:6379'
-    volumes:
-      - redis_data:/data
-    restart: unless-stopped
-
-  postgres:
-    container_name: postgres
-    image: postgres
-    environment:
-      POSTGRES_DB: demo
-      POSTGRES_USER: root
-      POSTGRES_PASSWORD: root
-      PGDATA: /data/postgres
-    volumes:
-      - postgres_data:/data/postgres
-    ports:
-      - '5432:5432'
+  # MongoDB: https://hub.docker.com/_/mongo/
+  mongo:
+    image: mongo:4.2
     networks:
-      - all
-    logging:
-      driver: 'gelf'
-      options:
-        gelf-address: 'udp://127.0.0.1:12201'
-    restart: unless-stopped
-    
-  rabbitmq:
-    image: rabbitmq:3-management-alpine
-    container_name: rabbitmq
-    volumes:
-      - 'rabbitmq_data:/var/lib/rabbitmq/'
-    environment:
-      RABBITMQ_ERLANG_COOKIE: democookie
-      RABBITMQ_DEFAULT_USER: root
-      RABBITMQ_DEFAULT_PASS: root
-    ports:
-      - 5672:5672
-      - 15672:15672
-    networks:
-      - all
+      - local
     restart: unless-stopped
 
+  # Elasticsearch: https://www.elastic.co/guide/en/elasticsearch/reference/7.10/docker.html
   elasticsearch:
-    container_name: elasticsearch
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.1
-    volumes:
-      - es_data:/usr/share/elasticsearch/data
+    image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.10.2
     environment:
       - http.host=0.0.0.0
       - transport.host=localhost
       - network.host=0.0.0.0
-      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
-      - ELASTIC_PASSWORD=elastic
-      - "discovery.type=single-node"
-      - "xpack.security.enabled=false"
-      - "action.auto_create_index=true"
+      - "ES_JAVA_OPTS=-Dlog4j2.formatMsgNoLookups=true -Xms512m -Xmx512m"
     ulimits:
       memlock:
         soft: -1
@@ -144,33 +86,39 @@ services:
     deploy:
       resources:
         limits:
-          memory: 10g
-    ports:
-      - '9200:9200'
-      - '9300:9300'
+          memory: 1g
     networks:
-      - all
+      - local
+    restart: unless-stopped
+
+  # Graylog: https://hub.docker.com/r/graylog/graylog/
+  graylog:
+    image: graylog/graylog:4.2
+    environment:
+      # CHANGE ME (must be at least 16 characters)!
+      - GRAYLOG_PASSWORD_SECRET=somepasswordpepper
+      # Password: admin
+      - GRAYLOG_ROOT_PASSWORD_SHA2=8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918
+      - GRAYLOG_HTTP_EXTERNAL_URI=http://127.0.0.1:9000/
+    entrypoint: /usr/bin/tini -- wait-for-it elasticsearch:9200 --  /docker-entrypoint.sh
+    networks:
+      - local
+    depends_on:
+      - mongo
+      - elasticsearch
+    ports:
+      # Graylog web interface and REST API
+      - 9000:9000
+      # Syslog TCP
+      - 1514:1514
+      # Syslog UDP
+      - 1514:1514/udp
+      # GELF TCP
+      - 12201:12201
+      # GELF UDP
+      - 12201:12201/udp
     restart: unless-stopped
 
 networks:
-  all:
+  local:
     driver: bridge
-volumes:
-  api_data:
-    driver: local
-  redis_data:
-    driver: local
-  postgres_data:
-    driver: local
-  rabbitmq_data:
-    driver: local
-  es_data:
-    driver: local
-  minio_data:
-    driver: local
-  netdataconfig:
-    driver: local
-  netdatalib:
-    driver: local
-  netdatacache:
-    driver: local

@@ -28,5 +28,7 @@ func Integrate(config *GraylogConfig) {
 	logrus.AddHook(hook)
 	logger.AddHook(hook)
 	logger.SetFormatter(&logrus.JSONFormatter{})
+
+	// add logger into build-in log
 	log.SetOutput(logger.Writer())
 }
