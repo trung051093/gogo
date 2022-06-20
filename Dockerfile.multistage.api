@@ -13,7 +13,8 @@ WORKDIR /app
 
 COPY go.mod ./
 COPY go.sum ./
-RUN go mod download
+RUN CGO_ENABLED=0 go install
+RUN CGO_ENABLED=0 go mod download
 
 COPY ./ ./
 
