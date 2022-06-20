@@ -88,11 +88,10 @@ func SwaggerRoutes(appCtx appctx.AppContext, router *gin.Engine) {
 ```
 
 
-4. Run the Swag at your Go api (for instance ~/modules/user/user_api.go), Swag will parse comments and generate required files(docs folder and docs/doc.go) at ~/docs.
+4. Run the Swag at your api (for instance ~/packages/rest_api), Swag will parse comments and generate required files(docs folder and docs/doc.go) at ~/docs.
 
 ```bash
-// for only one api
 swag init --parseDependency --parseInternal -d packages/rest_api
 ```
 ## Demo:
- [http://localhost:8080/swagger/index.html#/](http://localhost:8080/swagger/index.html#/)
+ [https://api.tdo.works/swagger/index.html#/](https://api.tdo.works/swagger/index.html#/)
