@@ -35,7 +35,7 @@ This implementation is advanced. There are something you may know before reading
 
 My approach is that we have a pre-existing application. Now QA reports some requests very slow and that request is a computational combination of several service. You don't know which service slowly and which don't. 
 
-So I'm try write a decorator function, this will help end the current service, doing exactly what it does.
+So I'm try write a decorator function, this will help wrap our current service, doing exactly what it does and do not change the business logic.
 
 - [Invoke func decorator](../decorators/invoke.go):
 The decorator function help invoke a function and do exactly what it does.
