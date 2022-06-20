@@ -8,7 +8,7 @@ I believe that Swagger will make smooth communication for Back-end and Front-end
 ## Start using it
 1. Add comments to your API source code, [See Declarative Comments Format.](https://github.com/swaggo/swag/blob/master/README.md#declarative-comments-format)
 
-[Code example](https://github.com/trung051093/gogo/blob/main/modules/user/user_api.go#L15-L24) 
+[Code example](../modules/user/user_api.go#L15-L24) 
 
 2. Download Swag for Go by using:
 ```bash
@@ -25,9 +25,9 @@ swag init -h
 
 3. Download gin-swagger by using:
 
-- [Import](https://github.com/trung051093/gogo/blob/main/routes/swagger_routes.go#8-9) 
+- [Import](../routes/swagger_routes.go#8-9) 
 
-- [Create swagger route](https://github.com/trung051093/gogo/blob/main/routes/swagger_routes.go#12) 
+- [Create swagger route](../routes/swagger_routes.go#12) 
 
 4. Run the Swag at your api (for instance ~/packages/rest_api), Swag will parse comments and generate required files(docs folder and docs/doc.go) at ~/docs.
 

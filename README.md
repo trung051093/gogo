@@ -4,10 +4,10 @@
 - Docker-compose v2.5.1.
 
 # Docs:
-- [Distributed tracing](https://github.com/trung051093/gogo/blob/main/_docs/tracing.md)
-- [Logging](https://github.com/trung051093/gogo/blob/main/_docs/logging.md)
-- [Swagger API](https://github.com/trung051093/gogo/blob/main/_docs/swagger.md)
-- [Docker build](https://github.com/trung051093/gogo/blob/main/_docs/build.md)
+- [Distributed tracing](./_docs/tracing.md)
+- [Logging](./_docs/logging.md)
+- [Swagger API](./_docs/swagger.md)
+- [Docker build](./_docs/build.md)
 
 # Demo:
 - [Api](https://api.tdo.works/swagger/index.html#/)

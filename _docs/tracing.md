@@ -17,7 +17,7 @@ Distributed tracing is the process of tracking the activity resulting from a req
 # Installation
 
 ## Jaeger:
-- [docker-compose.yml](https://github.com/trung051093/gogo/blob/main/docker-compose.yml)
+- [docker-compose.yml](../docker-compose.yml)
 
 ```bash
 docker-compose up -d
@@ -37,19 +37,19 @@ My approach is that we have a pre-existing application. Now QA reports some requ
 
 So I'm try write a decorator function, this will help end the current service, doing exactly what it does.
 
-- [Invoke func decorator](https://github.com/trung051093/gogo/blob/main/decorators/invoke.go)
+- [Invoke func decorator](../decorators/invoke.go)
 The decorator function do exactly what it does.
 
-- [Trace decorator](https://github.com/trung051093/gogo/blob/main/decorators/trace.go)
+- [Trace decorator](../decorators/trace.go)
 The decorator function wrap current service with a trace span.
 
-- [Service Trace](https://github.com/trung051093/gogo/blob/main/modules/user/user_service_trace.go)
+- [Service Trace](../modules/user/user_service_trace.go)
 You can see I've just wrapper every User Service with a trace span. 
 
-- [Auth Trace](https://github.com/trung051093/gogo/blob/main/modules/auth/auth_service.go)
+- [Auth Trace](../modules/auth/auth_service.go)
 Let check that file, the register service is computational combination of `SearchUser` service and `CreateUser` service. (Before create an user, we have to check the user is exists or not)
 
 I've switch current service `SearchUser`, `CreateUser` to `SearchUserTrace`, `CreateUserTrace`.
 
 - [Test](https://trace.tdo.works/trace/392c6a7843ae49667fd6fe558b6928d9)
-![trace image](./assets/trace.png)
+![trace image](../_assets/trace.png)

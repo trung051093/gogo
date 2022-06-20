@@ -15,7 +15,7 @@ pass: anonymous
 # Installation
 
 ## Graylog:
-- [docker-compose.yml](https://github.com/trung051093/gogo/blob/main/docker-compose.yml)
+- [docker-compose.yml](../docker-compose.yml)
 
 ```bash
 docker-compose up -d
@@ -28,9 +28,9 @@ go get github.com/sirupsen/logrus
 ```
 
 ## Implementation code
-- [component](https://github.com/trung051093/gogo/blob/main/components/log/graylog.go). 
+- [component](../components/log/graylog.go). 
 
-- [main](https://github.com/trung051093/gogo/blob/main/packages/rest_api/main.go#L49)
+- [main](../packages/rest_api/main.go#L49)
 
 - Using:
 ```bash
