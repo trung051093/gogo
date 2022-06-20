@@ -59,14 +59,3 @@ Require: RabbitMQ, Postgres, ElasticSearch
 ```bash
 $ go run ./packages/rest_api/main.go
 ```
-
-## Load test
-
-```bash
-# install package autocannon with nodejs
-$ npm i -g autocannon
-
-# run
-$ autocannon localhost:8080/api/v1/user
-
-```

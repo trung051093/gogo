@@ -1,4 +1,4 @@
-# Swagger in go:
+# Swagger:
 I believe that Swagger will make smooth communication for Back-end and Front-end. 
 
 # Demo:

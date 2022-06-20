@@ -1,4 +1,4 @@
-# Tracing in go:
+# Distributed tracing:
 Distributed tracing is the process of tracking the activity resulting from a request to an application. With this feature, you can:
 
 - Trace the path of a request as it travels across a complex system
