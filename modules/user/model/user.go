@@ -15,15 +15,15 @@ const EntityName = "user"
 
 type User struct {
 	common.SQLModel
-	FirstName    string     `json:"firstName" gorm:"column:first_name;"`
-	LastName     string     `json:"lastName" gorm:"column:last_name;"`
-	Email        string     `json:"email" gorm:"column:email;"`
-	Address      string     `json:"address" gorm:"column:address;"`
-	Company      string     `json:"company" gorm:"column:company;"`
-	BirthDate    *time.Time `json:"birthDate" gorm:"column:birth_date;"`
-	Gender       string     `json:"gender" gorm:"column:gender;"`
-	PhoneNumber  string     `json:"phoneNumber" gorm:"column:phone_number;"`
-	Role         string     `json:"role" gorm:"column:role;default:user"`
+	FirstName    string     `json:"firstName,omitempty" gorm:"column:first_name;"`
+	LastName     string     `json:"lastName,omitempty" gorm:"column:last_name;"`
+	Email        string     `json:"email,omitempty" gorm:"column:email;"`
+	Address      string     `json:"address,omitempty" gorm:"column:address;"`
+	Company      string     `json:"company,omitempty" gorm:"column:company;"`
+	BirthDate    *time.Time `json:"birthDate,omitempty" gorm:"column:birth_date;"`
+	Gender       string     `json:"gender,omitempty" gorm:"column:gender;"`
+	PhoneNumber  string     `json:"phoneNumber,omitempty" gorm:"column:phone_number;"`
+	Role         string     `json:"role,omitempty" gorm:"column:role;"`
 	Password     string     `json:"-" gorm:"column:password;"`
 	PasswordSalt string     `json:"-" gorm:"column:password_salt;"`
 }

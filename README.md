@@ -82,3 +82,14 @@ $ go run ./packages/rest_api/main.go
 ```bash
 wrk -t6 -c150 -d15s https://api.tdo.works/api/v1/users
 ```
+
+```bash
+Running 15s test @ https://api.tdo.works/api/v1/users
+  6 threads and 150 connections
+  Thread Stats   Avg      Stdev     Max   +/- Stdev
+    Latency   689.33ms  356.31ms   1.83s    55.45%
+    Req/Sec    33.83     18.60   100.00     69.51%
+  2838 requests in 15.01s, 4.19MB read
+Requests/sec:    189.02
+Transfer/sec:    285.93KB
+```
