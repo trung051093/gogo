@@ -17,8 +17,8 @@ func (u *UserFilter) Process() error {
 			UserField["company"],
 			UserField["gender"],
 			UserField["phoneNumber"],
-			// UserField["createdAt"],
-			// UserField["updatedAt"],
+			UserField["createdAt"],
+			UserField["updatedAt"],
 		}
 	} else {
 		for index, field := range u.Fields {

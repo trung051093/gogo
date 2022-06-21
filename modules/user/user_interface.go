@@ -18,6 +18,7 @@ type Reader interface {
 type Writer interface {
 	Create(ctx context.Context, user *usermodel.UserCreate) (int, error)
 	Update(ctx context.Context, id int, userUpdate *usermodel.UserUpdate) (int, error)
+	DeActive(ctx context.Context, user *usermodel.User) (int, error)
 	Delete(ctx context.Context, user *usermodel.User) (int, error)
 }
 

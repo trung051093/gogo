@@ -31,8 +31,15 @@ func (r *userRepository) Update(ctx context.Context, id int, userUpdate *usermod
 	return userUpdate.Id, nil
 }
 
+func (r *userRepository) DeActive(ctx context.Context, user *usermodel.User) (int, error) {
+	if err := r.db.WithContext(ctx).Where(map[string]interface{}{"id": user.Id}).Updates(map[string]interface{}{"is_active": 0}).Error; err != nil {
+		return -1, common.ErrorCannotDeleteEntity(usermodel.EntityName, err)
+	}
+	return user.Id, nil
+}
+
 func (r *userRepository) Delete(ctx context.Context, user *usermodel.User) (int, error) {
-	if err := r.db.WithContext(ctx).Delete(user).Error; err != nil {
+	if err := r.db.WithContext(ctx).Delete(&user).Error; err != nil {
 		return -1, common.ErrorCannotDeleteEntity(usermodel.EntityName, err)
 	}
 	return user.Id, nil
