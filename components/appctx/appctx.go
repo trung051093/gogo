@@ -2,6 +2,7 @@ package appctx
 
 import (
 	"context"
+	"time"
 	esprovider "user_management/components/elasticsearch"
 	jaegerprovider "user_management/components/jaeger"
 	rabbitmqprovider "user_management/components/rabbitmq"
@@ -79,6 +80,9 @@ func FromContext(ctx context.Context) (*appContext, bool) {
 
 func (appCtx *appContext) GetMainDBConnection() *gorm.DB {
 	return appCtx.db.Session(&gorm.Session{
+		NowFunc: func() time.Time {
+			return time.Now().UTC()
+		},
 		NewDB:  true,
 		Logger: appCtx.db.Logger.LogMode(logger.Error),
 	})

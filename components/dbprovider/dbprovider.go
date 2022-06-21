@@ -2,7 +2,6 @@ package dbprovider
 
 import (
 	"fmt"
-	"time"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -44,11 +43,7 @@ func NewDBProvider(config *DBConfig, optionsFunc ...func(*dbOptions)) (*dbprovid
 		config.SSLMode,
 		config.TimeZone)
 
-	if db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
-		NowFunc: func() time.Time {
-			return time.Now().UTC()
-		},
-	}); err != nil {
+	if db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{}); err != nil {
 		return nil, err
 	} else {
 		provider.config = config

@@ -27,60 +27,64 @@ func (w bodyLogWriter) Write(b []byte) (int, error) {
 	return w.ResponseWriter.Write(b)
 }
 
+type ApiHandler func(appctx.AppContext) func(*gin.Context)
+
+// example: CacheRequest(appctx, "user", 1 * time.Minute)(user.ListUserHandler)
 func CacheRequest(
 	appCtx appctx.AppContext,
 	cacheName string,
 	tls time.Duration,
-	funcHandler func(appctx.AppContext) func(*gin.Context),
-) gin.HandlerFunc {
-	return func(ginCtx *gin.Context) {
-		ctx := context.Background()
-		redisService := appCtx.GetRedisService()
-		url := ginCtx.Request.URL
-		key := fmt.Sprintf("%s:%s:%s", cacheName, url.Path, url.Query().Encode())
+) func(ApiHandler) func(*gin.Context) {
+	return func(apiHandler ApiHandler) func(*gin.Context) {
+		return func(ginCtx *gin.Context) {
+			ctx := context.Background()
+			redisService := appCtx.GetRedisService()
+			url := ginCtx.Request.URL
+			key := fmt.Sprintf("%s:%s:%s", cacheName, url.Path, url.Query().Encode())
 
-		if cacheString, err := redisService.GetStringValue(ctx, key); err != nil {
-			blw := &bodyLogWriter{body: bytes.NewBufferString(""), ResponseWriter: ginCtx.Writer}
-			ginCtx.Writer = blw
-			funcHandler(appCtx)(ginCtx)
-			go func(bodyWriter *bodyLogWriter) {
-				json := &dataReponse{
-					Code: bodyWriter.Status(),
-					Data: bodyWriter.body.String(),
-				}
-				jsonStr, jsonErr := common.JsonToString(json)
-				if jsonErr != nil {
-					log.Println("Cache error:", jsonErr)
-				}
+			if cacheString, err := redisService.GetStringValue(ctx, key); err != nil {
+				blw := &bodyLogWriter{body: bytes.NewBufferString(""), ResponseWriter: ginCtx.Writer}
+				ginCtx.Writer = blw
+				apiHandler(appCtx)(ginCtx)
+				go func(bodyWriter *bodyLogWriter) {
+					json := &dataReponse{
+						Code: bodyWriter.Status(),
+						Data: bodyWriter.body.String(),
+					}
+					jsonStr, jsonErr := common.JsonToString(json)
+					if jsonErr != nil {
+						log.Println("Cache error:", jsonErr)
+					}
 
-				str, err := redisService.SetValue(
-					ctx,
-					key,
-					jsonStr,
-					tls,
-				)
-				if err != nil {
-					log.Println("Cache error:", err)
-				} else {
-					log.Println("Cache SetValue:", str)
-				}
-			}(blw)
-		} else {
-			dataCache := &dataReponse{}
-			err = common.StringToJson(cacheString, &dataCache)
-			if err != nil {
-				funcHandler(appCtx)(ginCtx)
-				return
-			}
-			statusCode := int(dataCache.Code.(float64))
-			data := map[string]interface{}{}
-			jsonStr := dataCache.Data.(string)
-			err = common.StringToJson(jsonStr, &data)
-			if err != nil {
-				funcHandler(appCtx)(ginCtx)
-				return
+					str, err := redisService.SetValue(
+						ctx,
+						key,
+						jsonStr,
+						tls,
+					)
+					if err != nil {
+						log.Println("Cache error:", err)
+					} else {
+						log.Println("Cache SetValue:", str)
+					}
+				}(blw)
 			} else {
-				ginCtx.JSON(statusCode, data)
+				dataCache := &dataReponse{}
+				err = common.StringToJson(cacheString, &dataCache)
+				if err != nil {
+					apiHandler(appCtx)(ginCtx)
+					return
+				}
+				statusCode := int(dataCache.Code.(float64))
+				data := map[string]interface{}{}
+				jsonStr := dataCache.Data.(string)
+				err = common.StringToJson(jsonStr, &data)
+				if err != nil {
+					apiHandler(appCtx)(ginCtx)
+					return
+				} else {
+					ginCtx.JSON(statusCode, data)
+				}
 			}
 		}
 	}
