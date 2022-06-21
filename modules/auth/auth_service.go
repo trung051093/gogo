@@ -67,7 +67,7 @@ func (s *authService) Login(ctx context.Context, payload *authmodel.AuthLogin) (
 	}
 
 	token, gererateTokenErr := s.jwtProvider.Generate(authprovider.TokenPayload{
-		UserId: *user.Id,
+		UserId: user.Id,
 		Email:  user.Email,
 		Role:   user.Role,
 	}, uint(s.config.JWT.ExpireDays))

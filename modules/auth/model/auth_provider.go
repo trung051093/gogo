@@ -8,6 +8,6 @@ const EntityName = "auth"
 
 type AuthProvider struct {
 	common.SQLModel
-	ProviderName string `json:"providerName,omitempty" gorm:"column:provider_name;"`
-	ProviderId   string `json:"providerId,omitempty" gorm:"column:provider_id;"`
+	ProviderName string `json:"providerName" gorm:"column:provider_name;"`
+	ProviderId   string `json:"providerId" gorm:"column:provider_id;"`
 }

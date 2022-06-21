@@ -45,6 +45,7 @@ func CreateUserHandler(appCtx appctx.AppContext) func(*gin.Context) {
 		passwordSalt := hashService.GenerateRandomString(appConfig.JWT.PasswordSaltLength)
 		hashPassword := hashService.GenerateSHA256(newData.Password, passwordSalt)
 		newData.Password = hashPassword
+		newData.PasswordSalt = passwordSalt
 
 		userId, err := userService.CreateUserTrace(ginCtx.Request.Context(), &newData)
 

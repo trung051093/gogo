@@ -6,14 +6,14 @@ type Response struct {
 
 type ResponsePagination struct {
 	Data       interface{} `json:"data"`
-	Pagination *Pagination `json:"pagination,omitempty"`
-	Filter     interface{} `json:"filter,omitempty"`
+	Pagination *Pagination `json:"pagination"`
+	Filter     interface{} `json:"filter"`
 }
 
 func SuccessResponse(data interface{}) *Response {
-	return &Response{Data: CompactJson(data)}
+	return &Response{Data: data}
 }
 
 func SuccessResponsePagination(data interface{}, paging *Pagination, filter interface{}) *ResponsePagination {
-	return &ResponsePagination{Data: CompactJson(data), Pagination: paging, Filter: filter}
+	return &ResponsePagination{Data: data, Pagination: paging, Filter: filter}
 }

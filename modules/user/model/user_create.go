@@ -13,17 +13,17 @@ import (
 
 type UserCreate struct {
 	common.SQLModel
-	FirstName    string    `validate:"required" json:"firstName" gorm:"column:first_name;"`
-	LastName     string    `validate:"required" json:"lastName" gorm:"column:last_name;"`
-	Email        string    `validate:"required,email" json:"email" gorm:"column:email;"`
-	Address      string    `json:"address" gorm:"column:address;"`
-	Company      string    `json:"company" gorm:"column:company;"`
-	BirthDate    time.Time `json:"birthDate" gorm:"column:birth_date;"`
-	PhoneNumber  string    `json:"phoneNumber" gorm:"column:phone_number;"`
-	Gender       string    `json:"gender" gorm:"column:gender;"`
-	Role         string    `json:"role" gorm:"column:role;"`
-	Password     string    `json:"-" gorm:"column:password;"`
-	PasswordSalt string    `json:"-" gorm:"column:password_salt;"`
+	FirstName    string     `validate:"required" json:"firstName" gorm:"column:first_name;"`
+	LastName     string     `validate:"required" json:"lastName" gorm:"column:last_name;"`
+	Email        string     `validate:"required,email" json:"email" gorm:"column:email;"`
+	Address      string     `json:"address" gorm:"column:address;"`
+	Company      string     `json:"company" gorm:"column:company;"`
+	BirthDate    *time.Time `json:"birthDate" gorm:"column:birth_date;"`
+	PhoneNumber  string     `json:"phoneNumber" gorm:"column:phone_number;"`
+	Gender       string     `json:"gender" gorm:"column:gender;"`
+	Role         string     `json:"role" gorm:"column:role;"`
+	Password     string     `json:"-" gorm:"column:password;"`
+	PasswordSalt string     `json:"-" gorm:"column:password_salt;"`
 }
 
 func (UserCreate) TableName() string { return User{}.TableName() }
@@ -54,9 +54,9 @@ func (u *UserCreate) AfterCreate(tx *gorm.DB) (err error) {
 			defer common.Recovery()
 			data := &common.Notification{
 				Id: uuid.New().String(),
-				Data: common.CompactJson(map[string]interface{}{
+				Data: map[string]interface{}{
 					"id": user.Id,
-				}),
+				},
 				Event:       fmt.Sprintf("%s-%s", user.TableName(), common.Create),
 				Message:     "New user has been created",
 				CreatedTime: time.Now(),
