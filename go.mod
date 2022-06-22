@@ -21,7 +21,7 @@ require (
 	github.com/swaggo/swag v1.8.3
 	github.com/wagslane/go-rabbitmq v0.10.0
 	go.opencensus.io v0.23.0
-	gopkg.in/yaml.v3 v3.0.0
+	gopkg.in/yaml.v3 v3.0.1
 	gorm.io/driver/postgres v1.3.1
 	gorm.io/gorm v1.23.1
 )
