@@ -68,8 +68,8 @@ func main() {
 	}
 	configRedis := config.GetRedisConfig()
 	redisService := redisprovider.NewRedisService(configRedis)
-	configStorage := config.GetStorageConfig()
 
+	configStorage := config.GetStorageConfig()
 	storageService, storageErr := storageprovider.NewStorage(configStorage)
 	if storageErr != nil {
 		log.Fatalln("Connect Minio Error: ", storageErr)

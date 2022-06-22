@@ -34,7 +34,7 @@ type storageService struct {
 
 func NewStorage(config *StorageConfig) (*storageService, error) {
 	client, err := minio.New(config.Endpoint, &minio.Options{
-		Creds:  credentials.NewStaticV4(config.AccessKeyID, config.SecretAccessKey, ""),
+		Creds:  credentials.NewStatic(config.AccessKeyID, config.SecretAccessKey, "", 0),
 		Secure: config.UseSSL,
 	})
 	if err != nil {
@@ -46,19 +46,14 @@ func NewStorage(config *StorageConfig) (*storageService, error) {
 }
 
 func (s *storageService) CreateBucket(ctx context.Context, bucketName string, location string) error {
-	err := s.client.MakeBucket(ctx, bucketName, minio.MakeBucketOptions{Region: location})
-	if err != nil {
-		// Check to see if we already own this bucket (which happens if you run this twice)
-		exists, errBucketExists := s.client.BucketExists(ctx, bucketName)
-		if errBucketExists == nil && exists {
-			log.Printf("We already own %s\n", bucketName)
-		} else {
-			return err
-		}
+	// Check to see if we already own this bucket (which happens if you run this twice)
+	exists, errBucketExists := s.client.BucketExists(ctx, bucketName)
+	if errBucketExists == nil && exists {
+		log.Printf("We already own %s\n", bucketName)
+		return nil
 	} else {
-		log.Printf("Successfully created %s\n", bucketName)
+		return s.client.MakeBucket(ctx, bucketName, minio.MakeBucketOptions{Region: location})
 	}
-	return nil
 }
 
 func (s *storageService) FGetObject(ctx context.Context, bucketName string, objectName string, filePath string, options minio.GetObjectOptions) error {
