@@ -34,7 +34,7 @@ type storageService struct {
 
 func NewStorage(config *StorageConfig) (*storageService, error) {
 	client, err := minio.New(config.Endpoint, &minio.Options{
-		Creds:  credentials.NewStatic(config.AccessKeyID, config.SecretAccessKey, "", 0),
+		Creds:  credentials.NewStaticV2(config.AccessKeyID, config.SecretAccessKey, ""),
 		Secure: config.UseSSL,
 	})
 	if err != nil {

@@ -29,7 +29,7 @@ elasticsearch:
 # Minio
 minio:
   host: "localhost"
-  port: 10000
+  port: 9000
   accessKeyID: minioadmin
   secretAccessKey: minioadmin
   useSSL: false
