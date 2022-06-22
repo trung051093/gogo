@@ -66,7 +66,7 @@ func CreateUserHandler(appCtx appctx.AppContext) func(*gin.Context) {
 // @Param        user  body      usermodel.UserUpdate        true  "Add account"
 // @Success      200   {object}  common.Response{data=bool}  "desc"
 // @Failure      400   {object}  common.AppError
-// @Router       /api/v1/user [patch]
+// @Router       /api/v1/user/{id} [patch]
 func UpdateUserHandler(appCtx appctx.AppContext) func(*gin.Context) {
 	return func(ginCtx *gin.Context) {
 		var updateData usermodel.UserUpdate
