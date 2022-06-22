@@ -6,7 +6,7 @@ import (
 	"time"
 	"user_management/common"
 	"user_management/components/appctx"
-	"user_management/components/storage"
+	storageprovider "user_management/components/storage"
 	filemodel "user_management/modules/file/model"
 
 	"github.com/gin-gonic/gin"
@@ -39,7 +39,7 @@ func GetUploadPresignedUrl(appCtx appctx.AppContext) func(*gin.Context) {
 		}
 
 		storageService := appCtx.GetStorageService()
-		policy := storage.NewPostPolicy()
+		policy := storageprovider.NewPostPolicy()
 		policy.SetBucket(common.PhotoBucket)
 		policy.SetKey(objectName)
 		policy.SetContentLengthRange(0, 10000000)

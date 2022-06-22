@@ -3,23 +3,23 @@ package decorator
 import (
 	"bytes"
 	"context"
-	"fmt"
-	"log"
 	"time"
-	"user_management/common"
 	"user_management/components/appctx"
 
 	"github.com/gin-gonic/gin"
+	"github.com/go-redis/cache/v8"
+	"github.com/sirupsen/logrus"
 )
-
-type dataReponse struct {
-	Code interface{} `json:"code"`
-	Data interface{} `json:"data"`
-}
 
 type bodyLogWriter struct {
 	gin.ResponseWriter
 	body *bytes.Buffer
+}
+
+type dataCache struct {
+	Code    int
+	Headers map[string][]string
+	Data    interface{}
 }
 
 func (w bodyLogWriter) Write(b []byte) (int, error) {
@@ -29,62 +29,44 @@ func (w bodyLogWriter) Write(b []byte) (int, error) {
 
 type ApiHandler func(appctx.AppContext) func(*gin.Context)
 
-// example: CacheRequest(appctx, "user", 1 * time.Minute)(user.ListUserHandler)
 func CacheRequest(
 	appCtx appctx.AppContext,
 	cacheName string,
 	tls time.Duration,
 ) func(ApiHandler) func(*gin.Context) {
+	cacheService := appCtx.GetCacheService()
+
 	return func(apiHandler ApiHandler) func(*gin.Context) {
 		return func(ginCtx *gin.Context) {
-			ctx := context.Background()
-			redisService := appCtx.GetRedisService()
+			ctx := context.TODO()
 			url := ginCtx.Request.URL
-			key := fmt.Sprintf("%s:%s:%s", cacheName, url.Path, url.Query().Encode())
+			key := url.RequestURI()
+			var data dataCache
 
-			if cacheString, err := redisService.GetStringValue(ctx, key); err != nil {
+			if err := cacheService.Get(ctx, key, &data); err != nil {
 				blw := &bodyLogWriter{body: bytes.NewBufferString(""), ResponseWriter: ginCtx.Writer}
 				ginCtx.Writer = blw
 				apiHandler(appCtx)(ginCtx)
 				go func(bodyWriter *bodyLogWriter) {
-					json := &dataReponse{
-						Code: bodyWriter.Status(),
-						Data: bodyWriter.body.String(),
+					if bodyWriter.Status() > 300 || bodyWriter.Status() < 200 {
+						return
 					}
-					jsonStr, jsonErr := common.JsonToString(json)
-					if jsonErr != nil {
-						log.Println("Cache error:", jsonErr)
+					json := &dataCache{
+						Code:    bodyWriter.Status(),
+						Data:    bodyWriter.body.String(),
+						Headers: bodyWriter.Header(),
 					}
-
-					str, err := redisService.SetValue(
-						ctx,
-						key,
-						jsonStr,
-						tls,
-					)
+					err := cacheService.Once(&cache.Item{
+						Key:   key,
+						Value: json,
+						TTL:   tls,
+					})
 					if err != nil {
-						log.Println("Cache error:", err)
-					} else {
-						log.Println("Cache SetValue:", str)
+						logrus.Errorln("CacheRequest error:", err)
 					}
 				}(blw)
 			} else {
-				dataCache := &dataReponse{}
-				err = common.StringToJson(cacheString, &dataCache)
-				if err != nil {
-					apiHandler(appCtx)(ginCtx)
-					return
-				}
-				statusCode := int(dataCache.Code.(float64))
-				data := map[string]interface{}{}
-				jsonStr := dataCache.Data.(string)
-				err = common.StringToJson(jsonStr, &data)
-				if err != nil {
-					apiHandler(appCtx)(ginCtx)
-					return
-				} else {
-					ginCtx.JSON(statusCode, data)
-				}
+				ginCtx.JSON(data.Code, data.Data)
 			}
 		}
 	}

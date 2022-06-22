@@ -7,14 +7,15 @@ import (
 	"net/http"
 	"user_management/common"
 	"user_management/components/appctx"
-	"user_management/components/dbprovider"
+	cacheprovider "user_management/components/cache"
+	dbprovider "user_management/components/dbprovider"
 	esprovider "user_management/components/elasticsearch"
 	jaegerprovider "user_management/components/jaeger"
 	graylog "user_management/components/log"
 	rabbitmqprovider "user_management/components/rabbitmq"
 	redisprovider "user_management/components/redis"
 	socketprovider "user_management/components/socketio"
-	"user_management/components/storage"
+	storageprovider "user_management/components/storage"
 	"user_management/middleware"
 	"user_management/modules/indexer"
 	"user_management/modules/notificator"
@@ -28,20 +29,6 @@ import (
 	"go.opencensus.io/trace"
 )
 
-// @title           Swagger Example API
-// @version         1.0
-// @description     This is a sample server.
-// @termsOfService  http://swagger.io/terms/
-
-// @contact.name   API Support
-// @contact.url    http://www.swagger.io/support
-// @contact.email  support@swagger.io
-
-// @license.name  Apache 2.0
-// @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
-
-// @host      localhost:8080
-// @BasePath  /api/v1
 func main() {
 	config := appctx.GetConfig()
 
@@ -83,7 +70,7 @@ func main() {
 	redisProvider := redisprovider.NewRedisService(configRedis)
 	configStorage := config.GetStorageConfig()
 
-	storageService, storageErr := storage.NewStorage(configStorage)
+	storageService, storageErr := storageprovider.NewStorage(configStorage)
 	if storageErr != nil {
 		log.Fatalln("Connect Minio Error: ", storageErr)
 	}
@@ -101,6 +88,11 @@ func main() {
 		socketprovider.WithWebsocketTransport,
 	)
 	jaegerService := jaegerprovider.NewExporter(config.GetJaegerConfig())
+	cacheService := cacheprovider.NewCacheService(&cacheprovider.CacheConfig{
+		Addrs: map[string]string{
+			"server1": configRedis.Addr,
+		},
+	})
 
 	appCtx := appctx.NewAppContext(
 		dbprovider.GetDBConnection(),
@@ -112,6 +104,7 @@ func main() {
 		storageService,
 		socketService,
 		jaegerService,
+		cacheService,
 	)
 
 	router := gin.Default()

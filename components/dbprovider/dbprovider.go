@@ -1,4 +1,4 @@
-package dbprovider
+package components
 
 import (
 	"fmt"

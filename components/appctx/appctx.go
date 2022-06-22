@@ -3,12 +3,13 @@ package appctx
 import (
 	"context"
 	"time"
+	cacheprovider "user_management/components/cache"
 	esprovider "user_management/components/elasticsearch"
 	jaegerprovider "user_management/components/jaeger"
 	rabbitmqprovider "user_management/components/rabbitmq"
 	redisprovider "user_management/components/redis"
 	socketprovider "user_management/components/socketio"
-	"user_management/components/storage"
+	storageprovider "user_management/components/storage"
 
 	"github.com/go-playground/validator/v10"
 	"gorm.io/gorm"
@@ -22,8 +23,9 @@ type AppContext interface {
 	GetESService() esprovider.ElasticSearchSevice
 	GetRabbitMQService() rabbitmqprovider.RabbitmqSerivce
 	GetRedisService() redisprovider.RedisService
-	GetStorageService() storage.StorageService
+	GetStorageService() storageprovider.StorageService
 	GetSocketService() socketprovider.SocketService
+	GetCacheService() cacheprovider.CacheService
 }
 
 type appContext struct {
@@ -33,9 +35,10 @@ type appContext struct {
 	esService       esprovider.ElasticSearchSevice
 	rabbitmqService rabbitmqprovider.RabbitmqSerivce
 	redisService    redisprovider.RedisService
-	storageService  storage.StorageService
+	storageService  storageprovider.StorageService
 	socketService   socketprovider.SocketService
 	jaegerService   jaegerprovider.JaegerService
+	cacheService    cacheprovider.CacheService
 }
 
 type key string
@@ -49,9 +52,10 @@ func NewAppContext(
 	esService esprovider.ElasticSearchSevice,
 	rabbitmqService rabbitmqprovider.RabbitmqSerivce,
 	redisService redisprovider.RedisService,
-	storageService storage.StorageService,
+	storageService storageprovider.StorageService,
 	socketService socketprovider.SocketService,
 	jaegerService jaegerprovider.JaegerService,
+	cacheService cacheprovider.CacheService,
 ) *appContext {
 	return &appContext{
 		db:              db,
@@ -63,6 +67,7 @@ func NewAppContext(
 		storageService:  storageService,
 		socketService:   socketService,
 		jaegerService:   jaegerService,
+		cacheService:    cacheService,
 	}
 }
 
@@ -108,7 +113,7 @@ func (appCtx *appContext) GetRedisService() redisprovider.RedisService {
 	return appCtx.redisService
 }
 
-func (appCtx *appContext) GetStorageService() storage.StorageService {
+func (appCtx *appContext) GetStorageService() storageprovider.StorageService {
 	return appCtx.storageService
 }
 
@@ -118,4 +123,8 @@ func (appCtx *appContext) GetSocketService() socketprovider.SocketService {
 
 func (appCtx *appContext) GetJaegerService() jaegerprovider.JaegerService {
 	return appCtx.jaegerService
+}
+
+func (appCtx *appContext) GetCacheService() cacheprovider.CacheService {
+	return appCtx.cacheService
 }

@@ -7,7 +7,7 @@ import (
 	"sync"
 	"time"
 	"user_management/components/appctx"
-	"user_management/components/dbprovider"
+	dbprovider "user_management/components/dbprovider"
 	rabbitmqprovider "user_management/components/rabbitmq"
 	randomuserapi "user_management/components/randomuserapi"
 	usermodel "user_management/modules/user/model"

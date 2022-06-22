@@ -9,7 +9,7 @@ import (
 	jaegerprovider "user_management/components/jaeger"
 	graylog "user_management/components/log"
 	rabbitmqprovider "user_management/components/rabbitmq"
-	"user_management/components/storage"
+	storageprovider "user_management/components/storage"
 
 	es "github.com/elastic/go-elasticsearch/v8"
 	redis "github.com/go-redis/redis/v8"
@@ -145,8 +145,8 @@ func (cfg *Config) GetRedisConfig() *redis.Options {
 	}
 }
 
-func (cfg *Config) GetStorageConfig() *storage.StorageConfig {
-	return &storage.StorageConfig{
+func (cfg *Config) GetStorageConfig() *storageprovider.StorageConfig {
+	return &storageprovider.StorageConfig{
 		Endpoint:        fmt.Sprintf("%s:%d", cfg.Minio.Host, cfg.Minio.Port),
 		AccessKeyID:     cfg.Minio.AccessKeyID,
 		SecretAccessKey: cfg.Minio.SecretAccessKey,
