@@ -80,16 +80,16 @@ $ go run ./packages/rest_api/main.go
 [Wrk](https://github.com/wg/wrk)
 
 ```bash
-wrk -t6 -c150 -d15s https://api.tdo.works/api/v1/users
+wrk -t6 -c200 -d30s https://api.tdo.works/api/v1/users
 ```
 
 ```bash
-Running 15s test @ https://api.tdo.works/api/v1/users
-  6 threads and 150 connections
+Running 30s test @ https://api.tdo.works/api/v1/users
+  6 threads and 200 connections
   Thread Stats   Avg      Stdev     Max   +/- Stdev
-    Latency   689.33ms  356.31ms   1.83s    55.45%
-    Req/Sec    33.83     18.60   100.00     69.51%
-  2838 requests in 15.01s, 4.19MB read
-Requests/sec:    189.02
-Transfer/sec:    285.93KB
+    Latency   242.63ms   94.15ms 805.17ms   88.87%
+    Req/Sec   137.92     58.51   316.00     70.20%
+  24025 requests in 30.08s, 49.76MB read
+Requests/sec:    798.62
+Transfer/sec:      1.65MB
 ```
