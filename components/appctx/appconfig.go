@@ -61,6 +61,7 @@ type Config struct {
 		AccessKeyID     string `yaml:"access_key_id"`
 		SecretAccessKey string `yaml:"secret_access_key"`
 		UseSSL          bool   `yaml:"useSSL"`
+		PublicUrl       string `yaml:"public_url"`
 	} `yaml:"minio"`
 	JWT struct {
 		Secret             string `yaml:"secret"`
@@ -151,6 +152,7 @@ func (cfg *Config) GetStorageConfig() *storageprovider.StorageConfig {
 		AccessKeyID:     cfg.Minio.AccessKeyID,
 		SecretAccessKey: cfg.Minio.SecretAccessKey,
 		UseSSL:          cfg.Minio.UseSSL,
+		PublicUrl:       cfg.Minio.PublicUrl,
 	}
 }
 

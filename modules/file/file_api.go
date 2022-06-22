@@ -26,6 +26,9 @@ import (
 // @Router       /api/v1/file/presign-url [get]
 func GetUploadPresignedUrl(appCtx appctx.AppContext) func(*gin.Context) {
 	return func(ginCtx *gin.Context) {
+		config := appCtx.GetConfig()
+		configStorage := config.GetStorageConfig()
+
 		fileName := ginCtx.Query("fileName")
 		fileType := ginCtx.Query("fileType")
 		objectName := uuid.New().String()
@@ -48,7 +51,7 @@ func GetUploadPresignedUrl(appCtx appctx.AppContext) func(*gin.Context) {
 		// expire in 1 day
 		policy.SetExpires(time.Now().UTC().AddDate(0, 0, 1))
 
-		url, formData, presignErr := storageService.PresignedPostObject(
+		_, formData, presignErr := storageService.PresignedPostObject(
 			ginCtx.Request.Context(),
 			policy,
 		)
@@ -58,7 +61,7 @@ func GetUploadPresignedUrl(appCtx appctx.AppContext) func(*gin.Context) {
 		}
 
 		res := &filemodel.PresignedPostObject{
-			Url:    url.String(),
+			Url:    configStorage.PublicUrl,
 			Fields: formData,
 		}
 

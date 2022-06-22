@@ -33,6 +33,7 @@ minio:
   accessKeyID: minioadmin
   secretAccessKey: minioadmin
   useSSL: false
+  public_url: "localhost:9000"
 
 # Rabbit MQ
 rabbitmq:

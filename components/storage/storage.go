@@ -26,6 +26,7 @@ type StorageConfig struct {
 	AccessKeyID     string
 	SecretAccessKey string
 	UseSSL          bool
+	PublicUrl       string
 }
 
 type storageService struct {
