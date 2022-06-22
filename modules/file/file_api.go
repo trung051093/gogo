@@ -3,6 +3,8 @@ package file
 import (
 	"errors"
 	"net/http"
+	"net/url"
+	"path"
 	"time"
 	"user_management/common"
 	"user_management/components/appctx"
@@ -60,8 +62,14 @@ func GetUploadPresignedUrl(appCtx appctx.AppContext) func(*gin.Context) {
 			panic(common.NewCustomError(presignErr, "Cannot get presign url", "PRESIGN_URL"))
 		}
 
+		uploadUri, err := url.Parse(configStorage.PublicUrl)
+		if err != nil {
+			panic(common.ErrorInternal(err))
+		}
+
+		uploadUri.Path = path.Join(uploadUri.Path, common.PhotoBucket)
 		res := &filemodel.PresignedPostObject{
-			Url:    configStorage.PublicUrl,
+			Url:    uploadUri.String(),
 			Fields: formData,
 		}
 
