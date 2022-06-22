@@ -67,7 +67,7 @@ func main() {
 		log.Fatalln("Connect RabbitMQ Error: ", rabbitErr)
 	}
 	configRedis := config.GetRedisConfig()
-	redisProvider := redisprovider.NewRedisService(configRedis)
+	redisService := redisprovider.NewRedisService(configRedis)
 	configStorage := config.GetStorageConfig()
 
 	storageService, storageErr := storageprovider.NewStorage(configStorage)
@@ -88,11 +88,7 @@ func main() {
 		socketprovider.WithWebsocketTransport,
 	)
 	jaegerService := jaegerprovider.NewExporter(config.GetJaegerConfig())
-	cacheService := cacheprovider.NewCacheService(&cacheprovider.CacheConfig{
-		Addrs: map[string]string{
-			"server1": configRedis.Addr,
-		},
-	})
+	cacheService := cacheprovider.NewCacheService(redisService.GetClient())
 
 	appCtx := appctx.NewAppContext(
 		dbprovider.GetDBConnection(),
@@ -100,7 +96,7 @@ func main() {
 		config,
 		esService,
 		rabbitmqService,
-		redisProvider,
+		redisService,
 		storageService,
 		socketService,
 		jaegerService,

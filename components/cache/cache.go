@@ -19,21 +19,17 @@ type CacheConfig struct {
 }
 
 type cacheService struct {
-	ring    *redis.Ring
+	client  *redis.Client
 	mycache *cache.Cache
 }
 
-func NewCacheService(config *CacheConfig) *cacheService {
-	ring := redis.NewRing(&redis.RingOptions{
-		Addrs: config.Addrs,
-	})
-
+func NewCacheService(client *redis.Client) *cacheService {
 	mycache := cache.New(&cache.Options{
-		Redis:      ring,
+		Redis:      client,
 		LocalCache: cache.NewTinyLFU(1000, time.Minute),
 	})
 
-	return &cacheService{ring: ring, mycache: mycache}
+	return &cacheService{client: client, mycache: mycache}
 }
 
 func (s *cacheService) Once(item *cache.Item) error {

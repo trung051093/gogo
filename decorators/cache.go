@@ -3,7 +3,9 @@ package decorator
 import (
 	"bytes"
 	"context"
+	"net/http"
 	"time"
+	"user_management/common"
 	"user_management/components/appctx"
 
 	"github.com/gin-gonic/gin"
@@ -18,8 +20,8 @@ type bodyLogWriter struct {
 
 type dataCache struct {
 	Code    int
-	Headers map[string][]string
-	Data    interface{}
+	Headers http.Header
+	Data    string
 }
 
 func (w bodyLogWriter) Write(b []byte) (int, error) {
@@ -51,22 +53,33 @@ func CacheRequest(
 					if bodyWriter.Status() > 300 || bodyWriter.Status() < 200 {
 						return
 					}
-					json := &dataCache{
-						Code:    bodyWriter.Status(),
-						Data:    bodyWriter.body.String(),
-						Headers: bodyWriter.Header(),
-					}
 					err := cacheService.Once(&cache.Item{
 						Key:   key,
-						Value: json,
+						Value: new(dataCache),
 						TTL:   tls,
+						Do: func(i *cache.Item) (interface{}, error) {
+							return &dataCache{
+								Code:    bodyWriter.Status(),
+								Data:    bodyWriter.body.String(),
+								Headers: bodyWriter.Header(),
+							}, nil
+						},
 					})
 					if err != nil {
 						logrus.Errorln("CacheRequest error:", err)
 					}
 				}(blw)
 			} else {
-				ginCtx.JSON(data.Code, data.Data)
+				var jsonData interface{}
+				jsonErr := common.StringToJson(data.Data, &jsonData)
+				if jsonErr != nil {
+					apiHandler(appCtx)(ginCtx)
+					return
+				}
+				for key, val := range data.Headers {
+					ginCtx.Header(key, val[0])
+				}
+				ginCtx.JSON(data.Code, jsonData)
 			}
 		}
 	}

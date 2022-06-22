@@ -50,3 +50,7 @@ func (r *redisService) GetObjValue(ctx context.Context, key string, data interfa
 func (r *redisService) GetStringValue(ctx context.Context, key string) (string, error) {
 	return r.client.Get(ctx, key).Result()
 }
+
+func (r *redisService) GetClient() *redis.Client {
+	return r.client
+}
