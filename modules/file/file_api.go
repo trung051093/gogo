@@ -2,9 +2,8 @@ package file
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
-	"net/url"
-	"path"
 	"time"
 	"user_management/common"
 	"user_management/components/appctx"
@@ -23,7 +22,7 @@ import (
 // @Produce      json
 // @Param        fileName  query     string                                               true  "fileName"
 // @Param        fileType  query     string                                               true  "fileType"
-// @Param        proxy     query     string                                               true  "proxy"
+// @Param        proxy     query     string                                               false  "proxy"
 // @Success      200       {object}  common.Response{data=filemodel.PresignedPostObject}  "desc"
 // @Failure      400       {object}  common.AppError
 // @Router       /api/v1/file/presign-url [get]
@@ -69,14 +68,8 @@ func GetUploadPresignedUrl(appCtx appctx.AppContext) func(*gin.Context) {
 		if proxy != "" {
 			publicUrl = proxy
 		}
-		uploadUri, err := url.Parse(publicUrl)
-		if err != nil {
-			panic(common.ErrorInternal(err))
-		}
-
-		uploadUri.Path = path.Join(uploadUri.Path, common.ImageBucket)
 		res := &filemodel.PresignedPostObject{
-			Url:    uploadUri.String(),
+			Url:    fmt.Sprintf("%s/%s", publicUrl, common.ImageBucket),
 			Fields: formData,
 		}
 
