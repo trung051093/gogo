@@ -21,9 +21,9 @@ import (
 // @Tags         file
 // @Accept       json
 // @Produce      json
-// @Param        fileName            query                                                string  true  "fileName"
-// @Param        fileType            query
-// @Param        proxy            query                                            string  true  "fileType"
+// @Param        fileName  query     string                                               true  "fileName"
+// @Param        fileType  query     string                                               true  "fileType"
+// @Param        proxy     query     string                                               true  "proxy"
 // @Success      200       {object}  common.Response{data=filemodel.PresignedPostObject}  "desc"
 // @Failure      400       {object}  common.AppError
 // @Router       /api/v1/file/presign-url [get]

@@ -18,7 +18,7 @@ import (
 // @Tags         users
 // @Accept       json
 // @Produce      json
-// @Param        user                                       body  usermodel.UserCreate  true  "Add user"
+// @Param        user  body      usermodel.UserCreate       true  "Add user"
 // @Success      200   {object}  common.Response{data=int}  "desc"
 // @Failure      400   {object}  common.AppError
 // @Router       /api/v1/user [post]
@@ -143,11 +143,11 @@ func GetUserHandler(appCtx appctx.AppContext) func(*gin.Context) {
 // @Tags         users
 // @Accept       json
 // @Produce      json
-// @Param        fields               query                                                                                     int    false  "fields"
-// @Param        page                 query                                                                                     int    true   "page"
-// @Param        limit                query                                                                                     int    true   "limit"
-// @Param        sortField  query     string                                                                                    false  "sort by field"
-// @Param        sortName   query     string                                                                                    false  "sort by field"
+// @Param        fields     query     int                                                                                                        false  "fields"
+// @Param        page       query     int                                                                                                        true   "page"
+// @Param        limit      query     int                                                                                                        true   "limit"
+// @Param        sortField  query     string                                                                                                     false  "sort by field"
+// @Param        sortName   query     string                                                                                                     false  "sort by field"
 // @Success      200        {object}  common.ResponsePagination{data=[]usermodel.User,pagination=common.Pagination,filter=usermodel.UserFilter}  "desc"
 // @Failure      400  {object}  common.AppError
 // @Router       /api/v1/users [get]
@@ -233,8 +233,8 @@ func DeleteUserHandler(appCtx appctx.AppContext) func(*gin.Context) {
 // @Tags         users
 // @Accept       json
 // @Produce      json
-// @Param        query                query                                               int    true   "query"
-// @Param        lastIndex            query                                               int    false  "lastIndex"
+// @Param        query      query     int                                                 true   "query"
+// @Param        lastIndex  query     int                                                 false  "lastIndex"
 // @Param        sortField  query     string                                              false  "sort by field"
 // @Param        sortName   query     string                                              false  "sort by field"
 // @Param        id         path      int                                                 true   "User ID"
