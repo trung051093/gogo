@@ -74,7 +74,7 @@ func main() {
 	if storageErr != nil {
 		log.Fatalln("Connect Minio Error: ", storageErr)
 	}
-	createBucketErr := storageService.CreateBucket(context.Background(), common.PhotoBucket, common.PhotoBucketRegion)
+	createBucketErr := storageService.CreateBucket(context.Background(), common.ImageBucket, common.ImageBucketRegion)
 	if createBucketErr != nil {
 		log.Println("Create bucket error: ", createBucketErr)
 	}

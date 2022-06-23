@@ -45,7 +45,7 @@ func GetUploadPresignedUrl(appCtx appctx.AppContext) func(*gin.Context) {
 
 		storageService := appCtx.GetStorageService()
 		policy := storageprovider.NewPostPolicy()
-		policy.SetBucket(common.PhotoBucket)
+		policy.SetBucket(common.ImageBucket)
 		policy.SetKey(objectName)
 		policy.SetContentLengthRange(0, 10000000)
 		policy.SetUserMetadata("fileName", fileName)
@@ -67,7 +67,7 @@ func GetUploadPresignedUrl(appCtx appctx.AppContext) func(*gin.Context) {
 			panic(common.ErrorInternal(err))
 		}
 
-		uploadUri.Path = path.Join(uploadUri.Path, common.PhotoBucket)
+		uploadUri.Path = path.Join(uploadUri.Path, common.ImageBucket)
 		res := &filemodel.PresignedPostObject{
 			Url:    uploadUri.String(),
 			Fields: formData,

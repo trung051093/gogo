@@ -26,7 +26,7 @@ func MainRoutes(appCtx appctx.AppContext, router *gin.Engine) {
 		v1.POST("/auth/register", auth.RegisterUserHandler(appCtx))
 		v1.POST("/auth/login", auth.LoginUserHandler(appCtx))
 
-		// photo
+		// file
 		v1.GET("/file/presign-url", file.GetUploadPresignedUrl(appCtx))
 	}
 }

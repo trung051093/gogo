@@ -5,6 +5,6 @@ const (
 	CurrentUser       = "CurrentUser"
 	IndexingQueue     = "ElasticSearchService"
 	IndexingQueueKey  = "ElasticSearchServiceKey"
-	PhotoBucket       = "photo"
-	PhotoBucketRegion = "us-east-1"
+	ImageBucket       = "images"
+	ImageBucketRegion = "us-east-1"
 )

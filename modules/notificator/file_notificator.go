@@ -13,7 +13,7 @@ func FileHandler(appCtx appctx.AppContext) {
 	storageService := appCtx.GetStorageService()
 	storageService.ListenNotification(
 		context.Background(),
-		common.PhotoBucket,
+		common.ImageBucket,
 		"",
 		"",
 		[]string{
