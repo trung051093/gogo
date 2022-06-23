@@ -65,18 +65,18 @@ func GetUploadPresignedUrl(appCtx appctx.AppContext) func(*gin.Context) {
 			panic(common.NewCustomError(presignErr, "Cannot get presign url", "PRESIGN_URL"))
 		}
 
-		uploadUri, err := url.Parse(configStorage.PublicUrl)
+		publicUrl := configStorage.PublicUrl
+		if proxy != "" {
+			publicUrl = proxy
+		}
+		uploadUri, err := url.Parse(publicUrl)
 		if err != nil {
 			panic(common.ErrorInternal(err))
 		}
 
 		uploadUri.Path = path.Join(uploadUri.Path, common.ImageBucket)
-		url := uploadUri.String()
-		if proxy != "" {
-			url = proxy
-		}
 		res := &filemodel.PresignedPostObject{
-			Url:    url,
+			Url:    uploadUri.String(),
 			Fields: formData,
 		}
 
