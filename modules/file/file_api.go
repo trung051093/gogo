@@ -22,7 +22,8 @@ import (
 // @Accept       json
 // @Produce      json
 // @Param        fileName            query                                                string  true  "fileName"
-// @Param        fileType            query                                                string  true  "fileType"
+// @Param        fileType            query
+// @Param        proxy            query                                            string  true  "fileType"
 // @Success      200       {object}  common.Response{data=filemodel.PresignedPostObject}  "desc"
 // @Failure      400       {object}  common.AppError
 // @Router       /api/v1/file/presign-url [get]
@@ -33,6 +34,8 @@ func GetUploadPresignedUrl(appCtx appctx.AppContext) func(*gin.Context) {
 
 		fileName := ginCtx.Query("fileName")
 		fileType := ginCtx.Query("fileType")
+		proxy := ginCtx.Query("proxy")
+
 		objectName := uuid.New().String()
 
 		if fileType == "" {
@@ -68,8 +71,12 @@ func GetUploadPresignedUrl(appCtx appctx.AppContext) func(*gin.Context) {
 		}
 
 		uploadUri.Path = path.Join(uploadUri.Path, common.ImageBucket)
+		url := uploadUri.String()
+		if proxy != "" {
+			url = proxy
+		}
 		res := &filemodel.PresignedPostObject{
-			Url:    uploadUri.String(),
+			Url:    url,
 			Fields: formData,
 		}
 
