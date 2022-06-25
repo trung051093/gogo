@@ -12,8 +12,9 @@ https://support.google.com/mail/answer/7126229?hl=en
 https://myaccount.google.com/signinoptions/two-step-verification/enroll-welcome
 
 3. Create an app-specific password
-https://myaccount.google.com/apppasswords
-After this, put the password to the settings:[config_local.yml](../components/appctx/config_local.yml).
+https://myaccount.google.com/apppasswords.
+
+After this, put the password to the settings: [config_local.yml](../components/appctx/config_local.yml).
 
 ```bash
 # mail
