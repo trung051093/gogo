@@ -1,5 +1,11 @@
-basePath: /api/v1
 definitions:
+  authmodel.AuthForgotPassword:
+    properties:
+      email:
+        type: string
+    required:
+    - email
+    type: object
   authmodel.AuthLogin:
     properties:
       email:
@@ -19,6 +25,19 @@ definitions:
     required:
     - email
     - password
+    type: object
+  authmodel.AuthResetPassword:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+      token:
+        type: string
+    required:
+    - email
+    - password
+    - token
     type: object
   authmodel.AuthResponse:
     properties:
@@ -81,8 +100,6 @@ definitions:
         type: string
       createdAt:
         type: string
-      deletedAt:
-        type: string
       email:
         type: string
       firstName:
@@ -90,6 +107,8 @@ definitions:
       gender:
         type: string
       id:
+        type: integer
+      isActive:
         type: integer
       lastName:
         type: string
@@ -110,8 +129,6 @@ definitions:
         type: string
       createdAt:
         type: string
-      deletedAt:
-        type: string
       email:
         type: string
       firstName:
@@ -119,6 +136,8 @@ definitions:
       gender:
         type: string
       id:
+        type: integer
+      isActive:
         type: integer
       lastName:
         type: string
@@ -164,8 +183,6 @@ definitions:
         type: string
       createdAt:
         type: string
-      deletedAt:
-        type: string
       email:
         type: string
       firstName:
@@ -173,6 +190,8 @@ definitions:
       gender:
         type: string
       id:
+        type: integer
+      isActive:
         type: integer
       lastName:
         type: string
@@ -183,20 +202,40 @@ definitions:
       updatedAt:
         type: string
     type: object
-host: localhost:8080
 info:
-  contact:
-    email: support@swagger.io
-    name: API Support
-    url: http://www.swagger.io/support
-  description: This is a sample server.
-  license:
-    name: Apache 2.0
-    url: http://www.apache.org/licenses/LICENSE-2.0.html
-  termsOfService: http://swagger.io/terms/
-  title: Swagger Example API
-  version: "1.0"
+  contact: {}
 paths:
+  /api/v1/auth/forgot-password:
+    post:
+      consumes:
+      - application/json
+      description: ForgotPassword
+      parameters:
+      - description: login
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/authmodel.AuthForgotPassword'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: desc
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.Response'
+            - properties:
+                data:
+                  type: boolean
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/common.AppError'
+      summary: ForgotPassword
+      tags:
+      - auth
   /api/v1/auth/login:
     post:
       consumes:
@@ -228,6 +267,30 @@ paths:
       summary: Login
       tags:
       - auth
+  /api/v1/auth/logout:
+    post:
+      consumes:
+      - application/json
+      description: Logout
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: desc
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.Response'
+            - properties:
+                data:
+                  type: boolean
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/common.AppError'
+      summary: Logout
+      tags:
+      - auth
   /api/v1/auth/register:
     post:
       consumes:
@@ -250,7 +313,7 @@ paths:
             - $ref: '#/definitions/common.Response'
             - properties:
                 data:
-                  type: boolean
+                  type: integer
               type: object
         "400":
           description: Bad Request
@@ -259,18 +322,18 @@ paths:
       summary: Register
       tags:
       - auth
-  /api/v1/user:
-    patch:
+  /api/v1/auth/reset-password:
+    post:
       consumes:
       - application/json
-      description: update user
+      description: ResetPassword
       parameters:
-      - description: Add account
+      - description: login
         in: body
         name: user
         required: true
         schema:
-          $ref: '#/definitions/usermodel.UserUpdate'
+          $ref: '#/definitions/authmodel.AuthResetPassword'
       produces:
       - application/json
       responses:
@@ -287,9 +350,49 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/common.AppError'
-      summary: Update an user
+      summary: ResetPassword
       tags:
-      - users
+      - auth
+  /api/v1/file/presign-url:
+    get:
+      consumes:
+      - application/json
+      description: get a presigned url to upload
+      parameters:
+      - description: fileName
+        in: query
+        name: fileName
+        required: true
+        type: string
+      - description: fileType
+        in: query
+        name: fileType
+        required: true
+        type: string
+      - description: proxy
+        in: query
+        name: proxy
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: desc
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/filemodel.PresignedPostObject'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/common.AppError'
+      summary: get a presigned url to upload
+      tags:
+      - file
+  /api/v1/user:
     post:
       consumes:
       - application/json
@@ -377,6 +480,36 @@ paths:
           schema:
             $ref: '#/definitions/common.AppError'
       summary: Get an user
+      tags:
+      - users
+    patch:
+      consumes:
+      - application/json
+      description: update user
+      parameters:
+      - description: Add account
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/usermodel.UserUpdate'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: desc
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.Response'
+            - properties:
+                data:
+                  type: boolean
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/common.AppError'
+      summary: Update an user
       tags:
       - users
   /api/v1/user/search:
@@ -479,39 +612,4 @@ paths:
       summary: Get list of user
       tags:
       - users
-  /file/presign-url:
-    get:
-      consumes:
-      - application/json
-      description: get a presigned url to upload
-      parameters:
-      - description: fileName
-        in: query
-        name: fileName
-        required: true
-        type: string
-      - description: fileType
-        in: query
-        name: fileType
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: desc
-          schema:
-            allOf:
-            - $ref: '#/definitions/common.Response'
-            - properties:
-                data:
-                  $ref: '#/definitions/filemodel.PresignedPostObject'
-              type: object
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/common.AppError'
-      summary: get a presigned url to upload
-      tags:
-      - file
 swagger: "2.0"

@@ -30,8 +30,8 @@ func CreateUserHandler(appCtx appctx.AppContext) func(*gin.Context) {
 			panic(common.ErrorInvalidRequest(usermodel.EntityName, err))
 		}
 
-		validate := appCtx.GetValidator()
-		if err := validate.Struct(&newData); err != nil {
+		validator := appCtx.GetValidator()
+		if err := validator.Struct(&newData); err != nil {
 			panic(common.ErrorInvalidRequest(usermodel.EntityName, err))
 		}
 
@@ -81,8 +81,8 @@ func UpdateUserHandler(appCtx appctx.AppContext) func(*gin.Context) {
 			panic(common.ErrorInvalidRequest(usermodel.EntityName, err))
 		}
 
-		validate := appCtx.GetValidator()
-		if err := validate.Struct(&updateData); err != nil {
+		validator := appCtx.GetValidator()
+		if err := validator.Struct(&updateData); err != nil {
 			panic(common.ErrorInvalidRequest(usermodel.EntityName, err))
 		}
 

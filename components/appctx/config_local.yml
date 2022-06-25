@@ -68,3 +68,11 @@ swagger:
   host: "localhost:8080"
   schemes: ["http"]
   basepath: ""
+
+# mail
+mail:
+  sender: "yourgmail@gmail.com"
+  host: "smtp.gmail.com"
+  port: 587
+  username: "yourgmail@gmail.com"
+  password: "yourpassword"

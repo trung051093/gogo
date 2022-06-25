@@ -12,6 +12,8 @@ type CacheService interface {
 	Once(item *cache.Item) error
 	Get(ctx context.Context, key string, value interface{}) error
 	Set(item *cache.Item) error
+	Delete(ctx context.Context, key string) error
+	Exists(ctx context.Context, key string) bool
 }
 
 type CacheConfig struct {
@@ -36,10 +38,18 @@ func (s *cacheService) Once(item *cache.Item) error {
 	return s.mycache.Once(item)
 }
 
+func (s *cacheService) Set(item *cache.Item) error {
+	return s.mycache.Set(item)
+}
+
 func (s *cacheService) Get(ctx context.Context, key string, value interface{}) error {
 	return s.mycache.Get(ctx, key, value)
 }
 
-func (s *cacheService) Set(item *cache.Item) error {
-	return s.mycache.Set(item)
+func (s *cacheService) Exists(ctx context.Context, key string) bool {
+	return s.mycache.Exists(ctx, key)
+}
+
+func (s *cacheService) Delete(ctx context.Context, key string) error {
+	return s.mycache.Delete(ctx, key)
 }

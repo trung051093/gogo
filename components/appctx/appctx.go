@@ -6,6 +6,7 @@ import (
 	cacheprovider "user_management/components/cache"
 	esprovider "user_management/components/elasticsearch"
 	jaegerprovider "user_management/components/jaeger"
+	"user_management/components/mailer"
 	rabbitmqprovider "user_management/components/rabbitmq"
 	redisprovider "user_management/components/redis"
 	socketprovider "user_management/components/socketio"
@@ -26,6 +27,7 @@ type AppContext interface {
 	GetStorageService() storageprovider.StorageService
 	GetSocketService() socketprovider.SocketService
 	GetCacheService() cacheprovider.CacheService
+	GetMailService() mailer.MailService
 }
 
 type appContext struct {
@@ -39,6 +41,7 @@ type appContext struct {
 	socketService   socketprovider.SocketService
 	jaegerService   jaegerprovider.JaegerService
 	cacheService    cacheprovider.CacheService
+	mailService     mailer.MailService
 }
 
 type key string
@@ -56,6 +59,7 @@ func NewAppContext(
 	socketService socketprovider.SocketService,
 	jaegerService jaegerprovider.JaegerService,
 	cacheService cacheprovider.CacheService,
+	mailService mailer.MailService,
 ) *appContext {
 	return &appContext{
 		db:              db,
@@ -68,6 +72,7 @@ func NewAppContext(
 		socketService:   socketService,
 		jaegerService:   jaegerService,
 		cacheService:    cacheService,
+		mailService:     mailService,
 	}
 }
 
@@ -127,4 +132,8 @@ func (appCtx *appContext) GetJaegerService() jaegerprovider.JaegerService {
 
 func (appCtx *appContext) GetCacheService() cacheprovider.CacheService {
 	return appCtx.cacheService
+}
+
+func (appCtx *appContext) GetMailService() mailer.MailService {
+	return appCtx.mailService
 }

@@ -8,6 +8,7 @@ import (
 	"user_management/common"
 	jaegerprovider "user_management/components/jaeger"
 	graylog "user_management/components/log"
+	"user_management/components/mailer"
 	rabbitmqprovider "user_management/components/rabbitmq"
 	storageprovider "user_management/components/storage"
 
@@ -86,6 +87,13 @@ type Config struct {
 		Schemes     []string `yaml:"schemes"`
 		BasePath    string   `yaml:"basepath"`
 	} `yaml:"swagger"`
+	Mail struct {
+		Sender   string `yaml:"sender"`
+		Host     string `yaml:"host"`
+		Port     int    `yaml:"port"`
+		Username string `yaml:"username"`
+		Password string `yaml:"password"`
+	} `yaml:"mail"`
 }
 
 func RootDir() string {
@@ -180,5 +188,15 @@ func (cfg *Config) GetSwaggerConfig() *common.SwaggerInfo {
 		Version:     cfg.Swagger.Version,
 		Schemes:     cfg.Swagger.Schemes,
 		BasePath:    cfg.Swagger.BasePath,
+	}
+}
+
+func (cfg *Config) GetMailConfig() *mailer.MailConfig {
+	return &mailer.MailConfig{
+		Sender:   cfg.Mail.Sender,
+		Host:     cfg.Mail.Host,
+		Port:     cfg.Mail.Port,
+		Username: cfg.Mail.Username,
+		Password: cfg.Mail.Password,
 	}
 }

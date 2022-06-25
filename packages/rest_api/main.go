@@ -12,6 +12,7 @@ import (
 	esprovider "user_management/components/elasticsearch"
 	jaegerprovider "user_management/components/jaeger"
 	graylog "user_management/components/log"
+	"user_management/components/mailer"
 	rabbitmqprovider "user_management/components/rabbitmq"
 	redisprovider "user_management/components/redis"
 	socketprovider "user_management/components/socketio"
@@ -89,6 +90,7 @@ func main() {
 	)
 	jaegerService := jaegerprovider.NewExporter(config.GetJaegerConfig())
 	cacheService := cacheprovider.NewCacheService(redisService.GetClient())
+	mailService := mailer.NewMailer(config.GetMailConfig())
 
 	appCtx := appctx.NewAppContext(
 		dbprovider.GetDBConnection(),
@@ -101,6 +103,7 @@ func main() {
 		socketService,
 		jaegerService,
 		cacheService,
+		mailService,
 	)
 
 	router := gin.Default()

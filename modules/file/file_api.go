@@ -47,6 +47,7 @@ func GetUploadPresignedUrl(appCtx appctx.AppContext) func(*gin.Context) {
 
 		storageService := appCtx.GetStorageService()
 		policy := storageprovider.NewPostPolicy()
+
 		policy.SetBucket(common.ImageBucket)
 		policy.SetKey(objectName)
 		policy.SetContentLengthRange(0, 10000000)

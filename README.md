@@ -8,6 +8,7 @@
 - [Logging](./_docs/logging.md)
 - [Swagger API](./_docs/swagger.md)
 - [Docker build](./_docs/build.md)
+- [Send mail via Gmail SMTP server](./_docs/mail.md)
 
 # Demo:
 - [Api](https://api.tdo.works/swagger/index.html#/)

@@ -54,6 +54,7 @@ func CacheRequest(
 						return
 					}
 					err := cacheService.Once(&cache.Item{
+						Ctx:   ctx,
 						Key:   key,
 						Value: new(dataCache),
 						TTL:   tls,

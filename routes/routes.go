@@ -4,6 +4,7 @@ import (
 	"time"
 	"user_management/components/appctx"
 	decorator "user_management/decorators"
+	"user_management/middleware"
 	"user_management/modules/auth"
 	"user_management/modules/file"
 	"user_management/modules/user"
@@ -25,6 +26,9 @@ func MainRoutes(appCtx appctx.AppContext, router *gin.Engine) {
 		// authentication
 		v1.POST("/auth/register", auth.RegisterUserHandler(appCtx))
 		v1.POST("/auth/login", auth.LoginUserHandler(appCtx))
+		v1.POST("/auth/logout", middleware.JWTRequireHandler(appCtx), auth.LogoutUserHandler(appCtx))
+		v1.POST("/auth/forgot-password", auth.ForgotPasswordUserHandler(appCtx))
+		v1.POST("/auth/reset-password", auth.ResetPasswordUserHandler(appCtx))
 
 		// file
 		v1.GET("/file/presign-url", file.GetUploadPresignedUrl(appCtx))
