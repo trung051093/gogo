@@ -1,7 +1,7 @@
 package middleware
 
 import (
-	"user_management/components/appctx"
+	"gogo/components/appctx"
 
 	"github.com/gin-gonic/gin"
 )

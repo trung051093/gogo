@@ -3,10 +3,10 @@ package decorator
 import (
 	"bytes"
 	"context"
+	"gogo/common"
+	"gogo/components/appctx"
 	"net/http"
 	"time"
-	"user_management/common"
-	"user_management/components/appctx"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-redis/cache/v8"

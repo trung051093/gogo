@@ -1,8 +1,8 @@
 package routes
 
 import (
-	"user_management/components/appctx"
-	"user_management/middleware"
+	"gogo/components/appctx"
+	"gogo/middleware"
 
 	"github.com/gin-gonic/gin"
 )

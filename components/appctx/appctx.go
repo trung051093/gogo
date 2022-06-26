@@ -2,15 +2,15 @@ package appctx
 
 import (
 	"context"
+	cacheprovider "gogo/components/cache"
+	esprovider "gogo/components/elasticsearch"
+	jaegerprovider "gogo/components/jaeger"
+	"gogo/components/mailer"
+	rabbitmqprovider "gogo/components/rabbitmq"
+	redisprovider "gogo/components/redis"
+	socketprovider "gogo/components/socketio"
+	storageprovider "gogo/components/storage"
 	"time"
-	cacheprovider "user_management/components/cache"
-	esprovider "user_management/components/elasticsearch"
-	jaegerprovider "user_management/components/jaeger"
-	"user_management/components/mailer"
-	rabbitmqprovider "user_management/components/rabbitmq"
-	redisprovider "user_management/components/redis"
-	socketprovider "user_management/components/socketio"
-	storageprovider "user_management/components/storage"
 
 	"github.com/go-playground/validator/v10"
 	"gorm.io/gorm"

@@ -1,6 +1,6 @@
 package authmodel
 
-import authprovider "user_management/modules/auth_providers"
+import authprovider "gogo/modules/auth_providers"
 
 type AuthLogin struct {
 	Email    string `validate:"required,email" json:"email" gorm:"-"`

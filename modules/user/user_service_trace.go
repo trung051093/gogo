@@ -2,10 +2,10 @@ package user
 
 import (
 	"context"
-	"user_management/common"
-	elasticsearchmodel "user_management/components/elasticsearch/model"
-	decorator "user_management/decorators"
-	usermodel "user_management/modules/user/model"
+	"gogo/common"
+	elasticsearchmodel "gogo/components/elasticsearch/model"
+	decorator "gogo/decorators"
+	usermodel "gogo/modules/user/model"
 )
 
 func (s *userService) SearchUsersTrace(ctx context.Context, cond map[string]interface{}, f *usermodel.UserFilter, p *common.Pagination) ([]usermodel.User, error) {

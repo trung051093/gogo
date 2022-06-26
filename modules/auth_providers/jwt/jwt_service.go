@@ -1,9 +1,9 @@
 package jwtauthprovider
 
 import (
+	"gogo/common"
+	authprovider "gogo/modules/auth_providers"
 	"time"
-	"user_management/common"
-	authprovider "user_management/modules/auth_providers"
 
 	"github.com/dgrijalva/jwt-go"
 )

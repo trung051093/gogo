@@ -3,8 +3,8 @@ package user
 import (
 	"context"
 	"fmt"
-	"user_management/common"
-	usermodel "user_management/modules/user/model"
+	"gogo/common"
+	usermodel "gogo/modules/user/model"
 
 	"gorm.io/gorm"
 )

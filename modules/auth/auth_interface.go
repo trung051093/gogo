@@ -2,9 +2,9 @@ package auth
 
 import (
 	"context"
-	authmodel "user_management/modules/auth/model"
-	authprovider "user_management/modules/auth_providers"
-	usermodel "user_management/modules/user/model"
+	authmodel "gogo/modules/auth/model"
+	authprovider "gogo/modules/auth_providers"
+	usermodel "gogo/modules/user/model"
 )
 
 type AuthService interface {

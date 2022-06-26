@@ -1,11 +1,11 @@
 package auth
 
 import (
+	"gogo/common"
+	"gogo/components/appctx"
+	authmodel "gogo/modules/auth/model"
+	usermodel "gogo/modules/user/model"
 	"net/http"
-	"user_management/common"
-	"user_management/components/appctx"
-	authmodel "user_management/modules/auth/model"
-	usermodel "user_management/modules/user/model"
 
 	"github.com/gin-gonic/gin"
 )

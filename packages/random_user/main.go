@@ -3,16 +3,16 @@ package main
 import (
 	"context"
 	"fmt"
+	"gogo/components/appctx"
+	dbprovider "gogo/components/dbprovider"
+	rabbitmqprovider "gogo/components/rabbitmq"
+	randomuserapi "gogo/components/randomuserapi"
+	usermodel "gogo/modules/user/model"
 	"log"
 	"sync"
 	"time"
-	"user_management/components/appctx"
-	dbprovider "user_management/components/dbprovider"
-	rabbitmqprovider "user_management/components/rabbitmq"
-	randomuserapi "user_management/components/randomuserapi"
-	usermodel "user_management/modules/user/model"
 
-	"user_management/modules/user"
+	"gogo/modules/user"
 )
 
 func main() {

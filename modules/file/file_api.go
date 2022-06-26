@@ -3,12 +3,12 @@ package file
 import (
 	"errors"
 	"fmt"
+	"gogo/common"
+	"gogo/components/appctx"
+	storageprovider "gogo/components/storage"
+	filemodel "gogo/modules/file/model"
 	"net/http"
 	"time"
-	"user_management/common"
-	"user_management/components/appctx"
-	storageprovider "user_management/components/storage"
-	filemodel "user_management/modules/file/model"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"

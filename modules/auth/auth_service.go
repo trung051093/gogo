@@ -3,18 +3,18 @@ package auth
 import (
 	"context"
 	"errors"
+	"gogo/common"
+	"gogo/components/appctx"
+	cacheprovider "gogo/components/cache"
+	"gogo/components/hasher"
+	"gogo/components/mailer"
+	authmodel "gogo/modules/auth/model"
+	authprovider "gogo/modules/auth_providers"
+	jwtauthprovider "gogo/modules/auth_providers/jwt"
+	usermodel "gogo/modules/user/model"
 	"strconv"
-	"user_management/common"
-	"user_management/components/appctx"
-	cacheprovider "user_management/components/cache"
-	"user_management/components/hasher"
-	"user_management/components/mailer"
-	authmodel "user_management/modules/auth/model"
-	authprovider "user_management/modules/auth_providers"
-	jwtauthprovider "user_management/modules/auth_providers/jwt"
-	usermodel "user_management/modules/user/model"
 
-	"user_management/modules/user"
+	"gogo/modules/user"
 )
 
 type authService struct {

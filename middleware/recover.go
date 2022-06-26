@@ -1,8 +1,8 @@
 package middleware
 
 import (
-	"user_management/common"
-	"user_management/components/appctx"
+	"gogo/common"
+	"gogo/components/appctx"
 
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"

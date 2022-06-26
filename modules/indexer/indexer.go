@@ -2,9 +2,9 @@ package indexer
 
 import (
 	"context"
+	"gogo/common"
+	"gogo/components/appctx"
 	"log"
-	"user_management/common"
-	"user_management/components/appctx"
 
 	"github.com/wagslane/go-rabbitmq"
 )

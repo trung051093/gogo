@@ -2,7 +2,7 @@ package authprovider
 
 import (
 	"errors"
-	"user_management/common"
+	"gogo/common"
 )
 
 var (

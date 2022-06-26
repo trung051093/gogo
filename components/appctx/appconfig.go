@@ -2,15 +2,15 @@ package appctx
 
 import (
 	"fmt"
+	"gogo/common"
+	jaegerprovider "gogo/components/jaeger"
+	graylog "gogo/components/log"
+	"gogo/components/mailer"
+	rabbitmqprovider "gogo/components/rabbitmq"
+	storageprovider "gogo/components/storage"
 	"os"
 	"path"
 	"runtime"
-	"user_management/common"
-	jaegerprovider "user_management/components/jaeger"
-	graylog "user_management/components/log"
-	"user_management/components/mailer"
-	rabbitmqprovider "user_management/components/rabbitmq"
-	storageprovider "user_management/components/storage"
 
 	es "github.com/elastic/go-elasticsearch/v8"
 	redis "github.com/go-redis/redis/v8"

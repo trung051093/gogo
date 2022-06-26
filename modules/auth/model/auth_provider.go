@@ -1,7 +1,7 @@
 package authmodel
 
 import (
-	"user_management/common"
+	"gogo/common"
 )
 
 const EntityName = "auth"

@@ -1,9 +1,9 @@
 package main
 
 import (
+	"gogo/components/appctx"
+	"gogo/components/mailer"
 	"os"
-	"user_management/components/appctx"
-	"user_management/components/mailer"
 )
 
 func main() {

@@ -2,8 +2,8 @@ package filemodel
 
 import (
 	"fmt"
+	"gogo/common"
 	"strings"
-	"user_management/common"
 )
 
 const EntityName = "file"

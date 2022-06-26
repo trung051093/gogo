@@ -2,10 +2,10 @@ package usermodel
 
 import (
 	"fmt"
+	"gogo/common"
+	"gogo/components/appctx"
 	"log"
 	"time"
-	"user_management/common"
-	"user_management/components/appctx"
 
 	"gorm.io/gorm"
 )

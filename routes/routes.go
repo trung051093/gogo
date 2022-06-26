@@ -1,13 +1,13 @@
 package routes
 
 import (
+	"gogo/components/appctx"
+	decorator "gogo/decorators"
+	"gogo/middleware"
+	"gogo/modules/auth"
+	"gogo/modules/file"
+	"gogo/modules/user"
 	"time"
-	"user_management/components/appctx"
-	decorator "user_management/decorators"
-	"user_management/middleware"
-	"user_management/modules/auth"
-	"user_management/modules/file"
-	"user_management/modules/user"
 
 	"github.com/gin-gonic/gin"
 )

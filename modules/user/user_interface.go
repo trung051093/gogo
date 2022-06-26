@@ -2,9 +2,9 @@ package user
 
 import (
 	"context"
-	"user_management/common"
-	elasticsearchmodel "user_management/components/elasticsearch/model"
-	usermodel "user_management/modules/user/model"
+	"gogo/common"
+	elasticsearchmodel "gogo/components/elasticsearch/model"
+	usermodel "gogo/modules/user/model"
 )
 
 //Reader interface

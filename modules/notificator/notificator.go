@@ -2,9 +2,9 @@ package notificator
 
 import (
 	"fmt"
+	"gogo/common"
+	"gogo/components/appctx"
 	"log"
-	"user_management/common"
-	"user_management/components/appctx"
 
 	socketio "github.com/googollee/go-socket.io"
 )

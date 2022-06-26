@@ -1,4 +1,4 @@
-module user_management
+module gogo
 
 go 1.18
 

@@ -2,10 +2,10 @@ package storageprovider
 
 import (
 	"context"
+	"gogo/common"
 	"log"
 	"net/url"
 	"time"
-	"user_management/common"
 
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"

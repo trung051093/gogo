@@ -1,13 +1,13 @@
 package user
 
 import (
+	"gogo/common"
+	"gogo/components/appctx"
+	"gogo/components/hasher"
+	usermodel "gogo/modules/user/model"
 	"net/http"
 	"strconv"
 	"strings"
-	"user_management/common"
-	"user_management/components/appctx"
-	"user_management/components/hasher"
-	usermodel "user_management/modules/user/model"
 
 	"github.com/gin-gonic/gin"
 )

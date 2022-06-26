@@ -2,9 +2,9 @@ package notificator
 
 import (
 	"context"
+	"gogo/common"
+	"gogo/components/appctx"
 	"log"
-	"user_management/common"
-	"user_management/components/appctx"
 
 	"github.com/minio/minio-go/v7/pkg/notification"
 )

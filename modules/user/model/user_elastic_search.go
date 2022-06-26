@@ -3,9 +3,9 @@ package usermodel
 import (
 	"context"
 	"fmt"
-	"user_management/common"
-	esprovider "user_management/components/elasticsearch"
-	elasticsearchmodel "user_management/components/elasticsearch/model"
+	"gogo/common"
+	esprovider "gogo/components/elasticsearch"
+	elasticsearchmodel "gogo/components/elasticsearch/model"
 )
 
 type UserEsSearchResult struct {

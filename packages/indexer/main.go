@@ -3,14 +3,14 @@ package main
 import (
 	"context"
 	"fmt"
+	"gogo/common"
+	"gogo/components/appctx"
+	esprovider "gogo/components/elasticsearch"
+	rabbitmqprovider "gogo/components/rabbitmq"
 	"log"
 	"os"
 	"os/signal"
 	"syscall"
-	"user_management/common"
-	"user_management/components/appctx"
-	esprovider "user_management/components/elasticsearch"
-	rabbitmqprovider "user_management/components/rabbitmq"
 
 	"github.com/wagslane/go-rabbitmq"
 )

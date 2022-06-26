@@ -2,10 +2,10 @@ package user
 
 import (
 	"context"
-	"user_management/common"
-	esprovider "user_management/components/elasticsearch"
-	elasticsearchmodel "user_management/components/elasticsearch/model"
-	usermodel "user_management/modules/user/model"
+	"gogo/common"
+	esprovider "gogo/components/elasticsearch"
+	elasticsearchmodel "gogo/components/elasticsearch/model"
+	usermodel "gogo/modules/user/model"
 )
 
 type userService struct {

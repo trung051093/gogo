@@ -1,8 +1,8 @@
 package routes
 
 import (
-	"user_management/components/appctx"
-	"user_management/docs"
+	"gogo/components/appctx"
+	"gogo/docs"
 
 	"github.com/gin-gonic/gin" // swagger embed files
 	swaggerFiles "github.com/swaggo/files"

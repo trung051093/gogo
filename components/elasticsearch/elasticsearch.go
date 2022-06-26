@@ -5,10 +5,10 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	elasticsearchmodel "gogo/components/elasticsearch/model"
 	"log"
 	"strings"
 	"sync"
-	elasticsearchmodel "user_management/components/elasticsearch/model"
 
 	"github.com/elastic/go-elasticsearch/v8"
 	"github.com/elastic/go-elasticsearch/v8/esapi"
