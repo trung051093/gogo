@@ -30,6 +30,10 @@ import (
 	"go.opencensus.io/trace"
 )
 
+// @securityDefinitions.apikey  Bearer
+// @in                          header
+// @name                        Authorization
+// @description                 "Type 'Bearer TOKEN' to correctly set the API Key"
 func main() {
 	config := appctx.GetConfig()
 

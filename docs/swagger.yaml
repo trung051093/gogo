@@ -288,6 +288,8 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/common.AppError'
+      security:
+      - ApiKeyAuth: []
       summary: Logout
       tags:
       - auth
@@ -612,4 +614,10 @@ paths:
       summary: Get list of user
       tags:
       - users
+securityDefinitions:
+  Bearer:
+    description: '"Type ''Bearer TOKEN'' to correctly set the API Key"'
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"

@@ -20,8 +20,8 @@ import (
 // @Tags         file
 // @Accept       json
 // @Produce      json
-// @Param        fileName  query     string                                               true  "fileName"
-// @Param        fileType  query     string                                               true  "fileType"
+// @Param        fileName  query     string                                               true   "fileName"
+// @Param        fileType  query     string                                               true   "fileType"
 // @Param        proxy     query     string                                               false  "proxy"
 // @Success      200       {object}  common.Response{data=filemodel.PresignedPostObject}  "desc"
 // @Failure      400       {object}  common.AppError

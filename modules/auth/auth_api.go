@@ -16,9 +16,9 @@ import (
 // @Tags         auth
 // @Accept       json
 // @Produce      json
-// @Param        user  body      authmodel.AuthRegister      true  "register"
+// @Param        user  body      authmodel.AuthRegister     true  "register"
 // @Success      200   {object}  common.Response{data=int}  "desc"
-// @Failure      400   {object}  common.AppError
+// @Failure      400  {object}  common.AppError
 // @Router       /api/v1/auth/register [post]
 func RegisterUserHandler(appCtx appctx.AppContext) func(*gin.Context) {
 	return func(ginCtx *gin.Context) {
@@ -81,15 +81,15 @@ func LoginUserHandler(appCtx appctx.AppContext) func(*gin.Context) {
 }
 
 // Logout godoc
+// @Security     ApiKeyAuth
 // @Summary      Logout
 // @Description  Logout
 // @Tags         auth
 // @Accept       json
 // @Produce      json
-// @Success      200   {object}  common.Response{data=bool}  "desc"
+// @Success      200  {object}  common.Response{data=bool}  "desc"
 // @Failure      400   {object}  common.AppError
 // @Router       /api/v1/auth/logout [post]
-// @securityDefinitions.bearer BearerAuth
 func LogoutUserHandler(appCtx appctx.AppContext) func(*gin.Context) {
 	return func(ginCtx *gin.Context) {
 		currentUser := ginCtx.Value(common.CurrentUser).(usermodel.User)
@@ -112,8 +112,8 @@ func LogoutUserHandler(appCtx appctx.AppContext) func(*gin.Context) {
 // @Tags         auth
 // @Accept       json
 // @Produce      json
-// @Param        user  body      authmodel.AuthForgotPassword                           true  "login"
-// @Success      200   {object}  common.Response{data=bool}  "desc"
+// @Param        user  body      authmodel.AuthForgotPassword  true  "login"
+// @Success      200   {object}  common.Response{data=bool}    "desc"
 // @Failure      400   {object}  common.AppError
 // @Router       /api/v1/auth/forgot-password [post]
 func ForgotPasswordUserHandler(appCtx appctx.AppContext) func(*gin.Context) {
@@ -147,8 +147,8 @@ func ForgotPasswordUserHandler(appCtx appctx.AppContext) func(*gin.Context) {
 // @Tags         auth
 // @Accept       json
 // @Produce      json
-// @Param        user  body      authmodel.AuthResetPassword                           true  "login"
-// @Success      200   {object}  common.Response{data=bool}  "desc"
+// @Param        user  body      authmodel.AuthResetPassword  true  "login"
+// @Success      200   {object}  common.Response{data=bool}   "desc"
 // @Failure      400   {object}  common.AppError
 // @Router       /api/v1/auth/reset-password [post]
 func ResetPasswordUserHandler(appCtx appctx.AppContext) func(*gin.Context) {
