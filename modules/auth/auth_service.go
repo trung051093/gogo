@@ -3,6 +3,7 @@ package auth
 import (
 	"context"
 	"errors"
+	"fmt"
 	"gogo/common"
 	"gogo/components/appctx"
 	cacheprovider "gogo/components/cache"
@@ -133,7 +134,7 @@ func (s *authService) ForgotPassword(ctx context.Context, payload *authmodel.Aut
 		Sender:  s.config.Mail.Sender,
 		To:      []string{user.Email},
 		Subject: "Forgot Password",
-		Body:    resetPasswordToken,
+		Body:    fmt.Sprintf("%s?token=%s", payload.ForgotPasswordUri, resetPasswordToken),
 	})
 
 	return user.Id, nil
