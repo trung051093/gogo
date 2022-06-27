@@ -46,7 +46,7 @@ The decorator function wrap current service with a trace span.
 - [Service Trace](../modules/user/user_service_trace.go):
 You can see I've just wrapper every User Service with a trace span. 
 
-- [Auth Trace](../modules/auth/auth_service.go)
+- [Auth Trace](../modules/auth/auth_service.go):
 Let check that file, the register service is computational combination of `SearchUser` service and `CreateUser` service. (Before create an user, we have to check the user is exists or not)
 
 I've switch current service `SearchUser`, `CreateUser` to `SearchUserTrace`, `CreateUserTrace`.
