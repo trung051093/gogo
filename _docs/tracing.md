@@ -17,7 +17,7 @@ Distributed tracing is the process of tracking the activity resulting from a req
 # Installation
 
 ## Jaeger:
-- Deploy with docker: [docker-compose.yml](../docker-compose.yml)
+Deploy with docker: [docker-compose.yml](../docker-compose.yml)
 
 ```bash
 docker-compose up -d
