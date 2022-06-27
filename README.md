@@ -1,28 +1,21 @@
 <h1>Golang REST API boiterplate</h1>
-#Requirement:
-Go v1.18.
 
-Docker v20.10.14.
-
-Docker-compose v2.5.1.
+# Requirement:
+- Go v1.18.
+- Docker v20.10.14.
+- Docker-compose v2.5.1.
 
 # Docs:
-[Distributed tracing](./_docs/tracing.md)
-
-[Logging](./_docs/logging.md)
-
-[Swagger API](./_docs/swagger.md)
-
-[Docker build](./_docs/build.md)
-
-[Send mail via Gmail SMTP server](./_docs/mail.md)
+- [Distributed tracing](./_docs/tracing.md)
+- [Logging](./_docs/logging.md)
+- [Swagger API](./_docs/swagger.md)
+- [Docker build](./_docs/build.md)
+- [Send mail via Gmail SMTP server](./_docs/mail.md)
 
 # Demo:
-[Api](https://api.tdo.works/swagger/index.html#/)
-
-[Trace](https://trace.tdo.works/)
-
-[Graylog](https://graylog.tdo.works/):
+- [Api](https://api.tdo.works/swagger/index.html#/)
+- [Trace](https://trace.tdo.works/)
+- [Graylog](https://graylog.tdo.works/):
 ```bash
 user: anonymous
 pass: anonymous
