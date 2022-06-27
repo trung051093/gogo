@@ -12,13 +12,13 @@ I believe that Swagger will make smooth communication for Back-end and Front-end
 
 2. Download Swag for Go by using:
 ```bash
-// install swag
+# install swag
 go install github.com/swaggo/swag/cmd/swag
 
-// config GOPATH (macos)
+# config GOPATH (macos)
 export PATH=$(go env GOPATH)/bin:$PATH
 
-// test cmd
+# test cmd
 swag init -h
 ```
 
