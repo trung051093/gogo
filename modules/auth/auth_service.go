@@ -222,7 +222,7 @@ func (s *authService) GoogleValidate(ctx context.Context, code string) (*authpro
 	if err != nil || user == nil {
 		// random password
 		password := s.hashService.GenerateRandomString(s.config.JWT.PasswordSaltLength)
-		passwordSalt, hashPassword := s.hashService.HashPassword(password, passwordSalt)
+		passwordSalt, hashPassword := s.hashService.HashPassword(password, s.config.JWT.PasswordSaltLength)
 		userId, err := s.userService.CreateUserTrace(ctx, &usermodel.UserCreate{
 			Email:        googleUser.Email,
 			FirstName:    googleUser.GivenName,
