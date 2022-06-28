@@ -7,14 +7,14 @@ import (
 	usermodel "gogo/modules/user/model"
 )
 
-//Reader interface
+// Reader interface
 type Reader interface {
 	Get(ctx context.Context, id int) (*usermodel.User, error)
 	Search(ctx context.Context, cond map[string]interface{}, filter *usermodel.UserFilter, paging *common.Pagination) ([]usermodel.User, error)
 	SearchOne(ctx context.Context, cond map[string]interface{}) (*usermodel.User, error)
 }
 
-//Writer user writer
+// Writer user writer
 type Writer interface {
 	Create(ctx context.Context, user *usermodel.UserCreate) (int, error)
 	Update(ctx context.Context, id int, userUpdate *usermodel.UserUpdate) (int, error)
@@ -22,7 +22,7 @@ type Writer interface {
 	Delete(ctx context.Context, user *usermodel.User) (int, error)
 }
 
-//Repository interface
+// Repository interface
 type UserRepository interface {
 	Reader
 	Writer

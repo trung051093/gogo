@@ -68,6 +68,73 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/v1/auth/google/callback": {
+            "post": {
+                "description": "Google callback",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Google callback",
+                "responses": {
+                    "200": {
+                        "description": "desc",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/common.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/authmodel.AuthResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/common.AppError"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/auth/google/login": {
+            "post": {
+                "description": "Google login",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Google login",
+                "responses": {
+                    "307": {
+                        "description": ""
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/common.AppError"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/auth/login": {
             "post": {
                 "description": "Login",
@@ -697,10 +764,14 @@ const docTemplate = `{
         "authmodel.AuthForgotPassword": {
             "type": "object",
             "required": [
-                "email"
+                "email",
+                "forgotPasswordUri"
             ],
             "properties": {
                 "email": {
+                    "type": "string"
+                },
+                "forgotPasswordUri": {
                     "type": "string"
                 }
             }

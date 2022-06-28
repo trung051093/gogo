@@ -3,7 +3,7 @@ package middleware
 import (
 	"gogo/common"
 	"gogo/components/appctx"
-	jwtauthprovider "gogo/modules/auth_providers/jwt"
+	jwtauthprovider "gogo/modules/auth_provider/jwt"
 	"strings"
 
 	"github.com/gin-gonic/gin"

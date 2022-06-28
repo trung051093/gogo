@@ -30,6 +30,9 @@ func MainRoutes(appCtx appctx.AppContext, router *gin.Engine) {
 		v1.POST("/auth/forgot-password", auth.ForgotPasswordUserHandler(appCtx))
 		v1.POST("/auth/reset-password", auth.ResetPasswordUserHandler(appCtx))
 
+		v1.GET("/auth/google/login", auth.GoogleLoginUserHandler(appCtx))
+		v1.GET("/auth/google/callback", auth.GoogleCallbackUserHandler(appCtx))
+
 		// file
 		v1.GET("/file/presign-url", file.GetUploadPresignedUrl(appCtx))
 	}

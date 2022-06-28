@@ -69,6 +69,11 @@ type Config struct {
 		PasswordSaltLength int    `yaml:"pass_salt_length"`
 		ExpireDays         int    `yaml:"expire_days"`
 	} `yaml:"jwt"`
+	GoogleOauth2 struct {
+		ClientID     string `yaml:"client_id"`
+		ClientSecret string `yaml:"client_secret"`
+		RedirectUri  string `yaml:"redirect_uri"`
+	} `yaml:"google_oauth2"`
 	Jaeger struct {
 		ServiceName       string `yaml:"service_name"`
 		AgentEndpoint     string `yaml:"agent_endpoint"`

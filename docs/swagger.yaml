@@ -3,8 +3,11 @@ definitions:
     properties:
       email:
         type: string
+      forgotPasswordUri:
+        type: string
     required:
     - email
+    - forgotPasswordUri
     type: object
   authmodel.AuthLogin:
     properties:
@@ -234,6 +237,47 @@ paths:
           schema:
             $ref: '#/definitions/common.AppError'
       summary: ForgotPassword
+      tags:
+      - auth
+  /api/v1/auth/google/callback:
+    post:
+      consumes:
+      - application/json
+      description: Google callback
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: desc
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/authmodel.AuthResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/common.AppError'
+      summary: Google callback
+      tags:
+      - auth
+  /api/v1/auth/google/login:
+    post:
+      consumes:
+      - application/json
+      description: Google login
+      produces:
+      - application/json
+      responses:
+        "307":
+          description: ""
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/common.AppError'
+      summary: Google login
       tags:
       - auth
   /api/v1/auth/login:

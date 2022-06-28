@@ -16,6 +16,7 @@ import (
 	socketprovider "gogo/components/socketio"
 	storageprovider "gogo/components/storage"
 	"gogo/middleware"
+	authmodelprovider "gogo/modules/auth_provider/model"
 	"gogo/modules/indexer"
 	"gogo/modules/notificator"
 	usermodel "gogo/modules/user/model"
@@ -51,7 +52,10 @@ func main() {
 			TimeZone: config.Database.TimeZone,
 		},
 		// dbprovider.WithDebug,
-		dbprovider.WithAutoMigration(&usermodel.User{}),
+		dbprovider.WithAutoMigration(
+			&usermodel.User{},
+			&authmodelprovider.AuthProvider{},
+		),
 	)
 
 	if err != nil {
