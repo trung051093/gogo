@@ -18,7 +18,13 @@ type AuthProviderRepository interface {
 	Write
 }
 
+type AuthProviderServiceTrace interface {
+	CreateTrace(ctx context.Context, provider *authprovidermodel.AuthProviderCreate) (int, error)
+	SearchOneTrace(ctx context.Context, cond map[string]interface{}) (*authprovidermodel.AuthProvider, error)
+}
+
 type AuthProviderService interface {
+	AuthProviderServiceTrace
 	Create(ctx context.Context, provider *authprovidermodel.AuthProviderCreate) (int, error)
 	SearchOne(ctx context.Context, cond map[string]interface{}) (*authprovidermodel.AuthProvider, error)
 }

@@ -220,7 +220,7 @@ func (s *authService) GoogleValidate(ctx context.Context, code string) (*authpro
 
 	// if user is not exist, we should create the user and auth provider
 	if err != nil || user == nil {
-		userId, err := s.userService.CreateUser(ctx, &usermodel.UserCreate{
+		userId, err := s.userService.CreateUserTrace(ctx, &usermodel.UserCreate{
 			Email:     googleUser.Email,
 			FirstName: googleUser.GivenName,
 			LastName:  googleUser.FamilyName,
@@ -243,10 +243,10 @@ func (s *authService) GoogleValidate(ctx context.Context, code string) (*authpro
 		}
 	} else {
 		condFindWithUserId := map[string]interface{}{"user_id": user.Id, "provider_name": authprovidermodel.GoogleAuthProvider}
-		provider, _ := s.authProviderService.SearchOne(ctx, condFindWithUserId)
+		provider, _ := s.authProviderService.SearchOneTrace(ctx, condFindWithUserId)
 
 		if provider == nil {
-			s.authProviderService.Create(ctx, &authprovidermodel.AuthProviderCreate{
+			s.authProviderService.CreateTrace(ctx, &authprovidermodel.AuthProviderCreate{
 				UserId:       user.Id,
 				ProviderName: authprovidermodel.GoogleAuthProvider,
 				ProviderId:   googleUser.Id,
