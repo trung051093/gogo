@@ -218,21 +218,18 @@ func (s *authService) GoogleValidate(ctx context.Context, code string) (*authpro
 	condFindWithEmail := map[string]interface{}{"email": googleUser.Email}
 	user, err := s.userService.SearchUserTrace(ctx, condFindWithEmail)
 
-	// if user is not exist, we should create the user and auth provider
+	// if user is not exist, we should create the user
 	if err != nil || user == nil {
+		// random password
+		password := s.hashService.GenerateRandomString(s.config.JWT.PasswordSaltLength)
+		passwordSalt, hashPassword := s.hashService.HashPassword(password, passwordSalt)
 		userId, err := s.userService.CreateUserTrace(ctx, &usermodel.UserCreate{
-			Email:     googleUser.Email,
-			FirstName: googleUser.GivenName,
-			LastName:  googleUser.FamilyName,
-			Password:  s.hashService.GenerateRandomString(15), // random password
+			Email:        googleUser.Email,
+			FirstName:    googleUser.GivenName,
+			LastName:     googleUser.FamilyName,
+			Password:     hashPassword,
+			PasswordSalt: passwordSalt,
 		})
-
-		s.authProviderService.Create(ctx, &authprovidermodel.AuthProviderCreate{
-			UserId:       userId,
-			ProviderName: authprovidermodel.GoogleAuthProvider,
-			ProviderId:   googleUser.Id,
-		})
-
 		if err != nil {
 			return nil, err
 		}
@@ -241,16 +238,19 @@ func (s *authService) GoogleValidate(ctx context.Context, code string) (*authpro
 		if err != nil {
 			return nil, err
 		}
-	} else {
-		condFindWithUserId := map[string]interface{}{"user_id": user.Id, "provider_name": authprovidermodel.GoogleAuthProvider}
-		provider, _ := s.authProviderService.SearchOneTrace(ctx, condFindWithUserId)
+	}
 
-		if provider == nil {
-			s.authProviderService.CreateTrace(ctx, &authprovidermodel.AuthProviderCreate{
-				UserId:       user.Id,
-				ProviderName: authprovidermodel.GoogleAuthProvider,
-				ProviderId:   googleUser.Id,
-			})
+	condFindProviderWithUserId := map[string]interface{}{"user_id": user.Id, "provider_name": authprovidermodel.GoogleAuthProvider}
+	provider, _ := s.authProviderService.SearchOneTrace(ctx, condFindProviderWithUserId)
+
+	if provider == nil {
+		_, err = s.authProviderService.CreateTrace(ctx, &authprovidermodel.AuthProviderCreate{
+			UserId:       user.Id,
+			ProviderName: authprovidermodel.GoogleAuthProvider,
+			ProviderId:   googleUser.Id,
+		})
+		if err != nil {
+			return nil, err
 		}
 	}
 
