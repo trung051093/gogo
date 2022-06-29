@@ -36,7 +36,12 @@ func main() {
 		ctx,
 		func(d rabbitmq.Delivery) rabbitmq.Action {
 			log.Printf("Received a message: %v", string(d.Body))
-			dataIndex, dataByte, err := common.MessageToDataIndex(d.Body)
+			var dataIndex common.DataIndex
+			if err := dataIndex.FromByte(d.Body); err != nil {
+				log.Println("Error message: ", err)
+				return rabbitmq.NackRequeue
+			}
+			dataByte, err := dataIndex.GetByte()
 			if err != nil {
 				log.Println("Error message: ", err)
 				return rabbitmq.NackRequeue

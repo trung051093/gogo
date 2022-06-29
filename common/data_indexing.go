@@ -1,6 +1,7 @@
 package common
 
 import (
+	"bytes"
 	"encoding/json"
 	"time"
 )
@@ -21,15 +22,19 @@ type DataIndex struct {
 	SendTime time.Time
 }
 
-// this function to help normalize message to data index
-func MessageToDataIndex(msg []byte) (*DataIndex, []byte, error) {
-	var dataIndex *DataIndex
-	if err := json.Unmarshal(msg, &dataIndex); err != nil {
-		return nil, nil, err
+// normalize message to data index
+func (d *DataIndex) GetByte() ([]byte, error) {
+	reqBodyBytes := new(bytes.Buffer)
+	if err := json.NewEncoder(reqBodyBytes).Encode(d); err != nil {
+		return nil, err
 	}
-	dataByte, dataErr := json.Marshal(dataIndex.Data)
-	if dataErr != nil {
-		return nil, nil, dataErr
+	return reqBodyBytes.Bytes(), nil
+}
+
+// normalize message to data index
+func (d *DataIndex) FromByte(msg []byte) error {
+	if err := json.Unmarshal(msg, d); err != nil {
+		return err
 	}
-	return dataIndex, dataByte, nil
+	return nil
 }
