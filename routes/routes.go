@@ -20,7 +20,8 @@ func MainRoutes(appCtx appctx.AppContext, router *gin.Engine) {
 		v1.PATCH("/user/:id", user.UpdateUserHandler(appCtx))
 		v1.DELETE("/user/:id", user.DeleteUserHandler(appCtx))
 		v1.GET("/user/:id", user.GetUserHandler(appCtx))
-		v1.GET("/users", decorator.CacheRequest(appCtx, "user", 1*time.Minute)(user.ListUserHandler))
+		v1.GET("/users", user.ListUserHandler(appCtx))
+		v1.GET("/users-cache", decorator.CacheRequest(appCtx, "user", time.Minute)(user.ListUserHandler))
 		v1.GET("/user/search", user.SearchUserHandler(appCtx))
 
 		// authentication
