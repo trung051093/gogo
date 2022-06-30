@@ -20,7 +20,7 @@ type jaegerService struct {
 	exporter *jaeger.Exporter
 }
 
-func NewExporter(config *JaegerConfig) *jaegerService {
+func NewExporter(config JaegerConfig) JaegerService {
 	je, err := jaeger.NewExporter(jaeger.Options{
 		AgentEndpoint: config.AgentEndpoint,
 		Process:       jaeger.Process{ServiceName: config.ServiceName},

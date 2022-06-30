@@ -30,19 +30,18 @@ type elasticSearchSevice struct {
 
 var ElasticSearchServiceKey key = "ElasticSearchService"
 var once sync.Once
-var instance *elasticSearchSevice
+var instance ElasticSearchSevice
 var instanceErr error
 
-func NewEsService(config *elasticsearch.Config) (*elasticSearchSevice, error) {
-	client, err := elasticsearch.NewClient(*config)
+func NewEsService(config elasticsearch.Config) (ElasticSearchSevice, error) {
+	client, err := elasticsearch.NewClient(config)
 	if err != nil {
 		log.Printf("Error creating the client: %s", err)
 	}
 	return &elasticSearchSevice{client: client}, nil
 }
 
-// singleton
-func GetIntance(config *elasticsearch.Config) (*elasticSearchSevice, error) {
+func GetIntance(config elasticsearch.Config) (ElasticSearchSevice, error) {
 	once.Do(func() {
 		service, instanceErr := NewEsService(config)
 		if instanceErr != nil {

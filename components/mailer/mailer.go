@@ -27,10 +27,10 @@ type MailConfig struct {
 }
 
 type mailService struct {
-	config *MailConfig
+	config MailConfig
 }
 
-func NewMailer(config *MailConfig) *mailService {
+func NewMailer(config MailConfig) MailService {
 	return &mailService{config: config}
 }
 

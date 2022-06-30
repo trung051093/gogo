@@ -22,7 +22,7 @@ type hashService struct{}
 
 var letters = []byte("1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
 
-func NewHashService() *hashService {
+func NewHashService() HashService {
 	return &hashService{}
 }
 
