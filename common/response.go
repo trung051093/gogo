@@ -10,10 +10,10 @@ type ResponsePagination struct {
 	Filter     interface{} `json:"filter"`
 }
 
-func SuccessResponse(data interface{}) *Response {
-	return &Response{Data: data}
+func SuccessResponse(data interface{}) Response {
+	return Response{Data: data}
 }
 
-func SuccessResponsePagination(data interface{}, paging *Pagination, filter interface{}) *ResponsePagination {
-	return &ResponsePagination{Data: data, Pagination: paging, Filter: filter}
+func SuccessResponsePagination(data interface{}, paging *Pagination, filter interface{}) ResponsePagination {
+	return ResponsePagination{Data: data, Pagination: paging, Filter: filter}
 }
