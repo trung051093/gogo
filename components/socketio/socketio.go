@@ -78,9 +78,9 @@ func WithContext(ctx context.Context, socketService SocketService) context.Conte
 	return context.WithValue(ctx, SocketServiceKey, socketService)
 }
 
-func FromContext(ctx context.Context) (*socketService, bool) {
+func FromContext(ctx context.Context) (SocketService, bool) {
 	socketServiceCtx := ctx.Value(SocketServiceKey)
-	if so, ok := socketServiceCtx.(*socketService); ok {
+	if so, ok := socketServiceCtx.(SocketService); ok {
 		return so, true
 	}
 	return nil, false

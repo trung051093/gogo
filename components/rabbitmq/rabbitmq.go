@@ -74,9 +74,9 @@ func WithContext(ctx context.Context, rabbitmq RabbitmqSerivce) context.Context 
 	return context.WithValue(ctx, RabbitMQServiceKey, rabbitmq)
 }
 
-func FromContext(ctx context.Context) (*rabbitmqSerivce, bool) {
+func FromContext(ctx context.Context) (RabbitmqSerivce, bool) {
 	rabbitmqService := ctx.Value(RabbitMQServiceKey)
-	if es, ok := rabbitmqService.(*rabbitmqSerivce); ok {
+	if es, ok := rabbitmqService.(RabbitmqSerivce); ok {
 		return es, true
 	}
 	return nil, false

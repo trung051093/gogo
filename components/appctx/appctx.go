@@ -80,9 +80,9 @@ func WithContext(ctx context.Context, appCtx AppContext) context.Context {
 	return context.WithValue(ctx, AppContextKey, appCtx)
 }
 
-func FromContext(ctx context.Context) (*appContext, bool) {
+func FromContext(ctx context.Context) (AppContext, bool) {
 	appCtx := ctx.Value(AppContextKey)
-	if c, ok := appCtx.(*appContext); ok {
+	if c, ok := appCtx.(AppContext); ok {
 		return c, true
 	}
 	return nil, false

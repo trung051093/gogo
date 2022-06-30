@@ -57,9 +57,9 @@ func WithContext(ctx context.Context, es ElasticSearchSevice) context.Context {
 	return context.WithValue(ctx, ElasticSearchServiceKey, es)
 }
 
-func FromContext(ctx context.Context) (*elasticSearchSevice, bool) {
+func FromContext(ctx context.Context) (ElasticSearchSevice, bool) {
 	esService := ctx.Value(ElasticSearchServiceKey)
-	if es, ok := esService.(*elasticSearchSevice); ok {
+	if es, ok := esService.(ElasticSearchSevice); ok {
 		return es, true
 	}
 	return nil, false
