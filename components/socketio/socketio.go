@@ -48,7 +48,7 @@ type key string
 
 var SocketServiceKey key = "SocketServiceKey"
 
-func NewSocketProvider(optionsFunc ...func(*SocketOptions)) *socketService {
+func NewSocketProvider(optionsFunc ...func(*SocketOptions)) SocketService {
 	provider := &socketService{}
 	options := provider.handlerOptions(optionsFunc...)
 

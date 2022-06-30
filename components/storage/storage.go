@@ -13,6 +13,7 @@ import (
 )
 
 type StorageService interface {
+	CreateBucket(ctx context.Context, bucketName string, location string) error
 	FGetObject(ctx context.Context, bucketName string, objectName string, filePath string, options minio.GetObjectOptions) error
 	FPutObject(ctx context.Context, bucketName string, objectName string, fileName string, option minio.PutObjectOptions) (info minio.UploadInfo, err error)
 	PresignedPutObject(ctx context.Context, bucketName string, objectName string, expires time.Duration) (*url.URL, error)
@@ -33,7 +34,7 @@ type storageService struct {
 	client *minio.Client
 }
 
-func NewStorage(config *StorageConfig) (*storageService, error) {
+func NewStorage(config StorageConfig) (StorageService, error) {
 	client, err := minio.New(config.Endpoint, &minio.Options{
 		Creds:  credentials.NewStaticV2(config.AccessKeyID, config.SecretAccessKey, ""),
 		Secure: config.UseSSL,

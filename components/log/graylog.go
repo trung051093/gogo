@@ -15,7 +15,7 @@ type GraylogConfig struct {
 	Key  string
 }
 
-func Integrate(config *GraylogConfig) {
+func Integrate(config GraylogConfig) {
 	hostname, _ := os.Hostname()
 	logger := logrus.New()
 
