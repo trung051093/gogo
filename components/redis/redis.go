@@ -9,7 +9,6 @@ import (
 )
 
 type RedisService interface {
-	GetClient() *redis.Client
 	SetValue(ctx context.Context, key string, value string, tls time.Duration) (string, error)
 	DelValue(ctx context.Context, keys ...string) (int64, error)
 	GetObjValue(ctx context.Context, key string, data interface{}) error
@@ -17,12 +16,13 @@ type RedisService interface {
 }
 
 type redisService struct {
+	config *redis.Options
 	client *redis.Client
 }
 
-func NewRedisService(config redis.Options) RedisService {
-	client := redis.NewClient(&config)
-	return &redisService{client: client}
+func NewRedisService(config *redis.Options) *redisService {
+	client := redis.NewClient(config)
+	return &redisService{client: client, config: config}
 }
 
 func (r *redisService) SetValue(ctx context.Context, key string, value string, tls time.Duration) (string, error) {

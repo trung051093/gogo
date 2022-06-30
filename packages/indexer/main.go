@@ -20,7 +20,7 @@ func main() {
 	ctx := context.Background()
 
 	configEs := config.GetElasticSearchConfig()
-	esService, esErr := esprovider.NewEsService(&configEs)
+	esService, esErr := esprovider.NewEsService(configEs)
 	if esErr != nil {
 		return
 	}

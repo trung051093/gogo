@@ -8,7 +8,7 @@ import (
 )
 
 type DBProvider interface {
-	GetDBConnection() *gorm.DB
+	GetDBConnection()
 }
 
 type DBConfig struct {
@@ -31,7 +31,7 @@ type dbprovider struct {
 	db     *gorm.DB
 }
 
-func NewDBProvider(config *DBConfig, optionsFunc ...func(*dbOptions)) (DBProvider, error) {
+func NewDBProvider(config *DBConfig, optionsFunc ...func(*dbOptions)) (*dbprovider, error) {
 	provider := &dbprovider{}
 
 	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%d sslmode=%s TimeZone=%s",

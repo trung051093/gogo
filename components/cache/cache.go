@@ -25,7 +25,7 @@ type cacheService struct {
 	mycache *cache.Cache
 }
 
-func NewCacheService(client *redis.Client) CacheService {
+func NewCacheService(client *redis.Client) *cacheService {
 	mycache := cache.New(&cache.Options{
 		Redis:      client,
 		LocalCache: cache.NewTinyLFU(1000, time.Minute),

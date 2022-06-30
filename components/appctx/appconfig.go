@@ -134,8 +134,8 @@ func GetConfig() *Config {
 	return &cfg
 }
 
-func (cfg *Config) GetRabbitMQConfig() rabbitmqprovider.RabbitmqConfig {
-	return rabbitmqprovider.RabbitmqConfig{
+func (cfg *Config) GetRabbitMQConfig() *rabbitmqprovider.RabbitmqConfig {
+	return &rabbitmqprovider.RabbitmqConfig{
 		Host: cfg.RabbitMQ.Host,
 		Port: cfg.RabbitMQ.Port,
 		User: cfg.RabbitMQ.Username,
@@ -143,24 +143,24 @@ func (cfg *Config) GetRabbitMQConfig() rabbitmqprovider.RabbitmqConfig {
 	}
 }
 
-func (cfg *Config) GetElasticSearchConfig() es.Config {
-	return es.Config{
+func (cfg *Config) GetElasticSearchConfig() *es.Config {
+	return &es.Config{
 		Addresses: []string{cfg.ElasticSearch.Host},
 		Username:  cfg.ElasticSearch.Username,
 		Password:  cfg.ElasticSearch.Password,
 	}
 }
 
-func (cfg *Config) GetRedisConfig() redis.Options {
-	return redis.Options{
+func (cfg *Config) GetRedisConfig() *redis.Options {
+	return &redis.Options{
 		Addr:     fmt.Sprintf("%s:%d", cfg.Redis.Host, cfg.Redis.Port),
 		Password: cfg.Redis.Password,
 		DB:       cfg.Redis.DB,
 	}
 }
 
-func (cfg *Config) GetStorageConfig() storageprovider.StorageConfig {
-	return storageprovider.StorageConfig{
+func (cfg *Config) GetStorageConfig() *storageprovider.StorageConfig {
+	return &storageprovider.StorageConfig{
 		Endpoint:        fmt.Sprintf("%s:%d", cfg.Minio.Host, cfg.Minio.Port),
 		AccessKeyID:     cfg.Minio.AccessKeyID,
 		SecretAccessKey: cfg.Minio.SecretAccessKey,
@@ -169,24 +169,24 @@ func (cfg *Config) GetStorageConfig() storageprovider.StorageConfig {
 	}
 }
 
-func (cfg *Config) GetJaegerConfig() jaegerprovider.JaegerConfig {
-	return jaegerprovider.JaegerConfig{
+func (cfg *Config) GetJaegerConfig() *jaegerprovider.JaegerConfig {
+	return &jaegerprovider.JaegerConfig{
 		ServiceName:       cfg.Jaeger.ServiceName,
 		AgentEndpoint:     cfg.Jaeger.AgentEndpoint,
 		CollectorEndpoint: cfg.Jaeger.CollectorEndpoint,
 	}
 }
 
-func (cfg *Config) GetGraylogConfig() graylog.GraylogConfig {
-	return graylog.GraylogConfig{
+func (cfg *Config) GetGraylogConfig() *graylog.GraylogConfig {
+	return &graylog.GraylogConfig{
 		Host: cfg.Graylog.Host,
 		Port: cfg.Graylog.Port,
 		Key:  cfg.Graylog.Key,
 	}
 }
 
-func (cfg *Config) GetSwaggerConfig() common.SwaggerInfo {
-	return common.SwaggerInfo{
+func (cfg *Config) GetSwaggerConfig() *common.SwaggerInfo {
+	return &common.SwaggerInfo{
 		Host:        cfg.Swagger.Host,
 		Title:       cfg.Swagger.Title,
 		Description: cfg.Swagger.Description,
@@ -196,8 +196,8 @@ func (cfg *Config) GetSwaggerConfig() common.SwaggerInfo {
 	}
 }
 
-func (cfg *Config) GetMailConfig() mailer.MailConfig {
-	return mailer.MailConfig{
+func (cfg *Config) GetMailConfig() *mailer.MailConfig {
+	return &mailer.MailConfig{
 		Sender:   cfg.Mail.Sender,
 		Host:     cfg.Mail.Host,
 		Port:     cfg.Mail.Port,

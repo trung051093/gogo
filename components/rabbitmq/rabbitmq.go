@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"sync"
 	"time"
 
 	"github.com/wagslane/go-rabbitmq"
@@ -36,8 +37,11 @@ type rabbitmqSerivce struct {
 type key string
 
 var RabbitMQServiceKey key = "RabbitMQService"
+var once sync.Once
+var instance *rabbitmqSerivce
+var instanceErr error
 
-func NewRabbitMQ(config RabbitmqConfig) (RabbitmqSerivce, error) {
+func NewRabbitMQ(config *RabbitmqConfig) (*rabbitmqSerivce, error) {
 	connStr := fmt.Sprintf("amqp://%s:%s@%s:%d/", config.User, config.Pass, config.Host, config.Port)
 	consumer, err := rabbitmq.NewConsumer(
 		connStr,
@@ -68,6 +72,19 @@ func NewRabbitMQ(config RabbitmqConfig) (RabbitmqSerivce, error) {
 	rabbitmqSerivce.options = options
 
 	return rabbitmqSerivce, nil
+}
+
+// singleton
+func GetIntance(config *RabbitmqConfig) (*rabbitmqSerivce, error) {
+	once.Do(func() {
+		service, instanceErr := NewRabbitMQ(config)
+		if instanceErr != nil {
+			return
+		}
+		instanceErr = nil
+		instance = service
+	})
+	return instance, instanceErr
 }
 
 func WithContext(ctx context.Context, rabbitmq RabbitmqSerivce) context.Context {
