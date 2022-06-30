@@ -12,7 +12,7 @@ type RedisService interface {
 	GetClient() *redis.Client
 	SetValue(ctx context.Context, key string, value string, tls time.Duration) (string, error)
 	DelValue(ctx context.Context, keys ...string) (int64, error)
-	GetObjValue(ctx context.Context, key string, data interface{}) error
+	GetObjValue(ctx context.Context, key string, data *interface{}) error
 	GetStringValue(ctx context.Context, key string) (string, error)
 }
 
@@ -33,7 +33,7 @@ func (r *redisService) DelValue(ctx context.Context, keys ...string) (int64, err
 	return r.client.Del(ctx, keys...).Result()
 }
 
-func (r *redisService) GetObjValue(ctx context.Context, key string, data interface{}) error {
+func (r *redisService) GetObjValue(ctx context.Context, key string, data *interface{}) error {
 	str, geterr := r.client.Get(ctx, key).Result()
 	if geterr != nil {
 		return geterr
