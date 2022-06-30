@@ -80,20 +80,36 @@ Require: RabbitMQ, Postgres, ElasticSearch
 go run ./packages/rest_api/main.go
 ```
 
-## Load test:
-[Wrk](https://github.com/wg/wrk)
+## Load test: [Wrk](https://github.com/wg/wrk)
 
+### Cache 
 ```bash
-wrk -t6 -c200 -d30s https://api.tdo.works/api/v1/users
+wrk -t6 -c100 -d15s https://api.tdo.works/api/v1/users-cache
 ```
 
 ```bash
-Running 30s test @ https://api.tdo.works/api/v1/users
-  6 threads and 200 connections
-  Thread Stats   Avg      Stdev     Max   +/Stdev
-    Latency   242.63ms   94.15ms 805.17ms   88.87%
-    Req/Sec   137.92     58.51   316.00     70.20%
-  24025 requests in 30.08s, 49.76MB read
-Requests/sec:    798.62
-Transfer/sec:      1.65MB
+Running 15s test @ https://api.tdo.works/api/v1/users-cache
+  6 threads and 100 connections
+  Thread Stats   Avg      Stdev     Max   +/- Stdev
+    Latency   227.11ms   17.19ms 318.56ms   76.39%
+    Req/Sec    70.48     21.42   141.00     73.44%
+  6044 requests in 15.10s, 13.25MB read
+Requests/sec:    400.35
+Transfer/sec:      0.88MB
+```
+
+### No Cache 
+```bash
+wrk -t6 -c100 -d15s https://api.tdo.works/api/v1/users
+```
+
+```bash
+Running 15s test @ https://api.tdo.works/api/v1/users
+  6 threads and 100 connections
+  Thread Stats   Avg      Stdev     Max   +/- Stdev
+    Latency   581.02ms  217.44ms   1.56s    68.91%
+    Req/Sec    27.78     15.62    89.00     65.57%
+  2304 requests in 15.03s, 5.05MB read
+Requests/sec:    153.25
+Transfer/sec:    343.92KB
 ```
