@@ -35,7 +35,7 @@ func JsonToString[T any](data T) (string, error) {
 	return "", errors.New("invalid json string")
 }
 
-func StringToJson[T any](str string, data *T) error {
+func StringToJson[T any](str string, data T) error {
 	if err := json.Unmarshal([]byte(str), data); err != nil {
 		return err
 	}
