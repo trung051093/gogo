@@ -26,7 +26,6 @@ pass: anonymous
 
 ```bash
 go mod download
-go mod tidy
 ```
 
 # Running with docker compose
