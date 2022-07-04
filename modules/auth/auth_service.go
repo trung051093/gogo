@@ -3,7 +3,6 @@ package auth
 import (
 	"context"
 	"errors"
-	"fmt"
 	"gogo/common"
 	"gogo/components/appctx"
 	cacheprovider "gogo/components/cache"
@@ -15,6 +14,7 @@ import (
 	jwtauthprovider "gogo/modules/auth_provider/jwt"
 	authprovidermodel "gogo/modules/auth_provider/model"
 	usermodel "gogo/modules/user/model"
+	"net/url"
 	"strconv"
 
 	"gogo/modules/user"
@@ -154,15 +154,28 @@ func (s *authService) ForgotPassword(ctx context.Context, payload *authmodel.Aut
 		return -1, common.ErrorCannotFoundEntity(usermodel.EntityName, err)
 	}
 
-	key := s.getCacheKey(ctx, ForgotPasswordToken, strconv.Itoa(user.Id))
+	key := s.getCacheKey(ctx, ForgotPasswordToken, strconv.Itoa(user.Id), user.Email)
 	resetPasswordToken := s.hashService.GenerateRandomString(15)
-	s.setSession(ctx, key, resetPasswordToken, s.config.JWT.ExpireDays)
+	s.setSession(ctx, key, map[string]string{
+		"token": resetPasswordToken,
+		"email": user.Email,
+	}, s.config.JWT.ExpireDays)
+
+	resetPasswordUri, resetPasswordUriErr := url.Parse(payload.ForgotPasswordUri)
+	if resetPasswordUriErr != nil {
+		panic(common.ErrorInvalidRequest("google auth invalid redirect uri", err))
+	}
+
+	q := resetPasswordUri.Query()
+	q.Set("token", resetPasswordToken)
+	q.Set("email", user.Email)
+	resetPasswordUri.RawQuery = q.Encode()
 
 	go s.mailService.SendMail(mailer.Mail{
 		Sender:  s.config.Mail.Sender,
 		To:      []string{user.Email},
 		Subject: "Forgot Password",
-		Body:    fmt.Sprintf("%s?token=%s", payload.ForgotPasswordUri, resetPasswordToken),
+		Body:    resetPasswordUri.String(),
 	})
 
 	return user.Id, nil
@@ -175,15 +188,22 @@ func (s *authService) ResetPassword(ctx context.Context, payload *authmodel.Auth
 		return -1, common.ErrorCannotFoundEntity(usermodel.EntityName, err)
 	}
 
-	// validate token
-	key := s.getCacheKey(ctx, ForgotPasswordToken, strconv.Itoa(user.Id))
-	resetPasswordToken, tokenErr := s.getSession(ctx, key)
+	// validate token, alway get key from payload email to avoid hack.
+	key := s.getCacheKey(ctx, ForgotPasswordToken, strconv.Itoa(user.Id), payload.Email)
+	session, tokenErr := s.getSession(ctx, key)
 	if tokenErr != nil {
 		return -1, common.ErrorNotFound("forgot password token", tokenErr)
 	}
 
-	if resetPasswordToken.(string) != payload.Token {
+	token := session.(map[string]interface{})["token"].(string)
+	email := session.(map[string]interface{})["email"].(string)
+
+	if token != payload.Token {
 		return -1, common.ErrorInvalidRequest("token is invalid", errors.New("forgot password token is invalid"))
+	}
+
+	if user.Email != email {
+		return -1, common.ErrorInvalidRequest("email is invalid", errors.New("email is invalid"))
 	}
 
 	passwordSalt := s.hashService.GenerateRandomString(s.config.JWT.PasswordSaltLength)

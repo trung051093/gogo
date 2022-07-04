@@ -185,15 +185,15 @@ func ResetPasswordUserHandler(appCtx appctx.AppContext) func(*gin.Context) {
 // @Tags         auth
 // @Accept       json
 // @Produce      json
-// @Param        redirect      query     string                                                                                                        false   "redirect"
+// @Param        redirectUri      query     string                                                                                                        false   "redirect"
 // @Success      307
 // @Failure      400   {object}  common.AppError
 // @Router       /api/v1/auth/google/login [get]
 func GoogleLoginUserHandler(appCtx appctx.AppContext) func(*gin.Context) {
 	return func(ginCtx *gin.Context) {
-		redirect := ginCtx.Query("redirect")
+		redirectUri := ginCtx.Query("redirectUri")
 		authService := NewAuthServiceFromContext(appCtx)
-		url := authService.GoogleLogin(ginCtx.Request.Context(), redirect)
+		url := authService.GoogleLogin(ginCtx.Request.Context(), redirectUri)
 		ginCtx.Redirect(http.StatusTemporaryRedirect, url)
 	}
 }
