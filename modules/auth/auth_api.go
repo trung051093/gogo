@@ -191,10 +191,7 @@ func ResetPasswordUserHandler(appCtx appctx.AppContext) func(*gin.Context) {
 // @Router       /api/v1/auth/google/login [get]
 func GoogleLoginUserHandler(appCtx appctx.AppContext) func(*gin.Context) {
 	return func(ginCtx *gin.Context) {
-		var redirect string
-		if err := ginCtx.ShouldBind(&redirect); err != nil {
-			panic(common.ErrorInvalidRequest("redirect", err))
-		}
+		redirect := ginCtx.Query("redirect")
 		authService := NewAuthServiceFromContext(appCtx)
 		url := authService.GoogleLogin(ginCtx.Request.Context(), redirect)
 		ginCtx.Redirect(http.StatusTemporaryRedirect, url)
@@ -241,6 +238,6 @@ func GoogleCallbackUserHandler(appCtx appctx.AppContext) func(*gin.Context) {
 
 		authService.deleteKey(ctx, key)
 
-		ginCtx.JSON(http.StatusOK, redirectUri.RequestURI())
+		ginCtx.Redirect(http.StatusTemporaryRedirect, redirectUri.String())
 	}
 }
