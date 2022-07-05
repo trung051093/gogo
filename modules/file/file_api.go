@@ -70,7 +70,7 @@ func GetUploadPresignedUrl(appCtx appctx.AppContext) func(*gin.Context) {
 			publicUrl = proxy
 		}
 		res := &filemodel.PresignedPostObject{
-			Url:    fmt.Sprintf("%s/%s/", publicUrl, common.ImageBucket),
+			Url:    fmt.Sprintf("%s/%s", publicUrl, common.ImageBucket),
 			Fields: formData,
 		}
 
