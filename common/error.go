@@ -167,9 +167,9 @@ func ErrorEntityDeleted(entity string, err error) *AppError {
 	)
 }
 
-func ErrorUnauthorized() *AppError {
+func ErrorUnauthorized(err error) *AppError {
 	return NewUnauthorized(
-		errors.New("Unauthorized"),
+		err,
 		"Unauthorized",
 		"UNAUTHORIZED",
 	)

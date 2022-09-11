@@ -1,7 +1,7 @@
 package jwtauthprovider
 
 import (
-	"gogo/common"
+	"errors"
 	authmodelprovider "gogo/modules/auth_provider/model"
 	"time"
 
@@ -51,8 +51,13 @@ func (jwtP *jwtProvider) Validate(token string) (*authmodelprovider.TokenPayload
 	jwtToken, err := jwt.ParseWithClaims(token, claims, func(token *jwt.Token) (interface{}, error) {
 		return []byte(jwtP.secret), nil
 	})
-	if err != nil || !jwtToken.Valid {
-		return nil, common.ErrorUnauthorized()
+	if err != nil {
+		return nil, err
 	}
+
+	if !jwtToken.Valid {
+		return nil, errors.New("token invalid")
+	}
+
 	return &claims.Payload, nil
 }
