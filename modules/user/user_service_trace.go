@@ -8,7 +8,7 @@ import (
 	usermodel "gogo/modules/user/model"
 )
 
-func (s *userService) SearchUsersTrace(ctx context.Context, cond map[string]interface{}, f *usermodel.UserFilter, p *common.Pagination) ([]usermodel.User, error) {
+func (s *userService) SearchUsersTrace(ctx context.Context, cond map[string]interface{}, f *usermodel.UserFilter, p *common.PagePagination) ([]usermodel.User, error) {
 	data, err := decorator.TraceService[[]usermodel.User](ctx, "userService.SearchUsers")(s, "SearchUsers")(ctx, cond, f, p)
 	return data, err
 }
@@ -38,7 +38,7 @@ func (s *userService) DeleteUserTrace(ctx context.Context, id int) (int, error) 
 	return data, err
 }
 
-func (s *userService) EsSearchTrace(ctx context.Context, query string, lastIndex string, f *usermodel.UserFilter, p *common.Pagination) (*elasticsearchmodel.SearchResults, error) {
+func (s *userService) EsSearchTrace(ctx context.Context, query string, lastIndex string, f *usermodel.UserFilter, p *common.PagePagination) (*elasticsearchmodel.SearchResults, error) {
 	data, err := decorator.TraceService[*elasticsearchmodel.SearchResults](ctx, "userService.EsSearch")(s, "EsSearch")(ctx, query, lastIndex, f, p)
 	return data, err
 }

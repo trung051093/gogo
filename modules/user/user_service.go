@@ -20,7 +20,7 @@ func NewUserService(repo UserRepository, esService esprovider.ElasticSearchSevic
 	}
 }
 
-func (s *userService) SearchUsers(ctx context.Context, cond map[string]interface{}, f *usermodel.UserFilter, p *common.Pagination) ([]usermodel.User, error) {
+func (s *userService) SearchUsers(ctx context.Context, cond map[string]interface{}, f *usermodel.UserFilter, p *common.PagePagination) ([]usermodel.User, error) {
 	return s.repo.Search(ctx, cond, f, p)
 }
 
@@ -53,7 +53,7 @@ func (s *userService) DeleteUser(ctx context.Context, id int) (int, error) {
 	return s.repo.Delete(ctx, user)
 }
 
-func (s *userService) EsSearch(ctx context.Context, query string, lastIndex string, f *usermodel.UserFilter, p *common.Pagination) (*elasticsearchmodel.SearchResults, error) {
+func (s *userService) EsSearch(ctx context.Context, query string, lastIndex string, f *usermodel.UserFilter, p *common.PagePagination) (*elasticsearchmodel.SearchResults, error) {
 	userEsQuery := &usermodel.UserEsQuery{
 		Query:     query,
 		LastIndex: lastIndex,

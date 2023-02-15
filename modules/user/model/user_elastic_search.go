@@ -15,7 +15,7 @@ type UserEsSearchResult struct {
 type UserEsQuery struct {
 	Query     string
 	LastIndex string // for pagination
-	Paging    *common.Pagination
+	Paging    *common.PagePagination
 	Filter    *UserFilter
 }
 

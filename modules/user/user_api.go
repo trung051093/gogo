@@ -148,13 +148,13 @@ func GetUserHandler(appCtx appctx.AppContext) func(*gin.Context) {
 // @Param        limit      query     int                                                                                                        true   "limit"
 // @Param        sortField  query     string                                                                                                     false  "sort by field"
 // @Param        sortName   query     string                                                                                                     false  "sort by field"
-// @Success      200        {object}  common.ResponsePagination{data=[]usermodel.User,pagination=common.Pagination,filter=usermodel.UserFilter}  "desc"
+// @Success      200        {object}  common.ResponsePagination{data=[]usermodel.User,pagination=common.PagePagination,filter=usermodel.UserFilter}  "desc"
 // @Failure      400  {object}  common.AppError
 // @Router       /api/v1/users [get]
 func ListUserHandler(appCtx appctx.AppContext) func(*gin.Context) {
 	return func(ginCtx *gin.Context) {
 		filter := &usermodel.UserFilter{}
-		paging := &common.Pagination{}
+		paging := &common.PagePagination{}
 
 		filter.SortField = ginCtx.Query("sortField")
 		filter.SortName = ginCtx.Query("sortName")
@@ -244,7 +244,7 @@ func DeleteUserHandler(appCtx appctx.AppContext) func(*gin.Context) {
 func SearchUserHandler(appCtx appctx.AppContext) func(*gin.Context) {
 	return func(ginCtx *gin.Context) {
 		var filter usermodel.UserFilter
-		var paging common.Pagination
+		var paging common.PagePagination
 
 		query := ginCtx.Query("query")
 		lastIndex := ginCtx.Query("lastIndex")

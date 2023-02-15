@@ -55,7 +55,7 @@ func (r *userRepository) Get(ctx context.Context, id int) (*usermodel.User, erro
 	return user, nil
 }
 
-func (r *userRepository) Search(ctx context.Context, cond map[string]interface{}, filter *usermodel.UserFilter, paging *common.Pagination) ([]usermodel.User, error) {
+func (r *userRepository) Search(ctx context.Context, cond map[string]interface{}, filter *usermodel.UserFilter, paging *common.PagePagination) ([]usermodel.User, error) {
 	var users []usermodel.User
 	order := fmt.Sprintf("%s %s", filter.SortField, filter.SortName)
 	if err := r.db.WithContext(ctx).Model(&usermodel.User{}).Where(cond).Count(&paging.Total).Error; err != nil {
