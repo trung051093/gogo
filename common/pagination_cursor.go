@@ -7,22 +7,13 @@ import (
 	"github.com/pilagod/gorm-cursor-paginator/v2/paginator"
 )
 
-// =====cursor pagination=====
-// default is cursor pagination
 type CursorPagination struct {
 	Paginator *paginator.Paginator `json:"-"`
+	Limit     int                  `json:"limit" query:"limit"`
+	Order     string               `json:"order" query:"order"`
 	Cursor    paginator.Cursor     `json:"cursor"`
-	Limit     int                  `json:"limit"`
-	Total     int64                `json:"total"`
-	Order     string               `json:"-"`
 	Rules     []paginator.Rule     `json:"-"`
-}
-
-func (p *CursorPagination) Paginate() {
-	p.Rules = make([]paginator.Rule, 0)
-	if p.Limit <= 0 || p.Limit >= 100 {
-		p.Limit = DefaultLimit
-	}
+	Total     int64                `json:"total"`
 }
 
 func NewCursorPagination(config *paginator.Config, configRules map[string]paginator.Rule) *CursorPagination {
@@ -48,6 +39,17 @@ func NewCursorPagination(config *paginator.Config, configRules map[string]pagina
 	return p
 }
 
+func (p *CursorPagination) Prepare() {
+	p.Rules = make([]paginator.Rule, 0)
+	if p.Limit <= 0 || p.Limit >= 100 {
+		p.Limit = DefaultLimit
+	}
+}
+
+func (p *CursorPagination) Value() *CursorPagination {
+	return p
+}
+
 func (p *CursorPagination) BuildOrderRule(mapKey map[string]paginator.Rule) {
 	if p.Order != "" {
 		listOrders := strings.Split(p.Order, ",")
@@ -62,7 +64,8 @@ func (p *CursorPagination) BuildOrderRule(mapKey map[string]paginator.Rule) {
 
 func (p *CursorPagination) NewPaginator(config *paginator.Config, configRules map[string]paginator.Rule) *paginator.Paginator {
 	// set default setting and rules
-	p.Paginate()
+	p.Prepare()
+
 	if configRules != nil {
 		p.BuildOrderRule(configRules)
 	}

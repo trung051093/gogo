@@ -1,5 +1,5 @@
 definitions:
-  authmodel.AuthForgotPassword:
+  authmodel.AuthForgotPasswordDto:
     properties:
       email:
         type: string
@@ -9,9 +9,23 @@ definitions:
     - email
     - forgotPasswordUri
     type: object
-  authmodel.AuthLogin:
+  authmodel.AuthLoginDto:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    required:
+    - password
+    - username
+    type: object
+  authmodel.AuthRegisterDto:
     properties:
       email:
+        type: string
+      firstName:
+        type: string
+      lastName:
         type: string
       password:
         type: string
@@ -19,17 +33,7 @@ definitions:
     - email
     - password
     type: object
-  authmodel.AuthRegister:
-    properties:
-      email:
-        type: string
-      password:
-        type: string
-    required:
-    - email
-    - password
-    type: object
-  authmodel.AuthResetPassword:
+  authmodel.AuthResetPasswordDto:
     properties:
       email:
         type: string
@@ -42,7 +46,7 @@ definitions:
     - password
     - token
     type: object
-  authmodel.AuthResponse:
+  authmodel.AuthResponseDto:
     properties:
       created:
         type: integer
@@ -62,14 +66,14 @@ definitions:
       statusCode:
         type: integer
     type: object
-  common.Pagination:
+  common.CursorPagination:
     properties:
+      cursor:
+        $ref: '#/definitions/paginator.Cursor'
       limit:
         type: integer
-      offset:
-        type: integer
-      page:
-        type: integer
+      order:
+        type: string
       total:
         type: integer
     type: object
@@ -81,8 +85,7 @@ definitions:
     properties:
       data: {}
       filter: {}
-      pagination:
-        $ref: '#/definitions/common.Pagination'
+      pagination: {}
     type: object
   filemodel.PresignedPostObject:
     properties:
@@ -93,6 +96,13 @@ definitions:
       url:
         type: string
     type: object
+  paginator.Cursor:
+    properties:
+      after:
+        type: string
+      before:
+        type: string
+    type: object
   usermodel.User:
     properties:
       address:
@@ -101,7 +111,7 @@ definitions:
         type: string
       company:
         type: string
-      createdAt:
+      created_at:
         type: string
       email:
         type: string
@@ -110,19 +120,17 @@ definitions:
       gender:
         type: string
       id:
-        type: integer
-      isActive:
-        type: integer
+        type: string
       lastName:
         type: string
       phoneNumber:
         type: string
       role:
         type: string
-      updatedAt:
+      updated_at:
         type: string
     type: object
-  usermodel.UserCreate:
+  usermodel.UserCreateDto:
     properties:
       address:
         type: string
@@ -130,25 +138,19 @@ definitions:
         type: string
       company:
         type: string
-      createdAt:
-        type: string
       email:
         type: string
       firstName:
         type: string
       gender:
         type: string
-      id:
-        type: integer
-      isActive:
-        type: integer
       lastName:
+        type: string
+      password:
         type: string
       phoneNumber:
         type: string
       role:
-        type: string
-      updatedAt:
         type: string
     required:
     - email
@@ -165,18 +167,7 @@ definitions:
       total:
         type: integer
     type: object
-  usermodel.UserFilter:
-    properties:
-      fields:
-        items:
-          type: string
-        type: array
-      sortField:
-        type: string
-      sortName:
-        type: string
-    type: object
-  usermodel.UserUpdate:
+  usermodel.UserUpdateDto:
     properties:
       address:
         type: string
@@ -184,25 +175,17 @@ definitions:
         type: string
       company:
         type: string
-      createdAt:
-        type: string
       email:
         type: string
       firstName:
         type: string
       gender:
         type: string
-      id:
-        type: integer
-      isActive:
-        type: integer
       lastName:
         type: string
       phoneNumber:
         type: string
       role:
-        type: string
-      updatedAt:
         type: string
     type: object
 info:
@@ -219,7 +202,7 @@ paths:
         name: user
         required: true
         schema:
-          $ref: '#/definitions/authmodel.AuthForgotPassword'
+          $ref: '#/definitions/authmodel.AuthForgotPasswordDto'
       produces:
       - application/json
       responses:
@@ -230,7 +213,7 @@ paths:
             - $ref: '#/definitions/common.Response'
             - properties:
                 data:
-                  type: boolean
+                  type: string
               type: object
         "400":
           description: Bad Request
@@ -240,7 +223,7 @@ paths:
       tags:
       - auth
   /api/v1/auth/google/callback:
-    post:
+    get:
       consumes:
       - application/json
       description: Google callback
@@ -254,7 +237,7 @@ paths:
             - $ref: '#/definitions/common.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/authmodel.AuthResponse'
+                  $ref: '#/definitions/authmodel.AuthResponseDto'
               type: object
         "400":
           description: Bad Request
@@ -264,15 +247,20 @@ paths:
       tags:
       - auth
   /api/v1/auth/google/login:
-    post:
+    get:
       consumes:
       - application/json
       description: Google login
+      parameters:
+      - description: redirect
+        in: query
+        name: redirectUri
+        type: string
       produces:
       - application/json
       responses:
         "307":
-          description: ""
+          description: Temporary Redirect
         "400":
           description: Bad Request
           schema:
@@ -291,7 +279,7 @@ paths:
         name: user
         required: true
         schema:
-          $ref: '#/definitions/authmodel.AuthLogin'
+          $ref: '#/definitions/authmodel.AuthLoginDto'
       produces:
       - application/json
       responses:
@@ -302,7 +290,7 @@ paths:
             - $ref: '#/definitions/common.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/authmodel.AuthResponse'
+                  $ref: '#/definitions/authmodel.AuthResponseDto'
               type: object
         "400":
           description: Bad Request
@@ -326,14 +314,14 @@ paths:
             - $ref: '#/definitions/common.Response'
             - properties:
                 data:
-                  type: boolean
+                  type: string
               type: object
         "400":
           description: Bad Request
           schema:
             $ref: '#/definitions/common.AppError'
       security:
-      - ApiKeyAuth: []
+      - BearerAuth: []
       summary: Logout
       tags:
       - auth
@@ -348,7 +336,7 @@ paths:
         name: user
         required: true
         schema:
-          $ref: '#/definitions/authmodel.AuthRegister'
+          $ref: '#/definitions/authmodel.AuthRegisterDto'
       produces:
       - application/json
       responses:
@@ -359,7 +347,7 @@ paths:
             - $ref: '#/definitions/common.Response'
             - properties:
                 data:
-                  type: integer
+                  type: string
               type: object
         "400":
           description: Bad Request
@@ -379,7 +367,7 @@ paths:
         name: user
         required: true
         schema:
-          $ref: '#/definitions/authmodel.AuthResetPassword'
+          $ref: '#/definitions/authmodel.AuthResetPasswordDto'
       produces:
       - application/json
       responses:
@@ -390,7 +378,7 @@ paths:
             - $ref: '#/definitions/common.Response'
             - properties:
                 data:
-                  type: boolean
+                  type: string
               type: object
         "400":
           description: Bad Request
@@ -449,7 +437,7 @@ paths:
         name: user
         required: true
         schema:
-          $ref: '#/definitions/usermodel.UserCreate'
+          $ref: '#/definitions/usermodel.UserCreateDto'
       produces:
       - application/json
       responses:
@@ -460,12 +448,14 @@ paths:
             - $ref: '#/definitions/common.Response'
             - properties:
                 data:
-                  type: integer
+                  type: string
               type: object
         "400":
           description: Bad Request
           schema:
             $ref: '#/definitions/common.AppError'
+      security:
+      - BearerAuth: []
       summary: Create user
       tags:
       - users
@@ -496,6 +486,8 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/common.AppError'
+      security:
+      - BearerAuth: []
       summary: Delete an user
       tags:
       - users
@@ -525,6 +517,8 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/common.AppError'
+      security:
+      - BearerAuth: []
       summary: Get an user
       tags:
       - users
@@ -538,7 +532,7 @@ paths:
         name: user
         required: true
         schema:
-          $ref: '#/definitions/usermodel.UserUpdate'
+          $ref: '#/definitions/usermodel.UserUpdateDto'
       produces:
       - application/json
       responses:
@@ -549,12 +543,14 @@ paths:
             - $ref: '#/definitions/common.Response'
             - properties:
                 data:
-                  type: boolean
+                  type: string
               type: object
         "400":
           description: Bad Request
           schema:
             $ref: '#/definitions/common.AppError'
+      security:
+      - BearerAuth: []
       summary: Update an user
       tags:
       - users
@@ -568,11 +564,11 @@ paths:
         in: query
         name: query
         required: true
-        type: integer
+        type: string
       - description: lastIndex
         in: query
         name: lastIndex
-        type: integer
+        type: string
       - description: sort by field
         in: query
         name: sortField
@@ -584,7 +580,6 @@ paths:
       - description: User ID
         in: path
         name: id
-        required: true
         type: integer
       produces:
       - application/json
@@ -602,6 +597,8 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/common.AppError'
+      security:
+      - BearerAuth: []
       summary: Search an user
       tags:
       - users
@@ -615,11 +612,14 @@ paths:
         in: query
         name: fields
         type: integer
-      - description: page
+      - description: before cursor
         in: query
-        name: page
-        required: true
-        type: integer
+        name: before
+        type: string
+      - description: after cursor
+        in: query
+        name: after
+        type: string
       - description: limit
         in: query
         name: limit
@@ -646,15 +646,15 @@ paths:
                   items:
                     $ref: '#/definitions/usermodel.User'
                   type: array
-                filter:
-                  $ref: '#/definitions/usermodel.UserFilter'
                 pagination:
-                  $ref: '#/definitions/common.Pagination'
+                  $ref: '#/definitions/common.CursorPagination'
               type: object
         "400":
           description: Bad Request
           schema:
             $ref: '#/definitions/common.AppError'
+      security:
+      - BearerAuth: []
       summary: Get list of user
       tags:
       - users

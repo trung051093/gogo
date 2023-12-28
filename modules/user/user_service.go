@@ -3,63 +3,40 @@ package user
 import (
 	"context"
 	"gogo/common"
+	"gogo/components/appctx"
 	esprovider "gogo/components/elasticsearch"
 	elasticsearchmodel "gogo/components/elasticsearch/model"
 	usermodel "gogo/modules/user/model"
 )
 
+type UserService interface {
+	common.Service[usermodel.User, UserRepository]
+	EsSearch(ctx context.Context, userEsQuery *usermodel.UserEsSearchDto) (*elasticsearchmodel.SearchResults, error)
+}
+
 type userService struct {
-	repo      UserRepository
+	common.Service[usermodel.User, UserRepository]
+	appConfig *appctx.Config
 	esService esprovider.ElasticSearchSevice
 }
 
-func NewUserService(repo UserRepository, esService esprovider.ElasticSearchSevice) UserService {
-	return &userService{
-		repo:      repo,
-		esService: esService,
-	}
+func NewUserService(
+	repo UserRepository,
+	appConfig *appctx.Config,
+	esService esprovider.ElasticSearchSevice,
+) UserService {
+	service := common.NewService[usermodel.User, UserRepository](repo)
+	return &userService{service, appConfig, esService}
 }
 
-func (s *userService) SearchUsers(ctx context.Context, cond map[string]interface{}, f *usermodel.UserFilter, p *common.PagePagination) ([]usermodel.User, error) {
-	return s.repo.Search(ctx, cond, f, p)
+func NewUserServiceWithAppCtx(appCtx appctx.AppContext) UserService {
+	userRepo := NewUserRepository(appCtx.GetMainDBConnection())
+	appConfig := appCtx.GetConfig()
+	esService := appCtx.GetESService()
+	userService := NewUserService(userRepo, appConfig, esService)
+	return userService
 }
 
-func (s *userService) SearchUser(ctx context.Context, cond map[string]interface{}) (*usermodel.User, error) {
-	return s.repo.SearchOne(ctx, cond)
-}
-
-func (s *userService) GetUser(ctx context.Context, id int) (*usermodel.User, error) {
-	return s.repo.Get(ctx, id)
-}
-
-func (s *userService) CreateUser(ctx context.Context, newUser *usermodel.UserCreate) (int, error) {
-	return s.repo.Create(ctx, newUser)
-}
-
-func (s *userService) UpdateUser(ctx context.Context, id int, userUpdate *usermodel.UserUpdate) (int, error) {
-	user, err := s.GetUser(ctx, id)
-	if user == nil || err != nil {
-		return -1, err
-	}
-	userUpdate.Id = user.Id
-	return s.repo.Update(ctx, id, userUpdate)
-}
-
-func (s *userService) DeleteUser(ctx context.Context, id int) (int, error) {
-	user, err := s.GetUser(ctx, id)
-	if user == nil || err != nil {
-		return -1, err
-	}
-	return s.repo.Delete(ctx, user)
-}
-
-func (s *userService) EsSearch(ctx context.Context, query string, lastIndex string, f *usermodel.UserFilter, p *common.PagePagination) (*elasticsearchmodel.SearchResults, error) {
-	userEsQuery := &usermodel.UserEsQuery{
-		Query:     query,
-		LastIndex: lastIndex,
-		Paging:    p,
-		Filter:    f,
-	}
-	esUserQuery := usermodel.GetUserESQuery(ctx, userEsQuery)
-	return s.esService.Search(ctx, usermodel.User{}.TableIndex(), esUserQuery)
+func (s *userService) EsSearch(ctx context.Context, userEsQuery *usermodel.UserEsSearchDto) (*elasticsearchmodel.SearchResults, error) {
+	return s.esService.Search(ctx, usermodel.User{}.TableIndex(), userEsQuery.ToQuery())
 }

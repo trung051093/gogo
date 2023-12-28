@@ -222,7 +222,7 @@ func (es *elasticSearchSevice) Search(ctx context.Context, index string, query s
 	return &results, nil
 }
 
-func BuildQuery(ctx context.Context, query string, after ...string) string {
+func BuildQuery(query string, after ...string) string {
 	var b strings.Builder
 
 	b.WriteString("{\n")

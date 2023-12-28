@@ -1,5 +1,5 @@
 package authmodel
 
-type GoogleLogin struct {
+type GoogleLoginDto struct {
 	Redirect string `validate:"required" json:"redirect"`
 }

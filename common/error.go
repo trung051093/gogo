@@ -1,6 +1,7 @@
 package common
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"log"
@@ -173,4 +174,17 @@ func ErrorUnauthorized(err error) *AppError {
 		"Unauthorized",
 		"UNAUTHORIZED",
 	)
+}
+
+func ThrowErrorIf(ctx context.Context, condition bool, err error) error {
+	if condition {
+		return err
+	}
+	return nil
+}
+
+func PanicErrorIf(ctx context.Context, condition bool, err error) {
+	if condition {
+		panic(err)
+	}
 }

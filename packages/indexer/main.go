@@ -54,7 +54,6 @@ func main() {
 			case common.Delete:
 				esService.Delete(ctx, dataIndex.Index, dataIndex.Id)
 			}
-			// rabbitmq.Ack, rabbitmq.NackDiscard, rabbitmq.NackRequeue
 			return rabbitmq.Ack
 		},
 		common.IndexingQueue,

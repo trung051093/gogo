@@ -1,7 +1,6 @@
 package usermodel
 
 import (
-	"context"
 	"fmt"
 	"gogo/common"
 	esprovider "gogo/components/elasticsearch"
@@ -12,11 +11,10 @@ type UserEsSearchResult struct {
 	elasticsearchmodel.SearchResults
 }
 
-type UserEsQuery struct {
-	Query     string
+type UserEsSearchDto struct {
+	*common.PagePagination
+	Query     string `json:"-" query:"query"`
 	LastIndex string // for pagination
-	Paging    *common.PagePagination
-	Filter    *UserFilter
 }
 
 const ElasticSearchQuery = `
@@ -35,19 +33,15 @@ const ElasticSearchQuery = `
 	}
 },
 "size" : %d,
-"sort" : [ { "%s" : "%s" } ]
 `
 
-func GetUserESQuery(ctx context.Context, userEsQuery *UserEsQuery) string {
+func (userEsQuery *UserEsSearchDto) ToQuery() string {
 	q := fmt.Sprintf(
 		ElasticSearchQuery,
 		userEsQuery.Query,
-		userEsQuery.Paging.Limit,
-		userEsQuery.Filter.SortField,
-		userEsQuery.Filter.SortName,
+		userEsQuery.Limit,
 	)
 	return esprovider.BuildQuery(
-		ctx,
 		q,
 		userEsQuery.LastIndex,
 	)

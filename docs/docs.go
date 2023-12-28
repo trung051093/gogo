@@ -36,7 +36,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/authmodel.AuthForgotPassword"
+                            "$ref": "#/definitions/authmodel.AuthForgotPasswordDto"
                         }
                     }
                 ],
@@ -52,7 +52,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "type": "boolean"
+                                            "type": "string"
                                         }
                                     }
                                 }
@@ -69,7 +69,7 @@ const docTemplate = `{
             }
         },
         "/api/v1/auth/google/callback": {
-            "post": {
+            "get": {
                 "description": "Google callback",
                 "consumes": [
                     "application/json"
@@ -93,7 +93,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/authmodel.AuthResponse"
+                                            "$ref": "#/definitions/authmodel.AuthResponseDto"
                                         }
                                     }
                                 }
@@ -110,7 +110,7 @@ const docTemplate = `{
             }
         },
         "/api/v1/auth/google/login": {
-            "post": {
+            "get": {
                 "description": "Google login",
                 "consumes": [
                     "application/json"
@@ -122,9 +122,17 @@ const docTemplate = `{
                     "auth"
                 ],
                 "summary": "Google login",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "redirect",
+                        "name": "redirectUri",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "307": {
-                        "description": ""
+                        "description": "Temporary Redirect"
                     },
                     "400": {
                         "description": "Bad Request",
@@ -155,7 +163,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/authmodel.AuthLogin"
+                            "$ref": "#/definitions/authmodel.AuthLoginDto"
                         }
                     }
                 ],
@@ -171,7 +179,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/authmodel.AuthResponse"
+                                            "$ref": "#/definitions/authmodel.AuthResponseDto"
                                         }
                                     }
                                 }
@@ -191,7 +199,7 @@ const docTemplate = `{
             "post": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "BearerAuth": []
                     }
                 ],
                 "description": "Logout",
@@ -217,7 +225,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "type": "boolean"
+                                            "type": "string"
                                         }
                                     }
                                 }
@@ -253,7 +261,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/authmodel.AuthRegister"
+                            "$ref": "#/definitions/authmodel.AuthRegisterDto"
                         }
                     }
                 ],
@@ -269,7 +277,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "type": "integer"
+                                            "type": "string"
                                         }
                                     }
                                 }
@@ -305,7 +313,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/authmodel.AuthResetPassword"
+                            "$ref": "#/definitions/authmodel.AuthResetPasswordDto"
                         }
                     }
                 ],
@@ -321,7 +329,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "type": "boolean"
+                                            "type": "string"
                                         }
                                     }
                                 }
@@ -402,6 +410,11 @@ const docTemplate = `{
         },
         "/api/v1/user": {
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "create user",
                 "consumes": [
                     "application/json"
@@ -420,7 +433,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/usermodel.UserCreate"
+                            "$ref": "#/definitions/usermodel.UserCreateDto"
                         }
                     }
                 ],
@@ -436,7 +449,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "type": "integer"
+                                            "type": "string"
                                         }
                                     }
                                 }
@@ -454,6 +467,11 @@ const docTemplate = `{
         },
         "/api/v1/user/search": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "search user",
                 "consumes": [
                     "application/json"
@@ -467,14 +485,14 @@ const docTemplate = `{
                 "summary": "Search an user",
                 "parameters": [
                     {
-                        "type": "integer",
+                        "type": "string",
                         "description": "query",
                         "name": "query",
                         "in": "query",
                         "required": true
                     },
                     {
-                        "type": "integer",
+                        "type": "string",
                         "description": "lastIndex",
                         "name": "lastIndex",
                         "in": "query"
@@ -495,8 +513,7 @@ const docTemplate = `{
                         "type": "integer",
                         "description": "User ID",
                         "name": "id",
-                        "in": "path",
-                        "required": true
+                        "in": "path"
                     }
                 ],
                 "responses": {
@@ -529,6 +546,11 @@ const docTemplate = `{
         },
         "/api/v1/user/{id}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "get user by ID",
                 "consumes": [
                     "application/json"
@@ -577,6 +599,11 @@ const docTemplate = `{
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "delete user",
                 "consumes": [
                     "application/json"
@@ -625,6 +652,11 @@ const docTemplate = `{
                 }
             },
             "patch": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "update user",
                 "consumes": [
                     "application/json"
@@ -643,7 +675,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/usermodel.UserUpdate"
+                            "$ref": "#/definitions/usermodel.UserUpdateDto"
                         }
                     }
                 ],
@@ -659,7 +691,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "type": "boolean"
+                                            "type": "string"
                                         }
                                     }
                                 }
@@ -677,6 +709,11 @@ const docTemplate = `{
         },
         "/api/v1/users": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "get string by ID",
                 "consumes": [
                     "application/json"
@@ -696,11 +733,16 @@ const docTemplate = `{
                         "in": "query"
                     },
                     {
-                        "type": "integer",
-                        "description": "page",
-                        "name": "page",
-                        "in": "query",
-                        "required": true
+                        "type": "string",
+                        "description": "before cursor",
+                        "name": "before",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "after cursor",
+                        "name": "after",
+                        "in": "query"
                     },
                     {
                         "type": "integer",
@@ -739,11 +781,8 @@ const docTemplate = `{
                                                 "$ref": "#/definitions/usermodel.User"
                                             }
                                         },
-                                        "filter": {
-                                            "$ref": "#/definitions/usermodel.UserFilter"
-                                        },
                                         "pagination": {
-                                            "$ref": "#/definitions/common.Pagination"
+                                            "$ref": "#/definitions/common.CursorPagination"
                                         }
                                     }
                                 }
@@ -761,7 +800,7 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "authmodel.AuthForgotPassword": {
+        "authmodel.AuthForgotPasswordDto": {
             "type": "object",
             "required": [
                 "email",
@@ -776,7 +815,22 @@ const docTemplate = `{
                 }
             }
         },
-        "authmodel.AuthLogin": {
+        "authmodel.AuthLoginDto": {
+            "type": "object",
+            "required": [
+                "password",
+                "username"
+            ],
+            "properties": {
+                "password": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "authmodel.AuthRegisterDto": {
             "type": "object",
             "required": [
                 "email",
@@ -786,19 +840,10 @@ const docTemplate = `{
                 "email": {
                     "type": "string"
                 },
-                "password": {
+                "firstName": {
                     "type": "string"
-                }
-            }
-        },
-        "authmodel.AuthRegister": {
-            "type": "object",
-            "required": [
-                "email",
-                "password"
-            ],
-            "properties": {
-                "email": {
+                },
+                "lastName": {
                     "type": "string"
                 },
                 "password": {
@@ -806,7 +851,7 @@ const docTemplate = `{
                 }
             }
         },
-        "authmodel.AuthResetPassword": {
+        "authmodel.AuthResetPasswordDto": {
             "type": "object",
             "required": [
                 "email",
@@ -825,7 +870,7 @@ const docTemplate = `{
                 }
             }
         },
-        "authmodel.AuthResponse": {
+        "authmodel.AuthResponseDto": {
             "type": "object",
             "properties": {
                 "created": {
@@ -856,17 +901,17 @@ const docTemplate = `{
                 }
             }
         },
-        "common.Pagination": {
+        "common.CursorPagination": {
             "type": "object",
             "properties": {
+                "cursor": {
+                    "$ref": "#/definitions/paginator.Cursor"
+                },
                 "limit": {
                     "type": "integer"
                 },
-                "offset": {
-                    "type": "integer"
-                },
-                "page": {
-                    "type": "integer"
+                "order": {
+                    "type": "string"
                 },
                 "total": {
                     "type": "integer"
@@ -884,9 +929,7 @@ const docTemplate = `{
             "properties": {
                 "data": {},
                 "filter": {},
-                "pagination": {
-                    "$ref": "#/definitions/common.Pagination"
-                }
+                "pagination": {}
             }
         },
         "filemodel.PresignedPostObject": {
@@ -903,6 +946,17 @@ const docTemplate = `{
                 }
             }
         },
+        "paginator.Cursor": {
+            "type": "object",
+            "properties": {
+                "after": {
+                    "type": "string"
+                },
+                "before": {
+                    "type": "string"
+                }
+            }
+        },
         "usermodel.User": {
             "type": "object",
             "properties": {
@@ -915,7 +969,7 @@ const docTemplate = `{
                 "company": {
                     "type": "string"
                 },
-                "createdAt": {
+                "created_at": {
                     "type": "string"
                 },
                 "email": {
@@ -928,10 +982,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "id": {
-                    "type": "integer"
-                },
-                "isActive": {
-                    "type": "integer"
+                    "type": "string"
                 },
                 "lastName": {
                     "type": "string"
@@ -942,12 +993,12 @@ const docTemplate = `{
                 "role": {
                     "type": "string"
                 },
-                "updatedAt": {
+                "updated_at": {
                     "type": "string"
                 }
             }
         },
-        "usermodel.UserCreate": {
+        "usermodel.UserCreateDto": {
             "type": "object",
             "required": [
                 "email",
@@ -964,9 +1015,6 @@ const docTemplate = `{
                 "company": {
                     "type": "string"
                 },
-                "createdAt": {
-                    "type": "string"
-                },
                 "email": {
                     "type": "string"
                 },
@@ -976,22 +1024,16 @@ const docTemplate = `{
                 "gender": {
                     "type": "string"
                 },
-                "id": {
-                    "type": "integer"
-                },
-                "isActive": {
-                    "type": "integer"
-                },
                 "lastName": {
+                    "type": "string"
+                },
+                "password": {
                     "type": "string"
                 },
                 "phoneNumber": {
                     "type": "string"
                 },
                 "role": {
-                    "type": "string"
-                },
-                "updatedAt": {
                     "type": "string"
                 }
             }
@@ -1011,24 +1053,7 @@ const docTemplate = `{
                 }
             }
         },
-        "usermodel.UserFilter": {
-            "type": "object",
-            "properties": {
-                "fields": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "sortField": {
-                    "type": "string"
-                },
-                "sortName": {
-                    "type": "string"
-                }
-            }
-        },
-        "usermodel.UserUpdate": {
+        "usermodel.UserUpdateDto": {
             "type": "object",
             "properties": {
                 "address": {
@@ -1040,9 +1065,6 @@ const docTemplate = `{
                 "company": {
                     "type": "string"
                 },
-                "createdAt": {
-                    "type": "string"
-                },
                 "email": {
                     "type": "string"
                 },
@@ -1052,12 +1074,6 @@ const docTemplate = `{
                 "gender": {
                     "type": "string"
                 },
-                "id": {
-                    "type": "integer"
-                },
-                "isActive": {
-                    "type": "integer"
-                },
                 "lastName": {
                     "type": "string"
                 },
@@ -1065,9 +1081,6 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "role": {
-                    "type": "string"
-                },
-                "updatedAt": {
                     "type": "string"
                 }
             }

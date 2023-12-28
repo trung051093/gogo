@@ -2,7 +2,6 @@ package jwtauthprovider
 
 import (
 	"errors"
-	authmodelprovider "gogo/modules/auth_provider/model"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
@@ -10,7 +9,7 @@ import (
 
 type Claims struct {
 	jwt.StandardClaims
-	Payload authmodelprovider.TokenPayload `json:"payload"`
+	Payload TokenPayload `json:"payload"`
 }
 
 type jwtProvider struct {
@@ -21,7 +20,7 @@ func NewJWTProvider(secret string) *jwtProvider {
 	return &jwtProvider{secret: secret}
 }
 
-func (jwtP *jwtProvider) Generate(data authmodelprovider.TokenPayload, expired uint) (*authmodelprovider.TokenProvider, error) {
+func (jwtP *jwtProvider) Generate(data TokenPayload, expired uint) (*TokenProvider, error) {
 	expiresAt := time.Now().Add(time.Duration(expired) * time.Hour * 24).Unix()
 	createdAt := time.Now().Unix()
 	claims := &Claims{
@@ -39,14 +38,14 @@ func (jwtP *jwtProvider) Generate(data authmodelprovider.TokenPayload, expired u
 	if err != nil {
 		return nil, err
 	}
-	return &authmodelprovider.TokenProvider{
+	return &TokenProvider{
 		Token:   tokenString,
 		Expiry:  expiresAt,
 		Created: createdAt,
 	}, nil
 }
 
-func (jwtP *jwtProvider) Validate(token string) (*authmodelprovider.TokenPayload, error) {
+func (jwtP *jwtProvider) Validate(token string) (*TokenPayload, error) {
 	claims := &Claims{}
 	jwtToken, err := jwt.ParseWithClaims(token, claims, func(token *jwt.Token) (interface{}, error) {
 		return []byte(jwtP.secret), nil

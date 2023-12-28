@@ -2,7 +2,7 @@ package common
 
 const (
 	Project           = "UserManagement"
-	CurrentUser       = "CurrentUser"
+	CurrentAuth       = "CurrentAuth"
 	IndexingQueue     = "ElasticSearchService"
 	IndexingQueueKey  = "ElasticSearchServiceKey"
 	ImageBucket       = "images"

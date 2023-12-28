@@ -1,12 +1,12 @@
 package authmodel
 
-import authmodelprovider "gogo/modules/auth_provider/model"
+import jwtauthprovider "gogo/modules/auth/providers/jwt"
 
-type AuthLogin struct {
-	Email    string `validate:"required,email" json:"email"`
-	Password string `validate:"required" json:"password"`
+type AuthLoginDto struct {
+	UserName string `json:"username" validate:"required"`
+	Password string ` json:"password" validate:"required"`
 }
 
-type AuthResponse struct {
-	authmodelprovider.TokenProvider
+type AuthResponseDto struct {
+	jwtauthprovider.TokenProvider
 }

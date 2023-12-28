@@ -8,6 +8,7 @@ import (
 	cacheprovider "gogo/components/cache"
 	dbprovider "gogo/components/dbprovider"
 	esprovider "gogo/components/elasticsearch"
+	"gogo/components/hasher"
 	jaegerprovider "gogo/components/jaeger"
 	graylog "gogo/components/log"
 	"gogo/components/mailer"
@@ -16,11 +17,11 @@ import (
 	socketprovider "gogo/components/socketio"
 	storageprovider "gogo/components/storage"
 	"gogo/middleware"
-	authmodelprovider "gogo/modules/auth_provider/model"
+	authmodel "gogo/modules/auth/model"
 	"gogo/modules/indexer"
 	"gogo/modules/notificator"
 	usermodel "gogo/modules/user/model"
-	"gogo/routes"
+	"gogo/packages/rest_api/routes"
 	"log"
 	"net/http"
 
@@ -31,10 +32,10 @@ import (
 	"go.opencensus.io/trace"
 )
 
-// @securityDefinitions.apikey  Bearer
-// @in                          header
-// @name                        Authorization
-// @description                 "Type 'Bearer TOKEN' to correctly set the API Key"
+// @securityDefinitions.apikey Bearer
+// @in                         header
+// @name                       Authorization
+// @description                "Type 'Bearer TOKEN' to correctly set the API Key"
 func main() {
 	config := appctx.GetConfig()
 
@@ -54,7 +55,8 @@ func main() {
 		// dbprovider.WithDebug,
 		dbprovider.WithAutoMigration(
 			&usermodel.User{},
-			&authmodelprovider.AuthProvider{},
+			&authmodel.Auth{},
+			&authmodel.AuthProvider{},
 		),
 	)
 
@@ -99,6 +101,7 @@ func main() {
 	jaegerService := jaegerprovider.NewExporter(config.GetJaegerConfig())
 	cacheService := cacheprovider.NewCacheService(redisService.GetClient())
 	mailService := mailer.NewMailer(config.GetMailConfig())
+	hashService := hasher.NewHashService()
 
 	appCtx := appctx.NewAppContext(
 		dbprovider.GetDBConnection(),
@@ -112,6 +115,7 @@ func main() {
 		jaegerService,
 		cacheService,
 		mailService,
+		hashService,
 	)
 
 	router := gin.Default()

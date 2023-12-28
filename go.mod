@@ -12,7 +12,7 @@ require (
 	github.com/go-playground/validator/v10 v10.10.0
 	github.com/go-redis/cache/v8 v8.4.3
 	github.com/go-redis/redis/v8 v8.11.5
-	github.com/google/uuid v1.3.0
+	github.com/google/uuid v1.5.0
 	github.com/googollee/go-socket.io v1.6.2
 	github.com/minio/minio-go/v7 v7.0.27
 	github.com/sirupsen/logrus v1.8.1
@@ -44,6 +44,7 @@ require (
 	github.com/go-openapi/swag v0.21.1 // indirect
 	github.com/go-playground/locales v0.14.0 // indirect
 	github.com/go-playground/universal-translator v0.18.0 // indirect
+	github.com/go-playground/validator v9.31.0+incompatible // indirect
 	github.com/gofrs/uuid v4.0.0+incompatible // indirect
 	github.com/golang/groupcache v0.0.0-20200121045136-8c9f03a8e57e // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
@@ -71,6 +72,7 @@ require (
 	github.com/minio/md5-simd v1.1.0 // indirect
 	github.com/minio/sha256-simd v0.1.1 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
+	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/pilagod/gorm-cursor-paginator/v2 v2.3.1 // indirect

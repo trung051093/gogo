@@ -62,7 +62,7 @@ func main() {
 	}
 
 	ctx := rabbitmqprovider.WithContext(context.Background(), rabbitmqService)
-	createCh := make(chan usermodel.UserCreate, 10)
+	createCh := make(chan usermodel.UserCreateDto, 10)
 	done := make(chan int)
 	var wg sync.WaitGroup
 
@@ -70,7 +70,7 @@ func main() {
 		for _, user := range users {
 			wg.Add(1)
 			fmt.Println(user.Name.Title + " : " + user.Name.First + " " + user.Name.Last)
-			createCh <- usermodel.UserCreate{
+			createCh <- usermodel.UserCreateDto{
 				FirstName:   user.Name.First,
 				LastName:    user.Name.Last,
 				Email:       user.Email,
@@ -89,11 +89,11 @@ func main() {
 
 	for {
 		select {
-		case userCreate := <-createCh:
-			go func(u usermodel.UserCreate) {
-				repository.Create(ctx, &u)
+		case userCreateDto := <-createCh:
+			go func(u usermodel.UserCreateDto) {
+				repository.Create(ctx, u.ToEntity())
 				wg.Done()
-			}(userCreate)
+			}(userCreateDto)
 		case <-done:
 			wg.Wait()
 			println("Done !!!")

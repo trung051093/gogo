@@ -6,11 +6,12 @@ const (
 )
 
 type PagePagination struct {
-	Page      int   `json:"page"`
-	Limit     int   `json:"limit"`
-	Total     int64 `json:"total"`
-	TotalPage int   `json:"total_page"`
-	Offset    int   `json:"offset"`
+	Page      int    `json:"page" query:"page"`
+	Limit     int    `json:"limit" query:"limit"`
+	Total     int64  `json:"total"`
+	TotalPage int    `json:"total_page"`
+	Offset    int    `json:"offset"`
+	Order     string `json:"order" query:"order"`
 }
 
 func NewPagePagination() *PagePagination {

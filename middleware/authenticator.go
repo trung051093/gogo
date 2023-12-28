@@ -4,7 +4,7 @@ import (
 	"errors"
 	"gogo/common"
 	"gogo/components/appctx"
-	jwtauthprovider "gogo/modules/auth_provider/jwt"
+	jwtauthprovider "gogo/modules/auth/providers/jwt"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -25,7 +25,7 @@ func JWTRequireHandler(appCtx appctx.AppContext) gin.HandlerFunc {
 		if err != nil {
 			panic(common.ErrorUnauthorized(errors.New("token invalid")))
 		}
-		ginCtx.Set(common.CurrentUser, tokenPayload)
+		ginCtx.Set(common.CurrentAuth, tokenPayload)
 		ginCtx.Next()
 	}
 }

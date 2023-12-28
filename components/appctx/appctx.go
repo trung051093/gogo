@@ -4,6 +4,7 @@ import (
 	"context"
 	cacheprovider "gogo/components/cache"
 	esprovider "gogo/components/elasticsearch"
+	"gogo/components/hasher"
 	jaegerprovider "gogo/components/jaeger"
 	"gogo/components/mailer"
 	rabbitmqprovider "gogo/components/rabbitmq"
@@ -28,6 +29,7 @@ type AppContext interface {
 	GetSocketService() socketprovider.SocketService
 	GetCacheService() cacheprovider.CacheService
 	GetMailService() mailer.MailService
+	GetHashService() hasher.HashService
 }
 
 type appContext struct {
@@ -42,6 +44,7 @@ type appContext struct {
 	jaegerService   jaegerprovider.JaegerService
 	cacheService    cacheprovider.CacheService
 	mailService     mailer.MailService
+	hashService     hasher.HashService
 }
 
 type key string
@@ -60,6 +63,7 @@ func NewAppContext(
 	jaegerService jaegerprovider.JaegerService,
 	cacheService cacheprovider.CacheService,
 	mailService mailer.MailService,
+	hashService hasher.HashService,
 ) *appContext {
 	return &appContext{
 		db:              db,
@@ -73,6 +77,7 @@ func NewAppContext(
 		jaegerService:   jaegerService,
 		cacheService:    cacheService,
 		mailService:     mailService,
+		hashService:     hashService,
 	}
 }
 
@@ -136,4 +141,8 @@ func (appCtx *appContext) GetCacheService() cacheprovider.CacheService {
 
 func (appCtx *appContext) GetMailService() mailer.MailService {
 	return appCtx.mailService
+}
+
+func (appCtx *appContext) GetHashService() hasher.HashService {
+	return appCtx.hashService
 }

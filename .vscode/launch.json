@@ -11,7 +11,8 @@
       "mode": "auto",
       "program": "${fileDirname}",
       "env": {
-        "env": "dev"
+        "env": "dev",
+        "GO111MODULE": "on"
       }
     }
   ]
