@@ -10,16 +10,16 @@ import (
 )
 
 // CreateUser godoc
-// @Summary     Create user
-// @Description create user
-// @Tags        users
-// @Accept      json
-// @Produce     json
-// @Security    BearerAuth
-// @Param       user body     usermodel.UserCreateDto      true "Add user"
-// @Success     200  {object} common.Response{data=string} "desc"
-// @Failure     400  {object} common.AppError
-// @Router      /api/v1/user [post]
+//	@Summary		Create user
+//	@Description	create user
+//	@Tags			users
+//	@Accept			json
+//	@Produce		json
+//	@Security		BearerAuth
+//	@Param			user	body		usermodel.UserCreateDto			true	"Add user"
+//	@Success		200		{object}	common.Response{data=string}	"desc"
+//	@Failure		400		{object}	common.AppError
+//	@Router			/api/v1/user [post]
 func CreateUserHandler(appCtx appctx.AppContext) func(*gin.Context) {
 	return func(ginCtx *gin.Context) {
 		createDto := &usermodel.UserCreateDto{}
@@ -38,16 +38,16 @@ func CreateUserHandler(appCtx appctx.AppContext) func(*gin.Context) {
 }
 
 // UpdateUser godoc
-// @Summary     Update an user
-// @Description update user
-// @Tags        users
-// @Accept      json
-// @Produce     json
-// @Security    BearerAuth
-// @Param       user body     usermodel.UserUpdateDto      true "Add account"
-// @Success     200  {object} common.Response{data=string} "desc"
-// @Failure     400  {object} common.AppError
-// @Router      /api/v1/user/{id} [patch]
+//	@Summary		Update an user
+//	@Description	update user
+//	@Tags			users
+//	@Accept			json
+//	@Produce		json
+//	@Security		BearerAuth
+//	@Param			user	body		usermodel.UserUpdateDto			true	"Add account"
+//	@Success		200		{object}	common.Response{data=string}	"desc"
+//	@Failure		400		{object}	common.AppError
+//	@Router			/api/v1/user/{id} [patch]
 func UpdateUserHandler(appCtx appctx.AppContext) func(*gin.Context) {
 	return func(ginCtx *gin.Context) {
 		updateDto := &usermodel.UserUpdateDto{}
@@ -66,16 +66,16 @@ func UpdateUserHandler(appCtx appctx.AppContext) func(*gin.Context) {
 }
 
 // GetUser godoc
-// @Summary     Get an user
-// @Description get user by ID
-// @Tags        users
-// @Accept      json
-// @Produce     json
-// @Security    BearerAuth
-// @Param       id  path     int                                  true "User ID"
-// @Success     200 {object} common.Response{data=usermodel.User} "desc"
-// @Failure     400 {object} common.AppError
-// @Router      /api/v1/user/{id} [get]
+//	@Summary		Get an user
+//	@Description	get user by ID
+//	@Tags			users
+//	@Accept			json
+//	@Produce		json
+//	@Security		BearerAuth
+//	@Param			id	path		int										true	"User ID"
+//	@Success		200	{object}	common.Response{data=usermodel.User}	"desc"
+//	@Failure		400	{object}	common.AppError
+//	@Router			/api/v1/user/{id} [get]
 func GetUserHandler(appCtx appctx.AppContext) func(*gin.Context) {
 	return func(ginCtx *gin.Context) {
 		userId := ginCtx.Param("id")
@@ -90,21 +90,21 @@ func GetUserHandler(appCtx appctx.AppContext) func(*gin.Context) {
 }
 
 // GetListUser godoc
-// @Summary     Get list of user
-// @Description get string by ID
-// @Tags        users
-// @Accept      json
-// @Produce     json
-// @Security    BearerAuth
-// @Param       fields    query    int                                                                                 false "fields"
-// @Param       before    query    string                                                                              false "before cursor"
-// @Param       after     query    string                                                                              false "after cursor"
-// @Param       limit     query    int                                                                                 true  "limit"
-// @Param       sortField query    string                                                                              false "sort by field"
-// @Param       sortName  query    string                                                                              false "sort by field"
-// @Success     200       {object} common.ResponsePagination{data=[]usermodel.User,pagination=common.CursorPagination} "desc"
-// @Failure     400       {object} common.AppError
-// @Router      /api/v1/users [get]
+//	@Summary		Get list of user
+//	@Description	get string by ID
+//	@Tags			users
+//	@Accept			json
+//	@Produce		json
+//	@Security		BearerAuth
+//	@Param			fields		query		int																					false	"fields"
+//	@Param			before		query		string																				false	"before cursor"
+//	@Param			after		query		string																				false	"after cursor"
+//	@Param			limit		query		int																					true	"limit"
+//	@Param			sortField	query		string																				false	"sort by field"
+//	@Param			sortName	query		string																				false	"sort by field"
+//	@Success		200			{object}	common.ResponsePagination{data=[]usermodel.User,pagination=common.CursorPagination}	"desc"
+//	@Failure		400			{object}	common.AppError
+//	@Router			/api/v1/users [get]
 func ListUserHandler(appCtx appctx.AppContext) func(*gin.Context) {
 	return func(ginCtx *gin.Context) {
 		searchDto := &usermodel.UserSearchDto{
@@ -125,16 +125,16 @@ func ListUserHandler(appCtx appctx.AppContext) func(*gin.Context) {
 }
 
 // DeleteUser godoc
-// @Summary     Delete an user
-// @Description delete user
-// @Tags        users
-// @Accept      json
-// @Produce     json
-// @Security    BearerAuth
-// @Param       id  path     int                        true "User ID"
-// @Success     200 {object} common.Response{data=bool} "desc"
-// @Failure     400 {object} common.AppError
-// @Router      /api/v1/user/{id} [delete]
+//	@Summary		Delete an user
+//	@Description	delete user
+//	@Tags			users
+//	@Accept			json
+//	@Produce		json
+//	@Security		BearerAuth
+//	@Param			id	path		int							true	"User ID"
+//	@Success		200	{object}	common.Response{data=bool}	"desc"
+//	@Failure		400	{object}	common.AppError
+//	@Router			/api/v1/user/{id} [delete]
 func DeleteUserHandler(appCtx appctx.AppContext) func(*gin.Context) {
 	return func(ginCtx *gin.Context) {
 		userId := ginCtx.Param("id")
@@ -149,20 +149,20 @@ func DeleteUserHandler(appCtx appctx.AppContext) func(*gin.Context) {
 }
 
 // SearchUser godoc
-// @Summary     Search an user
-// @Description search user
-// @Tags        users
-// @Accept      json
-// @Produce     json
-// @Security    BearerAuth
-// @Param       query     query    string                                             true  "query"
-// @Param       lastIndex query    string                                             false "lastIndex"
-// @Param       sortField query    string                                             false "sort by field"
-// @Param       sortName  query    string                                             false "sort by field"
-// @Param       id        path     int                                                false "User ID"
-// @Success     200       {object} common.Response{data=usermodel.UserEsSearchResult} "desc"
-// @Failure     400       {object} common.AppError
-// @Router      /api/v1/user/search [get]
+//	@Summary		Search an user
+//	@Description	search user
+//	@Tags			users
+//	@Accept			json
+//	@Produce		json
+//	@Security		BearerAuth
+//	@Param			query		query		string												true	"query"
+//	@Param			lastIndex	query		string												false	"lastIndex"
+//	@Param			sortField	query		string												false	"sort by field"
+//	@Param			sortName	query		string												false	"sort by field"
+//	@Param			id			path		int													false	"User ID"
+//	@Success		200			{object}	common.Response{data=usermodel.UserEsSearchResult}	"desc"
+//	@Failure		400			{object}	common.AppError
+//	@Router			/api/v1/user/search [get]
 func SearchUserHandler(appCtx appctx.AppContext) func(*gin.Context) {
 	return func(ginCtx *gin.Context) {
 		searchDto := &usermodel.UserEsSearchDto{}

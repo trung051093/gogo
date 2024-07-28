@@ -30,6 +30,7 @@ type AppContext interface {
 	GetCacheService() cacheprovider.CacheService
 	GetMailService() mailer.MailService
 	GetHashService() hasher.HashService
+	GetJaegerService() jaegerprovider.JaegerService
 }
 
 type appContext struct {

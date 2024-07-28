@@ -57,7 +57,7 @@ func NewAuthService(
 	cacheService cacheprovider.CacheService,
 	mailService mailer.MailService,
 ) AuthService {
-	service := common.NewService[authmodel.Auth, AuthRepository](authRepo)
+	service := common.NewService(authRepo)
 	return &authService{
 		Service:          service,
 		authRepo:         authRepo,
@@ -303,7 +303,7 @@ func (s *authService) GoogleCallback(ctx context.Context, code, state string) (s
 		return "", common.ErrorCannotFoundEntity(authmodel.Auth{}.EntityName(), err)
 	}
 
-	provider, _ := s.authProviderRepo.FindById(ctx, auth.Id)
+	provider, err := s.authProviderRepo.FindById(ctx, auth.Id)
 	if err != nil {
 		return "", common.ErrorCannotFoundEntity(authmodel.AuthProvider{}.EntityName(), err)
 	}

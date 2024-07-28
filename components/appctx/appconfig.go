@@ -13,7 +13,7 @@ import (
 	"runtime"
 
 	es "github.com/elastic/go-elasticsearch/v8"
-	redis "github.com/go-redis/redis/v8"
+	redis "github.com/redis/go-redis/v9"
 	"gopkg.in/yaml.v3"
 )
 
@@ -99,6 +99,11 @@ type Config struct {
 		Username string `yaml:"username"`
 		Password string `yaml:"password"`
 	} `yaml:"mail"`
+	Auth struct {
+		SessionName string `yaml:"session_name"`
+		Expire      int    `yaml:"expire"`
+		Client      string `yaml:"client"`
+	} `yaml:"auth"`
 }
 
 func RootDir() string {
@@ -111,7 +116,7 @@ func GetFileConfig() string {
 	environment := os.Getenv("env")
 	rootDir := RootDir()
 	if environment == "" {
-		environment = string(EnvLocal)
+		environment = string(EnvDev)
 	}
 	file := fmt.Sprintf("%s/config_%s.yml", rootDir, environment)
 	fmt.Println("File Config:", file)

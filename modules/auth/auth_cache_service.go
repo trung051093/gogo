@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/go-redis/cache/v8"
+	"github.com/go-redis/cache/v9"
 )
 
 const (
@@ -19,12 +19,12 @@ func (s *authService) deleteKey(ctx context.Context, key string) error {
 	return s.cacheService.Delete(ctx, key)
 }
 
-func (s *authService) getCacheKey(ctx context.Context, keys ...string) string {
+func (s *authService) getCacheKey(_ context.Context, keys ...string) string {
 	return strings.Join(keys, ":")
 }
 
 // expireTime: 30d, 24h,...
-func (s *authService) setSession(ctx context.Context, key string, data interface{}, expireDays int) error {
+func (s *authService) setSession(_ context.Context, key string, data interface{}, expireDays int) error {
 	ttl := DefaultTTL
 	if paramsTTL, err := time.ParseDuration(fmt.Sprintf("%dd", expireDays)); err != nil {
 		ttl = paramsTTL

@@ -8,7 +8,7 @@ import (
 )
 
 type SQLModel struct {
-	Id        uuid.UUID  `json:"id" gorm:"column:id;primary_key;default:uuid_generate_v4()"`
+	Id        uuid.UUID  `json:"id" gorm:"column:id;primary_key;"`
 	CreatedAt *time.Time `json:"created_at" gorm:"column:created_at;autoCreateTime;"`
 	UpdatedAt *time.Time `json:"updated_at" gorm:"column:updated_at;autoUpdateTime;"`
 }

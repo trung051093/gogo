@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/go-redis/cache/v8"
+	"github.com/go-redis/cache/v9"
 	"github.com/sirupsen/logrus"
 )
 

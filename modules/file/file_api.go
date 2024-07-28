@@ -15,17 +15,17 @@ import (
 )
 
 // GetUploadPresignedUrl godoc
-// @Summary     get a presigned url to upload
-// @Description get a presigned url to upload
-// @Tags        file
-// @Accept      json
-// @Produce     json
-// @Param       fileName query    string                                              true  "fileName"
-// @Param       fileType query    string                                              true  "fileType"
-// @Param       proxy    query    string                                              false "proxy"
-// @Success     200      {object} common.Response{data=filemodel.PresignedPostObject} "desc"
-// @Failure     400      {object} common.AppError
-// @Router      /api/v1/file/presign-url [get]
+//	@Summary		get a presigned url to upload
+//	@Description	get a presigned url to upload
+//	@Tags			file
+//	@Accept			json
+//	@Produce		json
+//	@Param			fileName	query		string												true	"fileName"
+//	@Param			fileType	query		string												true	"fileType"
+//	@Param			proxy		query		string												false	"proxy"
+//	@Success		200			{object}	common.Response{data=filemodel.PresignedPostObject}	"desc"
+//	@Failure		400			{object}	common.AppError
+//	@Router			/api/v1/file/presign-url [get]
 func GetUploadPresignedUrl(appCtx appctx.AppContext) func(*gin.Context) {
 	return func(ginCtx *gin.Context) {
 		config := appCtx.GetConfig()

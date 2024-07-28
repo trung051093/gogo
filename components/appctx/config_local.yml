@@ -76,3 +76,9 @@ mail:
   port: 587
   username: "yourgmail@gmail.com"
   password: "yourpassword"
+
+# auth
+auth:
+  session_name: "SESSION"
+  expire: 2592000
+  client: "localhost"

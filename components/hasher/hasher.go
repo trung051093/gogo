@@ -57,7 +57,7 @@ func (hashS *hashService) GenerateSHA1(str string, salt string) string {
 func (hashS *hashService) GenerateRandomString(length int) string {
 	b := make([]byte, length)
 	for i := range b {
-		b[i] = letters[rand.Intn(length)]
+		b[i] = letters[rand.Intn(len(letters))]
 	}
 	return string(b)
 }

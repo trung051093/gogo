@@ -11,15 +11,15 @@ import (
 )
 
 // Register godoc
-// @Summary     Register
-// @Description Register
-// @Tags        auth
-// @Accept      json
-// @Produce     json
-// @Param       user body     authmodel.AuthRegisterDto    true "register"
-// @Success     200  {object} common.Response{data=string} "desc"
-// @Failure     400  {object} common.AppError
-// @Router      /api/v1/auth/register [post]
+//	@Summary		Register
+//	@Description	Register
+//	@Tags			auth
+//	@Accept			json
+//	@Produce		json
+//	@Param			user	body		authmodel.AuthRegisterDto		true	"register"
+//	@Success		200		{object}	common.Response{data=string}	"desc"
+//	@Failure		400		{object}	common.AppError
+//	@Router			/api/v1/auth/register [post]
 func RegisterUserHandler(appCtx appctx.AppContext) func(*gin.Context) {
 	return func(ginCtx *gin.Context) {
 		authRegisterDto := &authmodel.AuthRegisterDto{}
@@ -39,15 +39,15 @@ func RegisterUserHandler(appCtx appctx.AppContext) func(*gin.Context) {
 }
 
 // Login godoc
-// @Summary     Login
-// @Description Login
-// @Tags        auth
-// @Accept      json
-// @Produce     json
-// @Param       user body     authmodel.AuthLoginDto                          true "login"
-// @Success     200  {object} common.Response{data=authmodel.AuthResponseDto} "desc"
-// @Failure     400  {object} common.AppError
-// @Router      /api/v1/auth/login [post]
+//	@Summary		Login
+//	@Description	Login
+//	@Tags			auth
+//	@Accept			json
+//	@Produce		json
+//	@Param			user	body		authmodel.AuthLoginDto							true	"login"
+//	@Success		200		{object}	common.Response{data=authmodel.AuthResponseDto}	"desc"
+//	@Failure		400		{object}	common.AppError
+//	@Router			/api/v1/auth/login [post]
 func LoginUserHandler(appCtx appctx.AppContext) func(*gin.Context) {
 	return func(ginCtx *gin.Context) {
 		authLoginDto := &authmodel.AuthLoginDto{}
@@ -67,15 +67,15 @@ func LoginUserHandler(appCtx appctx.AppContext) func(*gin.Context) {
 }
 
 // Logout godoc
-// @Summary     Logout
-// @Description Logout
-// @Tags        auth
-// @Accept      json
-// @Produce     json
-// @Security    BearerAuth
-// @Success     200 {object} common.Response{data=string} "desc"
-// @Failure     400 {object} common.AppError
-// @Router      /api/v1/auth/logout [post]
+//	@Summary		Logout
+//	@Description	Logout
+//	@Tags			auth
+//	@Accept			json
+//	@Produce		json
+//	@Security		BearerAuth
+//	@Success		200	{object}	common.Response{data=string}	"desc"
+//	@Failure		400	{object}	common.AppError
+//	@Router			/api/v1/auth/logout [post]
 func LogoutUserHandler(appCtx appctx.AppContext) func(*gin.Context) {
 	return func(ginCtx *gin.Context) {
 		tokenPayload := ginCtx.Value(common.CurrentAuth).(jwtauthprovider.TokenPayload)
@@ -93,15 +93,15 @@ func LogoutUserHandler(appCtx appctx.AppContext) func(*gin.Context) {
 }
 
 // ForgotPassword godoc
-// @Summary     ForgotPassword
-// @Description ForgotPassword
-// @Tags        auth
-// @Accept      json
-// @Produce     json
-// @Param       user body     authmodel.AuthForgotPasswordDto true "login"
-// @Success     200  {object} common.Response{data=string}    "desc"
-// @Failure     400  {object} common.AppError
-// @Router      /api/v1/auth/forgot-password [post]
+//	@Summary		ForgotPassword
+//	@Description	ForgotPassword
+//	@Tags			auth
+//	@Accept			json
+//	@Produce		json
+//	@Param			user	body		authmodel.AuthForgotPasswordDto	true	"login"
+//	@Success		200		{object}	common.Response{data=string}	"desc"
+//	@Failure		400		{object}	common.AppError
+//	@Router			/api/v1/auth/forgot-password [post]
 func ForgotPasswordUserHandler(appCtx appctx.AppContext) func(*gin.Context) {
 	return func(ginCtx *gin.Context) {
 		authForgotPasswordDto := &authmodel.AuthForgotPasswordDto{}
@@ -122,15 +122,15 @@ func ForgotPasswordUserHandler(appCtx appctx.AppContext) func(*gin.Context) {
 }
 
 // ResetPassword godoc
-// @Summary     ResetPassword
-// @Description ResetPassword
-// @Tags        auth
-// @Accept      json
-// @Produce     json
-// @Param       user body     authmodel.AuthResetPasswordDto true "login"
-// @Success     200  {object} common.Response{data=string}   "desc"
-// @Failure     400  {object} common.AppError
-// @Router      /api/v1/auth/reset-password [post]
+//	@Summary		ResetPassword
+//	@Description	ResetPassword
+//	@Tags			auth
+//	@Accept			json
+//	@Produce		json
+//	@Param			user	body		authmodel.AuthResetPasswordDto	true	"login"
+//	@Success		200		{object}	common.Response{data=string}	"desc"
+//	@Failure		400		{object}	common.AppError
+//	@Router			/api/v1/auth/reset-password [post]
 func ResetPasswordUserHandler(appCtx appctx.AppContext) func(*gin.Context) {
 	return func(ginCtx *gin.Context) {
 		authResetPasswordDto := &authmodel.AuthResetPasswordDto{}
@@ -151,15 +151,15 @@ func ResetPasswordUserHandler(appCtx appctx.AppContext) func(*gin.Context) {
 }
 
 // GoogleLogin godoc
-// @Summary     Google login
-// @Description Google login
-// @Tags        auth
-// @Accept      json
-// @Produce     json
-// @Param       redirectUri query string false "redirect"
-// @Success     307
-// @Failure     400 {object} common.AppError
-// @Router      /api/v1/auth/google/login [get]
+//	@Summary		Google login
+//	@Description	Google login
+//	@Tags			auth
+//	@Accept			json
+//	@Produce		json
+//	@Param			redirectUri	query	string	false	"redirect"
+//	@Success		307
+//	@Failure		400	{object}	common.AppError
+//	@Router			/api/v1/auth/google/login [get]
 func GoogleLoginUserHandler(appCtx appctx.AppContext) func(*gin.Context) {
 	return func(ginCtx *gin.Context) {
 		redirectUri := ginCtx.Query("redirectUri")
@@ -170,14 +170,14 @@ func GoogleLoginUserHandler(appCtx appctx.AppContext) func(*gin.Context) {
 }
 
 // GoogleCallback godoc
-// @Summary     Google callback
-// @Description Google callback
-// @Tags        auth
-// @Accept      json
-// @Produce     json
-// @Success     200 {object} common.Response{data=authmodel.AuthResponseDto} "desc"
-// @Failure     400 {object} common.AppError
-// @Router      /api/v1/auth/google/callback [get]
+//	@Summary		Google callback
+//	@Description	Google callback
+//	@Tags			auth
+//	@Accept			json
+//	@Produce		json
+//	@Success		200	{object}	common.Response{data=authmodel.AuthResponseDto}	"desc"
+//	@Failure		400	{object}	common.AppError
+//	@Router			/api/v1/auth/google/callback [get]
 func GoogleCallbackUserHandler(appCtx appctx.AppContext) func(*gin.Context) {
 	return func(ginCtx *gin.Context) {
 		state := ginCtx.Query("state")

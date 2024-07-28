@@ -6,7 +6,7 @@ type ValidateDto interface {
 
 type CreateListDto[E GormEntity] interface {
 	ValidateDto
-	ToEntities() []E
+	ToEntities() []*E
 }
 
 type CreateDto[E GormEntity] interface {

@@ -90,7 +90,7 @@ func (p *CursorPagination) NewPaginator(config *paginator.Config, configRules ma
 func (p *CursorPagination) GetPaginator() *paginator.Paginator {
 	if p.Paginator == nil {
 		p.Paginator = p.NewPaginator(&paginator.Config{
-			Keys:  []string{"ID"},
+			Keys:  []string{"CreatedAt"},
 			Limit: 10,
 			// Order here will apply to keys without order specified.
 			Order: paginator.DESC,

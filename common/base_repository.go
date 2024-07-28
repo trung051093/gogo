@@ -49,7 +49,7 @@ type Repository[E GormEntity] interface {
 	Update(ctx context.Context, entity *E, column string, value interface{}) (*E, error)
 	Updates(ctx context.Context, entity *E, updateDto map[string]interface{}) (*E, error)
 	Create(ctx context.Context, entity *E) (*E, error)
-	CreateList(ctx context.Context, entities []E) ([]E, error)
+	CreateList(ctx context.Context, entities []*E) ([]*E, error)
 	DeleteById(ctx context.Context, Id any) error
 	DeleteByIds(ctx context.Context, Ids any) error
 	GetAll(ctx context.Context) ([]E, error)
@@ -58,9 +58,9 @@ type Repository[E GormEntity] interface {
 	FindById(ctx context.Context, id any) (*E, error)
 	FindByIds(ctx context.Context, Ids any) ([]E, error)
 	FindOneByCond(ctx context.Context, cond GormQuery) (*E, error)
-	FindByCond(ctx context.Context, cond GormQuery) ([]E, error)
-	FindWithCursorPagination(ctx context.Context, query GormQuery, paging GormCursorPagination) ([]E, GormQuery, GormCursorPagination, error)
-	FindWithPagePagination(ctx context.Context, query GormQuery, paging GormPagePagination) ([]E, GormQuery, GormPagePagination, error)
+	FindByCond(ctx context.Context, cond GormQuery) ([]*E, error)
+	FindWithCursorPagination(ctx context.Context, query GormQuery, paging GormCursorPagination) ([]*E, GormQuery, GormCursorPagination, error)
+	FindWithPagePagination(ctx context.Context, query GormQuery, paging GormPagePagination) ([]*E, GormQuery, GormPagePagination, error)
 }
 
 type ContextKey string
@@ -181,7 +181,7 @@ func (r *repository[E]) Save(ctx context.Context, entity *E) (*E, error) {
 	return entity, nil
 }
 
-func (r *repository[E]) CreateList(ctx context.Context, entities []E) ([]E, error) {
+func (r *repository[E]) CreateList(ctx context.Context, entities []*E) ([]*E, error) {
 	var entity *E
 	if err := r.GetDBWithCtx(ctx).WithContext(ctx).Model(entity).Create(entities).Error; err != nil {
 		return nil, err
@@ -276,8 +276,8 @@ func (r *repository[E]) FindOneByCond(ctx context.Context, cond GormQuery) (*E, 
 	return &entity, nil
 }
 
-func (r *repository[E]) FindByCond(ctx context.Context, cond GormQuery) ([]E, error) {
-	var entities []E
+func (r *repository[E]) FindByCond(ctx context.Context, cond GormQuery) ([]*E, error) {
+	var entities []*E
 	stmt := r.GetDBWithCtx(ctx).WithContext(ctx).Model(entities)
 	stmt = r.HandleQuery(stmt, cond)
 	stmt = r.GetPreload(stmt)
@@ -287,8 +287,8 @@ func (r *repository[E]) FindByCond(ctx context.Context, cond GormQuery) ([]E, er
 	return entities, nil
 }
 
-func (r *repository[E]) FindWithCursorPagination(ctx context.Context, query GormQuery, paging GormCursorPagination) ([]E, GormQuery, GormCursorPagination, error) {
-	var entities []E
+func (r *repository[E]) FindWithCursorPagination(ctx context.Context, query GormQuery, paging GormCursorPagination) ([]*E, GormQuery, GormCursorPagination, error) {
+	var entities []*E
 	var total int64
 
 	stmt := r.GetDBWithCtx(ctx).WithContext(ctx).Model(&entities)
@@ -312,8 +312,8 @@ func (r *repository[E]) FindWithCursorPagination(ctx context.Context, query Gorm
 	return entities, query, paging, nil
 }
 
-func (r *repository[E]) FindWithPagePagination(ctx context.Context, query GormQuery, paging GormPagePagination) ([]E, GormQuery, GormPagePagination, error) {
-	var entities []E
+func (r *repository[E]) FindWithPagePagination(ctx context.Context, query GormQuery, paging GormPagePagination) ([]*E, GormQuery, GormPagePagination, error) {
+	var entities []*E
 	var total int64
 
 	stmt := r.GetDBWithCtx(ctx).WithContext(ctx).Model(&entities)

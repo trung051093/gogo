@@ -9,14 +9,14 @@ import (
 
 type Service[E GormEntity, R any] interface {
 	Create(ctx context.Context, dto CreateDto[E]) (*E, error)
-	CreateList(ctx context.Context, dto CreateListDto[E]) ([]E, error)
+	CreateList(ctx context.Context, dto CreateListDto[E]) ([]*E, error)
 	UpdateByID(ctx context.Context, id any, dto UpdateDto[E]) (*E, error)
 	Updates(ctx context.Context, entity *E, dto UpdateDto[E]) (*E, error)
 	Save(ctx context.Context, entity *E) (*E, error)
 	DeleteById(ctx context.Context, Id any) error
 	DeleteByIds(ctx context.Context, Ids any) error
-	SearchCursorPaging(ctx context.Context, dto SearchCursorPagingDto) ([]E, GormQuery, GormCursorPagination, error)
-	Search(ctx context.Context, dto SearchDto) ([]E, error)
+	SearchCursorPaging(ctx context.Context, dto SearchCursorPagingDto) ([]*E, GormQuery, GormCursorPagination, error)
+	Search(ctx context.Context, dto SearchDto) ([]*E, error)
 	FindById(ctx context.Context, id any) (*E, error)
 	FindByIds(ctx context.Context, ids any) ([]E, error)
 	GetAll(ctx context.Context) ([]E, error)
@@ -54,7 +54,7 @@ func (s *service[E, R]) Create(ctx context.Context, dto CreateDto[E]) (*E, error
 	return s.repository.Create(ctx, entity)
 }
 
-func (s *service[E, R]) CreateList(ctx context.Context, dto CreateListDto[E]) ([]E, error) {
+func (s *service[E, R]) CreateList(ctx context.Context, dto CreateListDto[E]) ([]*E, error) {
 	if err := s.validateDto(dto); err != nil {
 		return nil, err
 	}
@@ -92,7 +92,7 @@ func (s *service[E, R]) DeleteByIds(ctx context.Context, ids any) error {
 	return s.repository.DeleteByIds(ctx, ids)
 }
 
-func (s *service[E, R]) SearchCursorPaging(ctx context.Context, dto SearchCursorPagingDto) ([]E, GormQuery, GormCursorPagination, error) {
+func (s *service[E, R]) SearchCursorPaging(ctx context.Context, dto SearchCursorPagingDto) ([]*E, GormQuery, GormCursorPagination, error) {
 	if err := s.validateDto(dto); err != nil {
 		return nil, nil, nil, err
 	}
@@ -101,7 +101,7 @@ func (s *service[E, R]) SearchCursorPaging(ctx context.Context, dto SearchCursor
 	return s.repository.FindWithCursorPagination(ctx, query, paging)
 }
 
-func (s *service[E, R]) Search(ctx context.Context, dto SearchDto) ([]E, error) {
+func (s *service[E, R]) Search(ctx context.Context, dto SearchDto) ([]*E, error) {
 	if err := s.validateDto(dto); err != nil {
 		return nil, err
 	}

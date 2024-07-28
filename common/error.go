@@ -1,7 +1,6 @@
 package common
 
 import (
-	"context"
 	"errors"
 	"fmt"
 	"log"
@@ -28,6 +27,9 @@ func FailOnError(err error, msg string) {
 }
 
 func NewErrorResponse(rootErr error, message string, log, key string) *AppError {
+	if rootErr == nil {
+		rootErr = errors.New("something went wrong with server")
+	}
 	return &AppError{
 		StatusCode: http.StatusBadRequest,
 		Message:    message,
@@ -98,7 +100,7 @@ func ErrorNotFound(entity string, err error) *AppError {
 	return NewErrorResponse(
 		err,
 		fmt.Sprintf("Cannot found %s", strings.ToLower(entity)),
-		err.Error(),
+		fmt.Sprintf("Cannot found %s", strings.ToLower(entity)),
 		"NOT_FOUND",
 	)
 }
@@ -107,7 +109,7 @@ func ErrorInvalidRequest(entity string, err error) *AppError {
 	return NewErrorResponse(
 		err,
 		"Invalid request",
-		err.Error(),
+		"Invalid request",
 		"INVALID_REQUEST",
 	)
 }
@@ -176,14 +178,14 @@ func ErrorUnauthorized(err error) *AppError {
 	)
 }
 
-func ThrowErrorIf(ctx context.Context, condition bool, err error) error {
+func ThrowErrorIf(condition bool, err error) error {
 	if condition {
 		return err
 	}
 	return nil
 }
 
-func PanicErrorIf(ctx context.Context, condition bool, err error) {
+func PanicIf(condition bool, err error) {
 	if condition {
 		panic(err)
 	}
