@@ -2,6 +2,7 @@ package redisprovider
 
 import (
 	"context"
+	"encoding/json"
 	"gogo/common"
 	"time"
 
@@ -11,9 +12,11 @@ import (
 type RedisService interface {
 	GetClient() *redis.Client
 	SetValue(ctx context.Context, key string, value string, tls time.Duration) (string, error)
+	SetObjValue(ctx context.Context, key string, value interface{}, tls time.Duration) (string, error)
 	DelValue(ctx context.Context, keys ...string) (int64, error)
 	GetObjValue(ctx context.Context, key string, data interface{}) error
 	GetStringValue(ctx context.Context, key string) (string, error)
+	Scan(ctx context.Context, key string) ([]string, error)
 }
 
 type redisService struct {
@@ -25,8 +28,28 @@ func NewRedisService(config redis.Options) RedisService {
 	return &redisService{client: client}
 }
 
+func (r *redisService) Scan(ctx context.Context, prefix string) ([]string, error) {
+	var cursor uint64
+	var err error
+	var scanKeys []string
+	scanKeys, _, err = r.client.Scan(ctx, cursor, prefix, 10).Result()
+	if err != nil {
+		return nil, err
+	}
+	return scanKeys, nil
+}
+
 func (r *redisService) SetValue(ctx context.Context, key string, value string, tls time.Duration) (string, error) {
 	return r.client.Set(ctx, key, value, tls).Result()
+}
+
+func (r *redisService) SetObjValue(ctx context.Context, key string, value interface{}, tls time.Duration) (string, error) {
+	jsonData, err := json.Marshal(value)
+	if err != nil {
+		return "", err
+	}
+
+	return r.client.Set(ctx, key, jsonData, tls).Result()
 }
 
 func (r *redisService) DelValue(ctx context.Context, keys ...string) (int64, error) {

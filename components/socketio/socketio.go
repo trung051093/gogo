@@ -15,10 +15,11 @@ import (
 type SocketService interface {
 	OnConnect(f func(socketio.Conn) error)
 	OnDisconnect(f func(socketio.Conn, string))
-	OnEvent(event string, f func(socketio.Conn, string))
+	OnEvent(event string, f func(socketio.Conn, interface{}))
 	OnError(f func(socketio.Conn, error))
 	JoinRoom(room string, connection socketio.Conn) bool
 	LeaveRoom(room string, connection socketio.Conn) bool
+	LeaveAllRooms(connection socketio.Conn) bool
 	BroadcastToRoom(room string, event string, args ...interface{}) bool
 	Serve() error
 	Close() error
@@ -135,7 +136,7 @@ func (s *socketService) OnDisconnect(f func(socketio.Conn, string)) {
 	s.server.OnDisconnect(s.config.Namespace, f)
 }
 
-func (s *socketService) OnEvent(event string, f func(socketio.Conn, string)) {
+func (s *socketService) OnEvent(event string, f func(socketio.Conn, interface{})) {
 	s.server.OnEvent(s.config.Namespace, event, f)
 }
 
@@ -149,6 +150,10 @@ func (s *socketService) JoinRoom(room string, connection socketio.Conn) bool {
 
 func (s *socketService) LeaveRoom(room string, connection socketio.Conn) bool {
 	return s.server.LeaveRoom(s.config.Namespace, room, connection)
+}
+
+func (s *socketService) LeaveAllRooms(connection socketio.Conn) bool {
+	return s.server.LeaveAllRooms(s.config.Namespace, connection)
 }
 
 func (s *socketService) BroadcastToRoom(room string, event string, args ...interface{}) bool {

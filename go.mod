@@ -12,26 +12,27 @@ require (
 	github.com/go-playground/validator v9.31.0+incompatible
 	github.com/go-playground/validator/v10 v10.10.0
 	github.com/go-redis/cache/v9 v9.0.0
-	github.com/google/uuid v1.5.0
+	github.com/google/uuid v1.6.0
 	github.com/googollee/go-socket.io v1.6.2
 	github.com/minio/minio-go/v7 v7.0.27
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/pilagod/gorm-cursor-paginator/v2 v2.3.1
 	github.com/redis/go-redis/v9 v9.6.1
+	github.com/samber/lo v1.46.0
 	github.com/sirupsen/logrus v1.8.1
-	github.com/swaggo/files v0.0.0-20220610200504-28940afbdbfe
-	github.com/swaggo/gin-swagger v1.5.0
 	github.com/swaggo/swag v1.8.3
 	github.com/wagslane/go-rabbitmq v0.10.0
 	go.opencensus.io v0.23.0
 	golang.org/x/oauth2 v0.0.0-20220622183110-fd043fe589d2
 	gopkg.in/yaml.v3 v3.0.1
-	gorm.io/driver/postgres v1.3.1
-	gorm.io/gorm v1.23.1
+	gorm.io/datatypes v1.2.5
+	gorm.io/driver/postgres v1.5.9
+	gorm.io/gorm v1.25.12
 )
 
 require (
 	cloud.google.com/go v0.65.0 // indirect
+	filippo.io/edwards25519 v1.1.0 // indirect
 	github.com/KyleBanks/depth v1.2.1 // indirect
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
@@ -45,22 +46,19 @@ require (
 	github.com/go-openapi/swag v0.21.1 // indirect
 	github.com/go-playground/locales v0.14.0 // indirect
 	github.com/go-playground/universal-translator v0.18.0 // indirect
+	github.com/go-sql-driver/mysql v1.8.1 // indirect
 	github.com/gofrs/uuid v4.0.0+incompatible // indirect
 	github.com/golang/groupcache v0.0.0-20200121045136-8c9f03a8e57e // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/gomodule/redigo v1.8.8 // indirect
 	github.com/gorilla/websocket v1.4.2 // indirect
 	github.com/iancoleman/strcase v0.0.0-20180726023541-3605ed457bf7 // indirect
-	github.com/jackc/chunkreader/v2 v2.0.1 // indirect
-	github.com/jackc/pgconn v1.10.1 // indirect
-	github.com/jackc/pgio v1.0.0 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
-	github.com/jackc/pgproto3/v2 v2.2.0 // indirect
-	github.com/jackc/pgservicefile v0.0.0-20200714003250-2b9c44734f2b // indirect
-	github.com/jackc/pgtype v1.9.1 // indirect
-	github.com/jackc/pgx/v4 v4.14.1 // indirect
+	github.com/jackc/pgservicefile v0.0.0-20231201235250-de7065d80cb9 // indirect
+	github.com/jackc/pgx/v5 v5.5.5 // indirect
+	github.com/jackc/puddle/v2 v2.2.1 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
-	github.com/jinzhu/now v1.1.4 // indirect
+	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/klauspost/compress v1.13.6 // indirect
@@ -76,7 +74,6 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/rabbitmq/amqp091-go v1.3.4 // indirect
 	github.com/rs/xid v1.2.1 // indirect
-	github.com/samber/lo v1.46.0 // indirect
 	github.com/stretchr/testify v1.8.2 // indirect
 	github.com/uber/jaeger-client-go v2.25.0+incompatible // indirect
 	github.com/ugorji/go/codec v1.2.6 // indirect
@@ -94,4 +91,5 @@ require (
 	google.golang.org/protobuf v1.28.0 // indirect
 	gopkg.in/ini.v1 v1.66.4 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
+	gorm.io/driver/mysql v1.5.6 // indirect
 )
