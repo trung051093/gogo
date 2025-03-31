@@ -8,6 +8,7 @@ import (
 	"gogo/modules/snake_battle/dto"
 	"gogo/modules/snake_battle/entity"
 	"gogo/modules/snake_battle/repository"
+	"log"
 
 	socketio "github.com/googollee/go-socket.io"
 	"github.com/mitchellh/mapstructure"
@@ -67,7 +68,13 @@ func (s *gameService) GameSocketListener(ctx context.Context) error {
 	socketService := s.appCtx.GetSocketService()
 
 	socketService.OnConnect(func(conn socketio.Conn) error {
+		log.Println("Client connected")
 		return nil
+	})
+
+	socketService.OnDisconnect(func(conn socketio.Conn, reason string) {
+		log.Println("Client disconnected: ", reason)
+		return
 	})
 
 	socketService.OnEvent(entity.GameEventCreateRoom, func(conn socketio.Conn, payload interface{}) {

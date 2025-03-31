@@ -1,6 +1,7 @@
 package server
 
 import (
+	"context"
 	"fmt"
 	"gogo/common"
 	"gogo/components/appctx"
@@ -17,7 +18,6 @@ import (
 	redisprovider "gogo/components/redis"
 	socketprovider "gogo/components/socketio"
 
-	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 	"go.opencensus.io/plugin/ochttp"
@@ -66,7 +66,14 @@ func New() *SnakeBattleServer {
 	cacheService := cacheprovider.NewCacheService(redisService.GetClient())
 	mailService := mailer.NewMailer(config.GetMailConfig())
 	hashService := hasher.NewHashService()
-	socketService := socketprovider.NewSocketProvider()
+	socketService := socketprovider.NewSocketProvider(
+		socketprovider.WithRedisAdapter(&socketprovider.SocketRedisAdapterConfig{
+			Addr:     configRedis.Addr,
+			Password: configRedis.Password,
+			Prefix:   "socketio",
+		}),
+		socketprovider.WithWebsocketTransport,
+	)
 
 	appCtx := appctx.NewAppContext(
 		dbprovider.GetDBConnection(),
@@ -83,10 +90,7 @@ func New() *SnakeBattleServer {
 		hashService,
 	)
 
-	ginEngine := gin.Default()
-	corsConfig := cors.DefaultConfig()
-	corsConfig.AllowAllOrigins = true
-	ginEngine.Use(cors.New(corsConfig))
+	ginEngine := gin.New()
 	ginEngine.Use(middleware.ErrorHandler(appCtx))
 	ginEngine.Use(middleware.SetAppContextIntoRequest(appCtx))
 
@@ -97,6 +101,7 @@ func New() *SnakeBattleServer {
 }
 
 func (s *SnakeBattleServer) Start() {
+
 	// create routers
 	s.createMainRoutes()
 
@@ -107,6 +112,15 @@ func (s *SnakeBattleServer) Start() {
 	trace.RegisterExporter(s.appCtx.GetJaegerService().GetExporter())
 	trace.ApplyConfig(trace.Config{DefaultSampler: trace.ProbabilitySampler(1)})
 
+	// serve socket
+	go s.appCtx.GetSocketService().Serve()
+	defer s.appCtx.GetSocketService().Close()
+
 	// listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
 	http.ListenAndServe(fmt.Sprintf(":%d", s.appCtx.GetConfig().Server.Port), &ochttp.Handler{Handler: s.ginEngine})
+}
+
+func (s *SnakeBattleServer) Shutdown(ctx context.Context) error {
+	s.appCtx.GetSocketService().Close()
+	return nil
 }

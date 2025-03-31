@@ -65,6 +65,7 @@ const (
 	GameEventMove        = "move"
 	GameEventPlayerState = "player_state" // For broadcasting full player states
 	GameEventChat        = "chat"
+	GameEventConnect     = "connect"
 	GameEventReconnect   = "reconnect"
 	GameEventDisconnect  = "disconnect"
 )

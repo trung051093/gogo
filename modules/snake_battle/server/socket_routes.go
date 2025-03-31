@@ -1,16 +1,19 @@
 package server
 
 import (
-	"context"
-	"gogo/modules/snake_battle/service"
+	"gogo/modules/snake_battle/middleware"
 
 	"github.com/gin-gonic/gin"
 )
 
 func (s *SnakeBattleServer) createSocketRoutes() {
-	socketSvc := s.appCtx.GetSocketService()
-	gameSvc := service.NewGameService(s.appCtx)
-	gameSvc.GameSocketListener(context.Background())
-	s.ginEngine.GET("/socket.io/*any", gin.WrapH(socketSvc.GetServer()))
-	s.ginEngine.POST("/socket.io/*any", gin.WrapH(socketSvc.GetServer()))
+	socketService := s.appCtx.GetSocketService()
+	socketServer := socketService.GetServer()
+
+	socketRoute := s.ginEngine.Group("/socket.io")
+	{
+		socketRoute.Use(middleware.CorsMiddleware("*"))
+		socketRoute.GET("/*any", gin.WrapH(socketServer))
+		socketRoute.POST("/*any", gin.WrapH(socketServer))
+	}
 }
