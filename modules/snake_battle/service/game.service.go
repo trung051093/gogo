@@ -16,7 +16,7 @@ import (
 
 type GameService interface {
 	CreateRoom(ctx context.Context, req *dto.CreateRoomReq) (*dto.CreateRoomRes, error)
-	GameSocketListener(ctx context.Context) error
+	GameSocketListener(ctx context.Context)
 }
 
 type gameService struct {
@@ -46,15 +46,11 @@ func NewGameService(appCtx appctx.AppContext) GameService {
 }
 
 func (s *gameService) CreateRoom(ctx context.Context, req *dto.CreateRoomReq) (*dto.CreateRoomRes, error) {
-	roomCode := s.hashService.GenerateRandomString(10)
-	room := &entity.Room{
-		RoomCode:   roomCode,
+	room, err := s.roomRepo.Create(ctx, &entity.Room{
+		RoomCode:   s.hashService.GenerateRandomString(10),
 		MaxPlayers: *req.MaxPlayers,
-	}
-
-	if _, err := s.roomRepo.Create(ctx, room); err != nil {
-		return nil, err
-	}
+	})
+	common.PanicIf(err != nil, common.ErrorCannotCreateEntity("room", err))
 
 	return &dto.CreateRoomRes{
 		Room: *room,
@@ -62,7 +58,7 @@ func (s *gameService) CreateRoom(ctx context.Context, req *dto.CreateRoomReq) (*
 }
 
 // --- Socket Event Listener Registration ---
-func (s *gameService) GameSocketListener(ctx context.Context) error {
+func (s *gameService) GameSocketListener(ctx context.Context) {
 	defer common.Recovery()
 
 	socketService := s.appCtx.GetSocketService()
@@ -134,6 +130,4 @@ func (s *gameService) GameSocketListener(ctx context.Context) error {
 		conn.Emit(entity.GameEventMove, req)
 		conn.Emit(entity.GameEventReply, dto.Reply{Ok: true, Ref: req.Ref})
 	})
-
-	return nil
 }

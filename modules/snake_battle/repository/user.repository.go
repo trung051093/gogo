@@ -7,26 +7,17 @@ import (
 	"gorm.io/gorm"
 )
 
-// User corresponds to the users table
-type User struct {
-	entity.User
-}
-
-func (User) TableName() string {
-	return entity.User{}.TableName()
-}
-
 type UserRepository interface {
-	common.Repository[User]
+	common.Repository[entity.User]
 	// Add other specific user methods if needed, e.g., FindByUsername
 }
 
 type userRepository struct {
-	common.Repository[User]
+	common.Repository[entity.User]
 }
 
 func NewUserRepository(db *gorm.DB) UserRepository {
-	repo := common.NewRepository[User](db)
+	repo := common.NewRepository[entity.User](db)
 	// Set preloads if needed
 	return &userRepository{repo}
 }

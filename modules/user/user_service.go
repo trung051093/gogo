@@ -25,7 +25,7 @@ func NewUserService(
 	appConfig *appctx.Config,
 	esService esprovider.ElasticSearchSevice,
 ) UserService {
-	service := common.NewService[usermodel.User, UserRepository](repo)
+	service := common.NewService(repo)
 	return &userService{service, appConfig, esService}
 }
 
